@@ -2,11 +2,13 @@
 import React from 'react';
 import { LucideStar, LucideCheckCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useTranslation } from '@/context/LanguageContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { CONFIG } from '@/lib/config';
 
 export function AboutView() {
   const { addToCart } = useCart();
+  const { t } = useTranslation();
 
   const handleContact = () => {
     window.open(`https://wa.me/${CONFIG.CONTACT.WHATSAPP.replace(/\s+/g, '')}?text=Hola,%20quisiera%20saber%20m%C3%A1s%20sobre%20su%20historia.`);
@@ -19,9 +21,9 @@ export function AboutView() {
       <div className="bg-stone-900 text-white py-32 px-6 text-center relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
         <div className="relative z-10 animate-in slide-in-from-bottom-8 duration-1000">
-          <span className="text-terracotta-400 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block">Nuestra Esencia</span>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6">Nuestra Historia</h1>
-          <p className="text-stone-400 max-w-xl mx-auto text-lg font-light">Hilos que unen generaciones en el corazón de Contumazá.</p>
+          <span className="text-terracotta-400 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block">{t('about.essence')}</span>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6">{t('about.title')}</h1>
+          <p className="text-stone-400 max-w-xl mx-auto text-lg font-light">{t('about.subtitle')}</p>
         </div>
       </div>
       
@@ -30,15 +32,13 @@ export function AboutView() {
            <div className="animate-in slide-in-from-left-8 duration-1000">
              <div className="flex items-center gap-3 mb-6">
                <span className="h-[1.5px] w-12 bg-terracotta-500"></span>
-               <span className="text-terracotta-600 font-bold tracking-widest text-xs uppercase">El Legado</span>
+               <span className="text-terracotta-600 font-bold tracking-widest text-xs uppercase">{t('about.legacy_tag')}</span>
              </div>
-             <h2 className="text-4xl font-bold text-stone-900 mb-8 font-serif leading-tight">La Tradición del <br/><span className="italic text-terracotta-600">Punto y Alma</span></h2>
+             <h2 className="text-4xl font-bold text-stone-900 mb-8 font-serif leading-tight" dangerouslySetInnerHTML={{ __html: t('about.legacy_title') }}></h2>
              <p className="text-lg text-stone-600 leading-relaxed mb-6 font-light">
-               En las alturas de Contumazá, tejer no es solo un oficio, es una forma de contar historias. Desde niñas, aprendemos a entrelazar hilos mirando la neblina bajar por el cerro El Calvario, heredando técnicas que han pasado de madres a hijas por siglos.
+               {t('about.p1')}
              </p>
-             <p className="text-lg text-stone-600 leading-relaxed font-light">
-               Cada pieza que encuentras en <strong>Tapetes.pe</strong> lleva horas de dedicación, paciencia y la esperanza de mujeres emprendedoras que buscan sacar adelante a sus familias honrando su identidad.
-             </p>
+             <p className="text-lg text-stone-600 leading-relaxed font-light" dangerouslySetInnerHTML={{ __html: t('about.p2') }} />
            </div>
            <div className="relative group">
              <div className="absolute -inset-4 bg-stone-100 rounded-[3rem] -rotate-3 transition-transform group-hover:rotate-0 duration-700"></div>
@@ -55,19 +55,19 @@ export function AboutView() {
              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-stone-100 flex items-center justify-center mx-auto mb-8 text-terracotta-600">
                <LucideStar size={32} />
              </div>
-             <h3 className="text-3xl font-bold text-stone-900 mb-6 font-serif">Compromiso Ético & Social</h3>
+             <h3 className="text-3xl font-bold text-stone-900 mb-6 font-serif">{t('about.ethics.title')}</h3>
              <p className="text-xl text-stone-600 max-w-2xl mx-auto mb-12 font-light">
-               Al elegir una pieza de nuestra colección, no solo decoras tu hogar; estás apoyando directamente el comercio justo y el empoderamiento de la mujer rural peruana.
+               {t('about.ethics.desc')}
              </p>
              
              <div className="grid sm:grid-cols-2 gap-8 mb-12 max-w-2xl mx-auto">
                 <div className="flex items-center gap-4 text-left p-6 bg-white rounded-2xl border border-stone-200/50">
                    <LucideCheckCircle className="text-green-600 shrink-0" size={24}/>
-                   <span className="font-bold text-stone-800">Pago Directo 100%</span>
+                   <span className="font-bold text-stone-800">{t('about.ethics.pay')}</span>
                 </div>
                 <div className="flex items-center gap-4 text-left p-6 bg-white rounded-2xl border border-stone-200/50">
                    <LucideCheckCircle className="text-green-600 shrink-0" size={24}/>
-                   <span className="font-bold text-stone-800">Autenticidad Garantizada</span>
+                   <span className="font-bold text-stone-800">{t('about.ethics.auth')}</span>
                 </div>
              </div>
 
@@ -75,7 +75,7 @@ export function AboutView() {
                 onClick={handleContact} 
                 className="bg-stone-900 text-white px-12 py-5 rounded-full font-bold hover:bg-terracotta-600 transition-all duration-300 shadow-xl transform hover:-translate-y-1"
              >
-               Escríbenos por WhatsApp
+               {t('about.ethics.cta')}
              </button>
            </div>
         </div>

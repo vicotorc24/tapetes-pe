@@ -154,8 +154,15 @@ export function LegacyManager({ setFeedback }) {
                 value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
                 <option>Historia</option>
                 <option>Poetas</option>
+                <option>Literatura</option>
                 <option>Arqueología</option>
+                <option>Música</option>
+                <option>Pintura</option>
+                <option>Educación</option>
+                <option>Religión</option>
+                <option>Política</option>
                 <option>Artesanía</option>
+                <option>Ciencia</option>
                 <option>Otros</option>
               </select>
             </div>

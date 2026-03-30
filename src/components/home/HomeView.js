@@ -271,7 +271,7 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
                    type="text" 
                    value={searchTerm}
                    onChange={(e) => onSearch?.(e.target.value)}
-                   placeholder="Buscar tapetes, manteles o artesanas..." 
+                   placeholder={t('catalog.search_placeholder')} 
                    className="w-full pl-12 pr-12 py-4 bg-stone-50 border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition-all text-sm font-medium text-stone-900 placeholder:text-stone-400"
                  />
                  {searchTerm && (
@@ -284,14 +284,14 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
                  )}
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
-                 <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mr-2 whitespace-nowrap">Categorías:</span>
-                 {['Todos', 'Mesa', 'Decoración', 'Accesorios'].map(cat => (
+                 <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mr-2 whitespace-nowrap">{t('catalog.categories_label')}</span>
+                 {[{id: 'Todos', label: t('catalog.cat_all')}, {id: 'Mesa', label: t('catalog.cat_table')}, {id: 'Decoración', label: t('catalog.cat_decor')}, {id: 'Accesorios', label: t('catalog.cat_acc')}].map(cat => (
                    <button 
-                     key={cat} 
-                     onClick={() => { onSearch?.(''); onSelectCategory?.(cat); onSelectCollection?.(null); }} 
-                     className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${cat === activeCategory && !activeCol ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
+                     key={cat.id} 
+                     onClick={() => { onSearch?.(''); onSelectCategory?.(cat.id); onSelectCollection?.(null); }} 
+                     className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${cat.id === activeCategory && !activeCol ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
                    >
-                     {cat}
+                     {cat.label}
                    </button>
                  ))}
               </div>
@@ -382,7 +382,7 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
                <LucidePlus size={48} className="rotate-45" />
             </div>
             <h3 className="text-3xl font-serif font-black text-stone-900 mb-4 italic">
-              {searchTerm ? `No encontramos resultados para "${searchTerm}"` : 'Próximamente más tesoros'}
+              {searchTerm ? `${t('catalog.no_search')} "${searchTerm}"` : t('catalog.future')}
             </h3>
             <p className="text-stone-500 max-w-md mb-10 font-light text-lg">
               {searchTerm 

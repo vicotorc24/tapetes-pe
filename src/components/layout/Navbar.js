@@ -87,7 +87,7 @@ export function Navbar() {
                </Link>
                
                <button onClick={() => { setLanguage(language === 'es' ? 'en' : 'es'); }} className="w-full border border-stone-200 py-6 rounded-2xl flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em] font-bold text-stone-500 active:bg-stone-50 transition-colors">
-                  <LucideGlobe size={18} /> Idioma: {language.toUpperCase()}
+                  <LucideGlobe size={18} /> {t('nav.language')}: {language.toUpperCase()}
                </button>
             </div>
           </div>
@@ -101,9 +101,7 @@ export function Navbar() {
           className="block w-full bg-stone-900 overflow-hidden relative group transition-all"
         >
           <div className="absolute inset-0 bg-stone-900 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-          <p className="relative z-10 text-white text-[10px] font-bold text-center py-2 tracking-[0.2em] uppercase transition-colors">
-            ✨ ¿Tejes un legado? Únete a nuestra comunidad de artesanas • <span className="underline decoration-white/50">Postula aquí</span> ✨
-          </p>
+          <p className="relative z-10 text-white text-[10px] font-bold text-center py-2 tracking-[0.2em] uppercase transition-colors" dangerouslySetInnerHTML={{ __html: t('nav.banner') }} />
         </Link>
         <nav className="bg-white/95 backdrop-blur-md border-b border-stone-100 h-20 flex items-center transition-all duration-500 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 w-full flex justify-between items-center text-stone-900">
@@ -114,7 +112,7 @@ export function Navbar() {
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-serif font-black tracking-tighter leading-none">Tapetes<span className="text-terracotta-600">.</span>pe</span>
-                <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-bold font-sans mt-0.5 group-hover:text-terracotta-600 transition-colors">Artesanía de Contumazá</span>
+                <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-bold font-sans mt-0.5 group-hover:text-terracotta-600 transition-colors">{t('nav.slogan')}</span>
               </div>
             </Link>
             <div className="hidden lg:flex items-center space-x-8 text-[13px] font-bold tracking-wide uppercase">
@@ -130,7 +128,26 @@ export function Navbar() {
               </Link>
               <Link href="/unete" className="hover:text-terracotta-600 transition-colors">{t('nav.join')}</Link>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 md:gap-6">
+              {/* Desktop Language Switcher */}
+              <button 
+                onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+                className="hidden lg:flex items-center gap-1.5 text-stone-500 hover:text-terracotta-600 font-bold uppercase tracking-widest text-[11px] transition-colors border border-stone-200 px-3 py-1.5 rounded-full hover:border-terracotta-200"
+                aria-label="Cambiar Idioma"
+              >
+                <LucideGlobe size={14} />
+                {language}
+              </button>
+              
+              {/* Desktop Login Link */}
+              <Link 
+                href={user ? "/admin" : "/login"} 
+                className="hidden lg:flex items-center gap-1.5 text-stone-500 hover:text-terracotta-600 font-bold uppercase tracking-widest text-[11px] transition-colors"
+                title={user ? t('nav.dashboard') : t('nav.admin')}
+              >
+                <LucideUser size={18} />
+                <span className="hidden xl:inline">{user ? t('nav.dashboard') : t('nav.admin')}</span>
+              </Link>
               <button className="relative p-2 text-stone-800 hover:text-terracotta-600 transition-all group" onClick={() => setIsCartOpen(true)}>
                 <LucideShoppingCart className="group-hover:scale-110 transition-transform" size={24} />
                 {cartCount > 0 && (

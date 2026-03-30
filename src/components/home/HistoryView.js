@@ -50,7 +50,7 @@ export function HistoryView() {
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-24">
         
         {loading ? (
-          <div className="py-20 text-center text-stone-400 italic animate-pulse">Cargando legado cultural...</div>
+          <div className="py-20 text-center text-stone-400 italic animate-pulse">{t('history.loading')}</div>
         ) : (
           <>
             {/* Featured Section (Walter Alva or first personality) */}
@@ -70,7 +70,7 @@ export function HistoryView() {
                   <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">{featured.name}</h2>
                   <div className="space-y-4 text-stone-600 leading-relaxed">
                     <div className="text-lg line-clamp-6 prose prose-stone lg:prose-lg" dangerouslySetInnerHTML={{ __html: featured.description }} />
-                    <button onClick={() => goToPersonality(featured.slug)} className="text-andeansky-700 font-bold hover:underline">Seguir leyendo →</button>
+                    <button onClick={() => goToPersonality(featured.slug)} className="text-andeansky-700 font-bold hover:underline">{t('history.read_more')}</button>
                   </div>
                 </div>
               </section>
@@ -102,7 +102,7 @@ export function HistoryView() {
             {/* Other Personalities Grid */}
             {others.length > 0 && (
               <section className="space-y-8">
-                <h3 className="text-2xl font-serif text-stone-900 text-center">Otras figuras notables</h3>
+                <h3 className="text-2xl font-serif text-stone-900 text-center">{t('history.others')}</h3>
                 <div className="grid md:grid-cols-3 gap-6">
                   {others.map(p => (
                     <div key={p.id} onClick={() => goToPersonality(p.slug)} className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-andeansky-200 shadow-sm hover:shadow-md transition cursor-pointer group">
@@ -137,9 +137,9 @@ export function HistoryView() {
                 <img src="/images/landmarks/plaza_armas.jpg" className="w-full h-full object-cover rounded-bl-full" alt="Plaza de Armas de Contumazá" />
               </div>
               <LucideMountain className="text-textilemagenta-700 mb-4" size={32} />
-              <h3 className="text-xl font-serif font-bold text-textilemagenta-900 mb-3">Nido de Cóndores</h3>
+              <h3 className="text-xl font-serif font-bold text-textilemagenta-900 mb-3">{t('history.condor.title')}</h3>
               <p className="text-textilemagenta-800/80 leading-relaxed">
-                A 2675 m.s.n.m, Contumazá es un balcón hacia los Andes. Su geografía moldea el carácter de su gente: fuerte, resiliente y profundamente conectada con la tierra y sus tradiciones.
+                {t('history.condor.desc')}
               </p>
            </div>
         </section>

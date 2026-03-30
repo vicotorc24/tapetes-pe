@@ -18,7 +18,7 @@ export function Footer({ onOpenInfo, onCategory, onAbout, onHistory, onImpact })
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-serif font-black tracking-tighter leading-none text-white">Tapetes<span className="text-terracotta-600">.</span>pe</span>
-              <span className="text-[9px] uppercase tracking-[0.3em] text-stone-500 font-bold font-sans mt-0.5">Artesanía de Contumazá</span>
+              <span className="text-[9px] uppercase tracking-[0.3em] text-stone-500 font-bold font-sans mt-0.5">{t('footer.slogan')}</span>
             </div>
           </div>
           
@@ -40,16 +40,16 @@ export function Footer({ onOpenInfo, onCategory, onAbout, onHistory, onImpact })
             <li><button onClick={() => onCategory('Todos')} className="hover:text-terracotta-500 transition-colors text-left flex items-center gap-2 group">{t('nav.catalog')} <div className="w-1 h-1 bg-terracotta-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div></button></li>
             <li><button onClick={onAbout} className="hover:text-terracotta-500 transition-colors text-left flex items-center gap-2 group">{t('nav.story')} <div className="w-1 h-1 bg-terracotta-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div></button></li>
             <li><button onClick={onHistory} className="hover:text-terracotta-500 transition-colors text-left flex items-center gap-2 group">{t('nav.heritage')} <div className="w-1 h-1 bg-terracotta-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div></button></li>
-            <li><button onClick={onImpact} className="text-terracotta-500 font-bold hover:text-white transition-colors text-left italic">Impacto Social</button></li>
+            <li><button onClick={onImpact} className="text-terracotta-500 font-bold hover:text-white transition-colors text-left italic">{t('footer.impact')}</button></li>
           </ul>
         </div>
 
         <div>
           <h4 className="text-white font-bold mb-8 uppercase text-[10px] tracking-[0.3em]">{t('footer.help')}</h4>
           <ul className="space-y-4 text-sm font-medium">
-            <li><button onClick={() => onOpenInfo('envios')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideTruck size={18} className="text-stone-600"/> Envíos</button></li>
-            <li><button onClick={() => onOpenInfo('cuidado')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideHeart size={18} className="text-stone-600"/> Cuidado</button></li>
-            <li><button onClick={() => onOpenInfo('preguntas')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideHelpCircle size={18} className="text-stone-600"/> FAQ</button></li>
+            <li><button onClick={() => onOpenInfo('envios')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideTruck size={18} className="text-stone-600"/> {t('footer.shipping')}</button></li>
+            <li><button onClick={() => onOpenInfo('cuidado')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideHeart size={18} className="text-stone-600"/> {t('footer.care')}</button></li>
+            <li><button onClick={() => onOpenInfo('preguntas')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideHelpCircle size={18} className="text-stone-600"/> {t('footer.faq')}</button></li>
           </ul>
         </div>
 
@@ -79,11 +79,11 @@ export function Footer({ onOpenInfo, onCategory, onAbout, onHistory, onImpact })
       </div>
 
       <div className="border-t border-stone-800/50 pt-10 max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center text-[11px] font-bold tracking-widest uppercase opacity-40 gap-8">
-        <p>© 2024 {CONFIG.BRAND.NAME} • Legado Ancestral</p>
+        <p>© 2024 {CONFIG.BRAND.NAME} • {t('footer.legacy')}</p>
         <div className="flex items-center gap-3">
-           <span className="opacity-60">Respaldado por la</span>
+           <span className="opacity-60">{t('footer.backed_by')}</span>
            <a href={CONFIG.EXTERNAL_LINKS.MUNICIPALITY} target="_blank" rel="noopener noreferrer" className="text-white hover:text-terracotta-500 transition-colors decoration-terracotta-500/30 underline underline-offset-4">
-             Municipalidad Provincial de Contumazá
+             {t('footer.municipality')}
            </a>
         </div>
       </div>
