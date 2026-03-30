@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { LucideStar, LucideCheckCircle } from 'lucide-react';
+import { LucideStar, LucideCheckCircle, LucideMapPin } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { Navbar } from '@/components/layout/Navbar';
@@ -46,6 +46,28 @@ export function AboutView() {
                <img src="/images/hero_authentic.png" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt="Artesanas de Contumazá"/>
              </div>
            </div>
+        </div>
+
+        {/* Map Section */}
+        <div className="mb-24 animate-in slide-in-from-bottom-8 duration-1000">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-stone-100 flex items-center justify-center mx-auto mb-6 text-terracotta-600">
+               <LucideMapPin size={32} />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-serif">Nuestra Tierra</h2>
+            <p className="text-xl text-stone-600 font-light">Contumazá, Cajamarca, Perú. A 2,675 m.s.n.m, en el balcón hacia los Andes.</p>
+          </div>
+          
+          <div className="rounded-[3rem] overflow-hidden shadow-2xl border border-stone-200/50 h-[500px] w-full relative z-10 bg-stone-100">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126685.2343!2d-78.8953046!3d-7.362624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91b2c4c237a8fb73%3A0xe6aaadd52b61ff61!2sContumaz%C3%A1%2C%20Peru!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" 
+              className="absolute inset-0 w-full h-full"
+              style={{border: 0}} 
+              allowFullScreen="" 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
         </div>
         
         <div className="bg-stone-50 p-12 md:p-20 rounded-[3rem] text-center border border-stone-100 relative overflow-hidden">
