@@ -27,14 +27,14 @@ export function HistoryView() {
   };
 
   return (
-    <div className="pt-20 animate-in fade-in">
+    <div className="animate-in fade-in">
       {/* Hero Section con Mirador Real */}
       <div className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-stone-900 border-b-8 border-terracotta-500 group">
         <div className="absolute inset-0 z-0">
            <img 
-             src="/images/landmarks/ermita.jpg" 
+             src="/images/landmarks/plaza_armas.jpg" 
              className="w-full h-full object-cover opacity-60 scale-105 group-hover:scale-100 transition-transform duration-[5000ms]" 
-             alt="Mirador La Ermita Contumazá"
+             alt="Plaza de Armas de Contumazá"
            />
            <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/40"></div>
         </div>
