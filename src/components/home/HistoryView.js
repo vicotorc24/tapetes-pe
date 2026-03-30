@@ -69,7 +69,7 @@ export function HistoryView() {
                   <span className="text-andeansky-700 font-bold text-[10px] uppercase tracking-widest bg-andeansky-50 px-3 py-1 rounded-full mb-3 inline-block">{featured.category}</span>
                   <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">{featured.name}</h2>
                   <div className="space-y-4 text-stone-600 leading-relaxed">
-                    <div className="text-lg line-clamp-6 prose prose-stone lg:prose-lg" dangerouslySetInnerHTML={{ __html: featured.description }} />
+                    <div className="text-lg line-clamp-6 prose prose-stone lg:prose-lg break-words w-full max-w-full overflow-hidden [&_*]:break-words [&_*]:max-w-full [&_*]:whitespace-normal" dangerouslySetInnerHTML={{ __html: featured.description?.replace(/&nbsp;/g, ' ') }} />
                     <button onClick={() => goToPersonality(featured.slug)} className="text-andeansky-700 font-bold hover:underline">{t('history.read_more')}</button>
                   </div>
                 </div>
@@ -90,8 +90,13 @@ export function HistoryView() {
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                        {poets.map((p) => (
-                         <button key={p.id} onClick={() => goToPersonality(p.slug)} className="bg-white px-5 py-2 rounded-full shadow-sm border border-stone-100 text-sm font-medium text-stone-800 hover:bg-orange-50 hover:border-orange-200 transition">
-                            {p.name}
+                         <button key={p.id} onClick={() => goToPersonality(p.slug)} className="bg-white p-1.5 pr-5 rounded-full shadow-sm border border-stone-100 text-sm font-medium text-stone-800 hover:bg-orange-50 hover:border-orange-200 transition flex items-center gap-3">
+                           {p.image ? (
+                             <img src={p.image} className="w-8 h-8 rounded-full object-cover shadow-sm bg-stone-100 border border-stone-200/50" alt={p.name} />
+                           ) : (
+                             <div className="w-8 h-8 rounded-full bg-stone-100 shadow-sm flex items-center justify-center text-stone-500 font-serif text-xs border border-stone-200/50">{(p.name || 'P')[0]}</div>
+                           )}
+                           {p.name}
                          </button>
                        ))}
                     </div>
@@ -111,7 +116,7 @@ export function HistoryView() {
                       </div>
                       <h4 className="font-bold text-stone-900 mb-1">{p.name}</h4>
                       <p className="text-xs text-stone-400 uppercase tracking-wider mb-3">{p.role}</p>
-                      <div className="text-sm text-stone-500 line-clamp-3 leading-relaxed prose prose-stone prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: p.description }} />
+                      <div className="text-sm text-stone-500 line-clamp-3 leading-relaxed prose prose-stone prose-sm break-words w-full max-w-full overflow-hidden [&_*]:break-words [&_*]:max-w-full [&_*]:whitespace-normal" dangerouslySetInnerHTML={{ __html: p.description?.replace(/&nbsp;/g, ' ') }} />
                     </div>
                   ))}
                 </div>

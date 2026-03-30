@@ -163,6 +163,7 @@ export function LegacyManager({ setFeedback }) {
                 <option>Política</option>
                 <option>Artesanía</option>
                 <option>Ciencia</option>
+                <option>Científico</option>
                 <option>Otros</option>
               </select>
             </div>

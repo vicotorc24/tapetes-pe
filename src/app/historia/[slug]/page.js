@@ -91,7 +91,7 @@ export default function PersonalityPage() {
 
           <div className="prose prose-stone lg:prose-xl max-w-none">
             <LucideQuote className="text-andeansky-100 mb-6" size={64} />
-            <div className="prose prose-stone lg:prose-xl max-w-none personality-bio break-words font-serif text-stone-700 leading-relaxed">
+            <div className="prose prose-stone lg:prose-xl w-full max-w-full overflow-hidden personality-bio break-words font-serif text-stone-700 leading-relaxed [&_*]:break-words [&_*]:max-w-full [&_*]:whitespace-normal">
               <div 
                 dangerouslySetInnerHTML={{ __html: personality.description?.replace(/&nbsp;/g, ' ') }} 
               />
