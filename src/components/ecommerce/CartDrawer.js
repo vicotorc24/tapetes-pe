@@ -26,7 +26,8 @@ export function CartDrawer() {
   const handleCheckout = () => {
     if (paymentMethod === 'whatsapp') {
       const text = `Hola, deseo adquirir: ${cart.map(i => i.title).join(', ')}. Total: S/${cartTotal}`;
-      window.open(`https://wa.me/51999999999?text=${encodeURIComponent(text)}`);
+      const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '51908513551';
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`);
     } else {
       alert("Redirigiendo a pasarela segura de MercadoPago... (Simulado)");
     }

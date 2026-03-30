@@ -4,13 +4,13 @@ import { getFirestore } from 'firebase/firestore';
 
 // NOTA: Reemplaza estos valores con tus credenciales reales de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDa9ZHlXv_4H0cJ9ec2eX-xnvfc21KKSTs",
-  authDomain: "tapetespe-prod.firebaseapp.com",
-  projectId: "tapetespe-prod",
-  storageBucket: "tapetespe-prod.firebasestorage.app",
-  messagingSenderId: "403347149122",
-  appId: "1:403347149122:web:5ca41e4d9d004aa86e38db",
-  measurementId: "G-XYPXX39BRD"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
