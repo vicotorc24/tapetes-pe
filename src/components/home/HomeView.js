@@ -1,19 +1,41 @@
 "use client";
 import React from 'react';
 import { useTranslation } from '../../context/LanguageContext';
-import { LucideCrown, LucidePlus, LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideX, History as LucideHistory } from 'lucide-react';
+import { LucideCrown, LucidePlus, LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideX, LucideSearch, History as LucideHistory } from 'lucide-react';
 
-export function HomeView({ products, activeCategory, collections = [], activeCollection, onSelectCollection, onViewProduct, onAddToCart, onExplore, onCustomOrder }) {
+export function HomeView({ products, activeCategory, collections = [], activeCollection, onSelectCollection, onSelectCategory, onViewProduct, onAddToCart, onExplore, onCustomOrder, searchTerm = '', onSearch }) {
   const { t } = useTranslation();
   
+  // Lógica de Filtrado Optimizada con Búsqueda
   let filteredProducts = products;
-  if (activeCollection) {
-    filteredProducts = products.filter(p => p.collection === activeCollection || p.collection === activeCollection?.id);
+  
+  // 1. Filtrar por Colección (Nombre o ID)
+  const activeCol = collections.find(c => 
+    c.id === activeCollection || 
+    c.name.toLowerCase() === activeCollection?.toString().toLowerCase()
+  );
+
+  if (activeCol) {
+    filteredProducts = filteredProducts.filter(p => 
+      p.collectionId === activeCol.id || 
+      p.collection === activeCol.name ||
+      p.collection === activeCol.id
+    );
   } else if (activeCategory !== 'Todos') {
-    filteredProducts = products.filter(p => p.category === activeCategory);
+    // 2. Filtrar por Categoría (solo si no hay colección activa para evitar "1 producto")
+    filteredProducts = filteredProducts.filter(p => p.category === activeCategory);
   }
 
-  const activeCollectionData = collections.find(c => c.id === activeCollection || c.name.toLowerCase().includes(activeCollection?.toLowerCase()));
+  // 3. Filtrar por Término de Búsqueda (Cualquier campo relevante)
+  if (searchTerm && searchTerm.trim() !== '') {
+    const query = searchTerm.toLowerCase().trim();
+    filteredProducts = filteredProducts.filter(p => 
+      p.title.toLowerCase().includes(query) || 
+      p.description.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query) ||
+      (p.sellerName && p.sellerName.toLowerCase().includes(query))
+    );
+  }
 
   return (
     <div>
@@ -238,62 +260,143 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
         </div>
       )}
 
-      <div id="catalog-section" className="max-w-6xl mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          {activeCollection ? (
-            <div className="inline-flex items-center gap-4 bg-terracotta-50 px-6 py-3 rounded-2xl mb-4 border border-terracotta-100">
-              <div className="text-left">
-                <span className="text-terracotta-700 font-bold text-xs uppercase tracking-widest block mb-1">Colección Seleccionada</span>
-                <h2 className="text-xl md:text-2xl font-bold text-stone-900 font-serif leading-tight">{activeCollectionData?.name || activeCollection}</h2>
+      <div id="catalog-section" className="max-w-6xl mx-auto px-4 py-8 md:py-24 animate-in fade-in duration-700">
+        
+        {/* Barra de Búsqueda y Navegación de Catálogo */}
+        <div className="mb-12 border-b border-stone-100 pb-8">
+           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="w-full md:max-w-md relative group">
+                 <LucideSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-terracotta-600 transition-colors" size={20} />
+                 <input 
+                   type="text" 
+                   value={searchTerm}
+                   onChange={(e) => onSearch?.(e.target.value)}
+                   placeholder="Buscar tapetes, manteles o artesanas..." 
+                   className="w-full pl-12 pr-12 py-4 bg-stone-50 border border-stone-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-500 transition-all text-sm font-medium text-stone-900 placeholder:text-stone-400"
+                 />
+                 {searchTerm && (
+                   <button 
+                     onClick={() => onSearch?.('')}
+                     className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-stone-200 rounded-full transition-colors text-stone-400"
+                   >
+                     <LucideX size={16} />
+                   </button>
+                 )}
               </div>
-              <button 
-                onClick={() => onSelectCollection?.(null)}
-                className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-terracotta-600 hover:bg-terracotta-600 hover:text-white transition shadow-sm ml-4"
-                title="Limpiar filtro de colección"
-              >
-                <LucideX size={20} />
-              </button>
-            </div>
-          ) : (
-            <>
-              <span className="text-andeansky-700 font-bold text-xs uppercase tracking-widest bg-andeansky-50 px-3 py-1 rounded-full mb-3 inline-block">{activeCategory === 'Todos' ? 'Catálogo General' : activeCategory}</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-stone-900 font-serif">{t('catalog.title')}</h2>
-            </>
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
+                 <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mr-2 whitespace-nowrap">Categorías:</span>
+                 {['Todos', 'Mesa', 'Decoración', 'Accesorios'].map(cat => (
+                   <button 
+                     key={cat} 
+                     onClick={() => { onSearch?.(''); onSelectCategory?.(cat); onSelectCollection?.(null); }} 
+                     className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${cat === activeCategory && !activeCol ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
+                   >
+                     {cat}
+                   </button>
+                 ))}
+              </div>
+           </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
+          <div>
+            {activeCol || searchTerm ? (
+              <div className="space-y-4">
+                <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-stone-400">
+                  <button onClick={() => { onSelectCollection?.(null); onSearch?.(''); }} className="hover:text-terracotta-600 transition-colors">Catálogo</button>
+                  <LucideArrowRight size={10} className="rotate-0" />
+                  <span className="text-stone-900">
+                    {searchTerm ? `Resultados para: "${searchTerm}"` : `Colección: ${activeCol?.name}`}
+                  </span>
+                </nav>
+                <div className="flex items-baseline gap-4">
+                   <h2 className="text-4xl md:text-5xl font-serif font-black text-stone-900 tracking-tight">
+                     {searchTerm ? 'Búsqueda' : activeCol?.name}
+                   </h2>
+                   <span className="text-sm font-bold text-stone-400 italic">({filteredProducts.length} {filteredProducts.length === 1 ? 'piezaúnica' : 'piezas'})</span>
+                </div>
+                {activeCol && <p className="text-stone-500 max-w-2xl font-light italic text-lg leading-relaxed">{activeCol.description || 'Una selección de piezas exclusivas tejidas con alma por nuestras maestras artesanas.'}</p>}
+              </div>
+            ) : (
+              <>
+                <span className="text-andeansky-700 font-bold text-[11px] uppercase tracking-[0.3em] bg-andeansky-50 px-4 py-1.5 rounded-full mb-6 inline-block leading-none border border-andeansky-100 shadow-sm animate-in zoom-in duration-500">
+                   {activeCategory === 'Todos' ? 'Nuestra Curaduría' : activeCategory}
+                </span>
+                <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-900 tracking-tighter leading-none mb-4">{t('catalog.title')}</h2>
+                <div className="w-24 h-1.5 bg-terracotta-500 rounded-full mb-4"></div>
+              </>
+            )}
+          </div>
+          
+          {(activeCol || searchTerm) && (
+            <button 
+               onClick={() => { onSelectCollection?.(null); onSearch?.(''); }}
+               className="bg-stone-900 text-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-terracotta-600 transition-all shadow-xl shadow-stone-900/10 transform active:scale-95 group"
+            >
+               <LucideX size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+               Limpiar Filtros
+            </button>
           )}
         </div>
 
 
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
             {filteredProducts.map(p => (
-              <div key={p.id} className={`group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 cursor-pointer border flex flex-col h-full relative ${p.isPromoted ? 'border-textilemagenta-500 ring-1 ring-textilemagenta-100' : 'border-stone-100'}`} onClick={() => onViewProduct(p)}>
+              <div key={p.id} className={`group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border flex flex-col h-full relative ${p.isPromoted ? 'border-terracotta-200 ring-4 ring-terracotta-50' : 'border-stone-100 hover:border-terracotta-100'}`} onClick={() => onViewProduct(p)}>
                 {p.isPromoted && (
-                  <div className="absolute top-3 right-3 z-10 bg-textilemagenta-500 text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
+                  <div className="absolute top-4 right-4 z-10 bg-terracotta-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg uppercase tracking-widest">
                     <LucideCrown size={12} fill="white"/> {t('catalog.featured')}
                   </div>
                 )}
-                <div className="relative aspect-square overflow-hidden bg-stone-100">
-                  <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" onError={(e) => {e.target.src = 'https://placehold.co/400?text=Tapete'}}/>
-                  <button onClick={(e) => { e.stopPropagation(); onAddToCart(p); }} className="absolute bottom-3 right-3 bg-white text-andeansky-700 p-3 rounded-full shadow-lg translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition hover:bg-andeansky-700 hover:text-white">
-                    <LucidePlus size={20} strokeWidth={3} />
+                <div className="relative aspect-square overflow-hidden bg-stone-50">
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" onError={(e) => {e.target.src = 'https://placehold.co/400?text=Tapete'}}/>
+                  <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/20 transition-colors duration-500"></div>
+                  <button onClick={(e) => { e.stopPropagation(); onAddToCart(p); }} className="absolute bottom-6 right-6 bg-white text-stone-900 p-4 rounded-2xl shadow-2xl translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 hover:bg-stone-900 hover:text-white transform active:scale-90">
+                    <LucidePlus size={24} strokeWidth={2.5} />
                   </button>
                 </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <h3 className="text-lg font-bold text-stone-800 mb-0.5 group-hover:text-andeansky-700 transition">{p.title}</h3>
-                  <p className="text-[11px] text-terracotta-600 font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <LucideUsers size={12} /> Artesana: {p.sellerName || 'Contumazina'}
-                  </p>
-                  <p className="text-sm text-stone-500 line-clamp-2 mb-4 flex-1 font-light leading-relaxed">{p.description}</p>
-                  <div className="flex items-center justify-between pt-4 border-t border-stone-50 mt-auto">
-                    <span className="text-xl font-bold text-stone-900">S/ {p.price}</span>
-                    <span className="text-xs text-andeansky-700 font-bold bg-andeansky-50 px-2 py-1 rounded-md">{t('catalog.view')}</span>
+                <div className="p-8 flex-1 flex flex-col">
+                  <div className="mb-4">
+                    <h3 className="text-xl font-serif font-bold text-stone-900 mb-1 group-hover:text-terracotta-600 transition-colors">{p.title}</h3>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 bg-terracotta-500 rounded-full"></span>
+                       {p.sellerName || 'Maestra Contumazina'}
+                    </p>
+                  </div>
+                  <p className="text-sm text-stone-500 line-clamp-2 mb-6 flex-1 font-light leading-relaxed italic">"{p.description}"</p>
+                  <div className="flex items-center justify-between pt-6 border-t border-stone-50 mt-auto">
+                    <div>
+                      <p className="text-[9px] font-bold text-stone-400 uppercase tracking-widest mb-0.5">Precio de Origen</p>
+                      <span className="text-2xl font-black text-stone-900">S/ {p.price}</span>
+                    </div>
+                    <span className="text-[10px] text-terracotta-600 font-black uppercase tracking-widest bg-terracotta-50 px-4 py-2 rounded-xl group-hover:bg-terracotta-600 group-hover:text-white transition-all">Ver Detalle</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-stone-400">{t('catalog.empty')}</div>
+          <div className="py-32 flex flex-col items-center text-center animate-in fade-in zoom-in duration-700">
+            <div className="w-24 h-24 bg-stone-100 rounded-[2rem] flex items-center justify-center text-stone-300 mb-8 transform -rotate-6">
+               <LucidePlus size={48} className="rotate-45" />
+            </div>
+            <h3 className="text-3xl font-serif font-black text-stone-900 mb-4 italic">
+              {searchTerm ? `No encontramos resultados para "${searchTerm}"` : 'Próximamente más tesoros'}
+            </h3>
+            <p className="text-stone-500 max-w-md mb-10 font-light text-lg">
+              {searchTerm 
+                ? 'Intenta con términos más generales como "mantel", "mesa" o busca el nombre de una artesana.' 
+                : 'Estamos tejiendo nuevas piezas para esta colección especial. Mientras tanto, te invitamos a explorar nuestra curaduría completa.'}
+            </p>
+            <button 
+              onClick={() => { onSelectCollection?.(null); onSearch?.(''); }}
+              className="bg-stone-900 text-white px-12 py-5 rounded-full font-bold hover:bg-terracotta-600 transition-all shadow-2xl flex items-center gap-4 group"
+            >
+              {searchTerm ? 'Limpiar Búsqueda' : 'Ver Todo el Catálogo'}
+              <LucideArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+            </button>
+          </div>
         )}
       </div>
 

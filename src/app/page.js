@@ -21,6 +21,7 @@ export default function HomePage() {
   const [collectionsData, setCollectionsData] = useState([]);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [activeCollection, setActiveCollection] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -55,6 +56,9 @@ export default function HomePage() {
       collections={collectionsData}
       activeCollection={activeCollection}
       onSelectCollection={handleSelectCollection}
+      onSelectCategory={setActiveCategory}
+      searchTerm={searchTerm}
+      onSearch={setSearchTerm}
       onViewProduct={handleViewProduct} 
       onAddToCart={addToCart}
       onExplore={() => {
