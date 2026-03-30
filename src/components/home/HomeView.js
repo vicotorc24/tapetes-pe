@@ -17,8 +17,8 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
 
   return (
     <div>
-      {/* Hero Section Auténtico Renovado */}
-      <div className="relative bg-[#FCFBFA] py-24 md:py-36 border-b border-stone-100 overflow-hidden group">
+      {/* Hero Section Auténtico Renovado - Fondo ajustado para contraste con Nav */}
+      <div className="relative bg-stone-50 py-24 md:py-36 border-b border-stone-100 overflow-hidden group">
         <div className="max-w-7xl mx-auto px-8 lg:px-12 relative z-10 grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <span className="text-terracotta-600 font-bold text-[10px] md:text-xs uppercase tracking-[0.4em] mb-6 block drop-shadow-sm">{t('hero.subtitle')}</span>
@@ -60,30 +60,55 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-terracotta-50/40 rounded-full blur-[100px] pointer-events-none"></div>
       </div>
 
-      {/* Banner de Campaña: Semana Santa (Estilo Premium Granate Restaurado) */}
+      {/* Banner de Campaña: Semana Santa (Restaurado por preferencia del usuario) */}
       {!activeCollection && (
         <div className="bg-textilemagenta-900 text-white overflow-hidden relative border-y-8 border-terracotta-500 group">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-stretch justify-between">
-            <div className="p-10 md:p-16 flex-1 text-center md:text-left z-10 flex flex-col justify-center">
-              <span className="text-wheat-500 font-bold tracking-widest text-sm uppercase mb-2 block animate-in fade-in slide-in-from-left-4 duration-500">Tradición & Fe</span>
-              <h2 className="text-4xl md:text-6xl font-serif font-bold mb-4 text-white drop-shadow-md">Colección Semana Santa</h2>
-              <p className="text-textilemagenta-100 text-lg mb-8 max-w-lg font-light leading-relaxed">Viste tu mesa y tu hogar con nuestra colección especial dedicada a la devoción de nuestro pueblo. Llevemos el arte del tejido a tu celebración santificada.</p>
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch justify-between">
+            <div className="p-12 md:p-20 flex-1 text-center md:text-left z-10 flex flex-col justify-center">
+              <span className="text-wheat-500 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block animate-in fade-in slide-in-from-left-4 duration-500">Tradición & Fe</span>
+              <h2 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white leading-tight drop-shadow-md">Colección Semana Santa</h2>
+              <p className="text-textilemagenta-100 text-lg mb-10 max-w-xl font-light leading-relaxed">
+                Viste tu mesa y tu hogar con nuestra colección especial dedicada a la devoción de nuestro pueblo. Llevemos el arte del tejido a tu celebración santificada.
+              </p>
               <div>
                 <button 
                   onClick={() => onSelectCollection?.('Semana Santa')} 
-                  className="bg-wheat-500 text-textilemagenta-900 px-10 py-4 rounded-full font-bold hover:bg-white transition-all transform hover:scale-105 shadow-xl"
+                  className="bg-wheat-500 text-textilemagenta-900 px-12 py-5 rounded-full font-bold hover:bg-white transition-all transform hover:-translate-y-1 shadow-2xl"
                 >
-                  Explorar el Legado
+                  Explorar la Colección
                 </button>
               </div>
             </div>
-            <div className="md:w-1/2 w-full h-80 md:h-auto min-h-[400px] relative overflow-hidden">
+            <div className="md:w-1/2 w-full h-[400px] md:h-auto relative overflow-hidden">
               <img 
                 src="/images/semanasanta.webp" 
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100" 
                 alt="Semana Santa Contumazá Real"
               />
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-textilemagenta-900/40 to-textilemagenta-900"></div>
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-textilemagenta-900/60 to-textilemagenta-900"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Banner de Campaña Secundaria: Herencia Viva */}
+      {!activeCollection && (
+        <div className="bg-stone-900 text-white overflow-hidden relative border-b-8 border-stone-800 group">
+          <div className="max-w-7xl mx-auto px-8 py-20 flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="max-w-2xl">
+              <span className="text-terracotta-400 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block">Legado Contumacino</span>
+              <h2 className="text-4xl font-serif font-bold mb-6 italic text-andeansky-100">Tejiendo el Futuro de Nuestra Herencia</h2>
+              <p className="text-stone-400 text-lg font-light leading-relaxed mb-0">
+                Únete a nuestra misión de preservar el arte del crochet y empoderar a las madres tejedoras del Nido de Cóndores.
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => window.location.href = '/unete'} 
+                className="bg-white text-stone-900 px-10 py-4 rounded-full font-bold hover:bg-terracotta-600 hover:text-white transition-all shadow-xl"
+              >
+                Postular como Artesana
+              </button>
             </div>
           </div>
         </div>

@@ -1,30 +1,83 @@
 "use client";
 import React from 'react';
-import { LucideStar } from 'lucide-react';
+import { LucideStar, LucideCheckCircle } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
+import { Navbar } from '@/components/layout/Navbar';
+import { CONFIG } from '@/lib/config';
 
-export function AboutView({ onContact }) {
+export function AboutView() {
+  const { addToCart } = useCart();
+
+  const handleContact = () => {
+    window.open(`https://wa.me/${CONFIG.CONTACT.WHATSAPP.replace(/\s+/g, '')}?text=Hola,%20quisiera%20saber%20m%C3%A1s%20sobre%20su%20historia.`);
+  };
+
   return (
-    <div className="pt-20 animate-in fade-in">
-      <div className="bg-andeangreen-900 border-b-8 border-terracotta-500 text-white py-24 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Nuestra Historia</h1>
-        <p className="text-andeangreen-100 max-w-xl mx-auto text-lg">Hilos que unen generaciones al pie de la montaña San Mateo.</p>
+    <div className="animate-in fade-in pb-20 bg-white min-h-screen">
+      <Navbar />
+      
+      <div className="bg-stone-900 text-white py-32 px-6 text-center relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-terracotta-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+        <div className="relative z-10 animate-in slide-in-from-bottom-8 duration-1000">
+          <span className="text-terracotta-400 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block">Nuestra Esencia</span>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6">Nuestra Historia</h1>
+          <p className="text-stone-400 max-w-xl mx-auto text-lg font-light">Hilos que unen generaciones en el corazón de Contumazá.</p>
+        </div>
       </div>
-      <div className="max-w-4xl mx-auto px-4 py-16 space-y-16">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-           <div>
-            <h2 className="text-2xl font-bold text-stone-900 mb-4 font-serif">La Tradición</h2>
-            <p className="text-stone-600 leading-relaxed mb-4">En las alturas de Contumazá, tejer no es solo un oficio, es una forma de preservar la vida. Manos que amasan el famoso pan contumacino al alba y tejen historias entre la neblina por la tarde, siempre bajo la mirada de San Mateo.</p>
-            <p className="text-stone-600 leading-relaxed">Cada prenda que vendemos en <strong>Tapetes.pe</strong> lleva horas de dedicación, fe y la esperanza de valientes mujeres emprendedoras del campo que honran sus raíces.</p>
+      
+      <div className="max-w-6xl mx-auto px-8 py-24 space-y-24">
+        <div className="grid md:grid-cols-2 gap-20 items-center">
+           <div className="animate-in slide-in-from-left-8 duration-1000">
+             <div className="flex items-center gap-3 mb-6">
+               <span className="h-[1.5px] w-12 bg-terracotta-500"></span>
+               <span className="text-terracotta-600 font-bold tracking-widest text-xs uppercase">El Legado</span>
+             </div>
+             <h2 className="text-4xl font-bold text-stone-900 mb-8 font-serif leading-tight">La Tradición del <br/><span className="italic text-terracotta-600">Punto y Alma</span></h2>
+             <p className="text-lg text-stone-600 leading-relaxed mb-6 font-light">
+               En las alturas de Contumazá, tejer no es solo un oficio, es una forma de contar historias. Desde niñas, aprendemos a entrelazar hilos mirando la neblina bajar por el cerro El Calvario, heredando técnicas que han pasado de madres a hijas por siglos.
+             </p>
+             <p className="text-lg text-stone-600 leading-relaxed font-light">
+               Cada pieza que encuentras en <strong>Tapetes.pe</strong> lleva horas de dedicación, paciencia y la esperanza de mujeres emprendedoras que buscan sacar adelante a sus familias honrando su identidad.
+             </p>
            </div>
-           <div className="bg-terracotta-50 rounded-2xl h-64 overflow-hidden shadow-lg rotate-2 border-2 border-terracotta-100">
-            <img src="/images/fb_1.jpg" className="w-full h-full object-cover" alt="Manos tejiendo"/>
+           <div className="relative group">
+             <div className="absolute -inset-4 bg-stone-100 rounded-[3rem] -rotate-3 transition-transform group-hover:rotate-0 duration-700"></div>
+             <div className="relative aspect-[4/5] bg-stone-200 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white z-10 transition-transform group-hover:-translate-y-2 duration-700">
+               <img src="/images/hero_authentic.png" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt="Artesanas de Contumazá"/>
+             </div>
            </div>
         </div>
-        <div className="bg-terracotta-50 p-8 rounded-2xl text-center border border-terracotta-100">
-          <LucideStar className="mx-auto text-terracotta-500 mb-4" size={32}/>
-          <h3 className="text-xl font-bold text-terracotta-900 mb-2">¿Por qué elegirnos?</h3>
-          <p className="text-terracotta-700 max-w-2xl mx-auto mb-6">Comercio Justo real. Trato directo con la artesana, llevando la calidez de su hogar al tuyo.</p>
-          <button onClick={onContact} className="bg-andeangreen-700 text-white px-6 py-3 rounded-full font-bold hover:bg-andeangreen-900 transition">Escríbenos por WhatsApp</button>
+        
+        <div className="bg-stone-50 p-12 md:p-20 rounded-[3rem] text-center border border-stone-100 relative overflow-hidden">
+           <div className="absolute top-0 left-0 w-32 h-32 bg-andeansky-100/30 rounded-full blur-3xl -ml-16 -mt-16"></div>
+           
+           <div className="relative z-10">
+             <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-stone-100 flex items-center justify-center mx-auto mb-8 text-terracotta-600">
+               <LucideStar size={32} />
+             </div>
+             <h3 className="text-3xl font-bold text-stone-900 mb-6 font-serif">Compromiso Ético & Social</h3>
+             <p className="text-xl text-stone-600 max-w-2xl mx-auto mb-12 font-light">
+               Al elegir una pieza de nuestra colección, no solo decoras tu hogar; estás apoyando directamente el comercio justo y el empoderamiento de la mujer rural peruana.
+             </p>
+             
+             <div className="grid sm:grid-cols-2 gap-8 mb-12 max-w-2xl mx-auto">
+                <div className="flex items-center gap-4 text-left p-6 bg-white rounded-2xl border border-stone-200/50">
+                   <LucideCheckCircle className="text-green-600 shrink-0" size={24}/>
+                   <span className="font-bold text-stone-800">Pago Directo 100%</span>
+                </div>
+                <div className="flex items-center gap-4 text-left p-6 bg-white rounded-2xl border border-stone-200/50">
+                   <LucideCheckCircle className="text-green-600 shrink-0" size={24}/>
+                   <span className="font-bold text-stone-800">Autenticidad Garantizada</span>
+                </div>
+             </div>
+
+             <button 
+                onClick={handleContact} 
+                className="bg-stone-900 text-white px-12 py-5 rounded-full font-bold hover:bg-terracotta-600 transition-all duration-300 shadow-xl transform hover:-translate-y-1"
+             >
+               Escríbenos por WhatsApp
+             </button>
+           </div>
         </div>
       </div>
     </div>

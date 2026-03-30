@@ -13,6 +13,7 @@ import { HomeView } from '../components/home/HomeView';
 // Services
 import { getProducts } from '../lib/services/products';
 import { getCollections } from '../lib/services/collections';
+import { CONFIG } from '../lib/config';
 
 export default function HomePage() {
   const { addToCart } = useCart();
@@ -61,7 +62,7 @@ export default function HomePage() {
         setActiveCollection(null);
         document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
       }} 
-      onCustomOrder={() => window.open(`https://wa.me/51999999999?text=Hola,%20me%20gustar%C3%ADa%20hacer%20un%20pedido%20especial.`)}
+      onCustomOrder={() => window.open(`https://wa.me/${CONFIG.CONTACT.WHATSAPP.replace(/\s+/g, '')}?text=Hola,%20me%20gustar%C3%ADa%20hacer%20un%20pedido%20especial.`)}
     />
   );
 }
