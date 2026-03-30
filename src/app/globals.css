@@ -1,26 +1,90 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-serif: var(--font-merriweather), serif;
+
+  --color-wheat-50: #fdfaf5;
+  --color-wheat-100: #f6eed6;
+  --color-wheat-200: #ead7a9;
+  --color-wheat-500: #d19a3b;
+  --color-wheat-700: #ad7225;
+  --color-wheat-900: #5c3915;
+
+  --color-andeansky-50: #f0f7fd;
+  --color-andeansky-100: #e0effa;
+  --color-andeansky-200: #bce1f5;
+  --color-andeansky-500: #419fd9;
+  --color-andeansky-700: #236ca6;
+  --color-andeansky-900: #133e66;
+
+  --color-andeangreen-50: #f2f7f4;
+  --color-andeangreen-100: #dceada;
+  --color-andeangreen-500: #4a9e5c;
+  --color-andeangreen-700: #2b6133;
+  --color-andeangreen-900: #1a3e20;
+
+  --color-terracotta-50: #fef6f4;
+  --color-terracotta-100: #fde5df;
+  --color-terracotta-500: #cf5e43;
+  --color-terracotta-700: #a13d25;
+  --color-terracotta-900: #5c1f10;
+
+  --color-textilemagenta-50: #fdf2f8;
+  --color-textilemagenta-100: #fae1f0;
+  --color-textilemagenta-500: #d8459b;
+  --color-textilemagenta-700: #a1286c;
+  --color-textilemagenta-900: #621440;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+::selection {
+  background-color: #fed7aa; /* orange-200 */
+  color: #7c2d12; /* orange-900 */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Typography Fallback for Biographies & Admin Editor */
+.personality-bio h1, .personality-bio h2, .personality-bio h3,
+.personality-bio .ql-editor h1, .personality-bio .ql-editor h2, .personality-bio .ql-editor h3 {
+  font-family: var(--font-serif);
+  color: #1c1917; /* stone-900 */
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.personality-bio h1, .personality-bio .ql-editor h1 { font-size: 2rem; }
+.personality-bio h2, .personality-bio .ql-editor h2 { font-size: 1.5rem; }
+.personality-bio h3, .personality-bio .ql-editor h3 { font-size: 1.25rem; }
+
+.personality-bio p, .personality-bio .ql-editor p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #44403c; /* stone-700 */
+}
+
+.personality-bio .ql-editor {
+  font-size: 1rem;
+}
+
+.personality-bio strong, .personality-bio .ql-editor strong {
+  color: #1c1917; /* stone-900 */
+  font-weight: 700;
+}
+
+.personality-bio ul, .personality-bio ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.personality-bio li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
 }
