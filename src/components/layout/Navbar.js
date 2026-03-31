@@ -106,10 +106,7 @@ export function Navbar() {
         <nav className="bg-white/95 backdrop-blur-md border-b border-stone-100 h-20 flex items-center transition-all duration-500 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 w-full flex justify-between items-center text-stone-900">
             <Link href="/" className="flex items-center gap-4 group">
-              <div className="relative">
-                <div className="w-10 h-10 border border-stone-200 rounded-full flex items-center justify-center font-serif text-xl group-hover:bg-stone-900 group-hover:text-white transition-all duration-500">T</div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-terracotta-500 rounded-full border-2 border-white"></div>
-              </div>
+              <img src="/logo.svg" className="w-11 h-11 object-contain group-hover:scale-105 transition-transform duration-500" alt="Tapetes.pe Logo" />
               <div className="flex flex-col">
                 <span className="text-2xl font-serif font-black tracking-tighter leading-none">Tapetes<span className="text-terracotta-600">.</span>pe</span>
                 <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-bold font-sans mt-0.5 group-hover:text-terracotta-600 transition-colors">{t('nav.slogan')}</span>
