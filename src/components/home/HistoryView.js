@@ -39,13 +39,13 @@ export function HistoryView() {
         <div className="absolute inset-0 z-0">
            <img 
              src="/images/landmarks/plaza_armas.jpg" 
-             className="w-full h-full object-cover opacity-60 scale-105 group-hover:scale-100 transition-transform duration-[5000ms]" 
+             className="w-full h-full object-cover opacity-50 scale-105 group-hover:scale-100 transition-transform duration-[5000ms]" 
              alt="Plaza de Armas de Contumazá"
            />
-           <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/40"></div>
+           <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/40 to-stone-900/60"></div>
         </div>
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          <span className="text-wheat-400 font-bold tracking-[0.4em] uppercase text-[10px] md:text-xs mb-4 block drop-shadow-lg">{t('history.subtitle')}</span>
+          <span className="text-wheat-200 font-bold tracking-[0.4em] uppercase text-[10px] md:text-xs mb-4 block drop-shadow-lg">{t('history.subtitle')}</span>
           <h1 className="text-5xl md:text-8xl text-white font-serif mb-6 leading-tight drop-shadow-2xl">
             {t('history.title')}
           </h1>
@@ -124,7 +124,7 @@ export function HistoryView() {
                   <img src={site.image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]" alt={site.name} />
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/20 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 p-10 w-full">
-                    <span className="text-wheat-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-3 block">{site.role}</span>
+                    <span className="text-wheat-200 text-[10px] font-bold uppercase tracking-[0.3em] mb-3 block">{site.role}</span>
                     <h4 className="text-3xl font-serif text-white mb-4">{site.name}</h4>
                     <div 
                       className="text-stone-200 text-sm line-clamp-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0"

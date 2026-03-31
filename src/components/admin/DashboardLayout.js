@@ -92,7 +92,7 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
                     onClick={() => handleSetView(item.id)} 
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${currentView === item.id ? 'bg-stone-900 text-white shadow-lg shadow-stone-200 translate-x-1' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-900'}`}
                   >
-                    <item.icon size={18} className={currentView === item.id ? 'text-wheat-400' : ''} /> 
+                    <item.icon size={18} className={currentView === item.id ? 'text-wheat-500' : ''} /> 
                     {item.label}
                   </button>
                 ))}
