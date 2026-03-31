@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { LucideSearch, LucidePlus, LucideEdit, LucideTrash2, LucideX, LucideUser, LucideCheckCircle, LucidePartyPopper } from 'lucide-react';
+import { LucideSearch, LucidePlus, LucideEdit, LucideTrash2, LucideX, LucideUser, LucideCheckCircle, LucidePartyPopper, LucideGripVertical, LucideImage } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getPersonalities, addPersonality, updatePersonality, deletePersonality } from '../../lib/services/personalities';
 import RichTextEditor from '../ui/RichTextEditor';
 import { ImageUpload } from '../ui/ImageUpload';
@@ -134,6 +135,14 @@ export function LegacyManager({ setFeedback }) {
     p.role.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(formData.images || []);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setFormData({ ...formData, images: items });
+  };
+
   if (isCreating) {
     return (
       <div className="max-w-3xl bg-white p-8 rounded-xl border border-stone-200 shadow-sm animate-in slide-in-from-right">
@@ -198,27 +207,73 @@ export function LegacyManager({ setFeedback }) {
           </div>
 
           {(formData.images || []).length > 0 && (
-            <div className="space-y-4 p-4 bg-stone-50 rounded-xl border border-stone-200">
-               <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Pies de Foto (Opcional)</h4>
-               {(formData.images || []).map((img, idx) => (
-                 <div key={idx} className="flex gap-4 items-center">
-                    <img src={typeof img === 'string' ? img : img.url} className="w-10 h-10 rounded object-cover shrink-0" alt="" />
-                    <input 
-                      className="flex-1 p-2 text-sm bg-white border rounded-lg focus:ring-1 focus:ring-orange-200 outline-none"
-                      placeholder="Contexto o descripción de la imagen..."
-                      value={typeof img === 'string' ? '' : img.caption}
-                      onChange={e => {
-                        const nextImages = [...(formData.images || [])];
-                        if (typeof nextImages[idx] === 'string') {
-                          nextImages[idx] = { url: nextImages[idx], caption: e.target.value };
-                        } else {
-                          nextImages[idx] = { ...nextImages[idx], caption: e.target.value };
-                        }
-                        setFormData({...formData, images: nextImages});
-                      }}
-                    />
-                 </div>
-               ))}
+            <div className="space-y-4 p-6 bg-stone-50 rounded-2xl border border-stone-200">
+               <div className="flex justify-between items-center mb-2">
+                 <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
+                   <LucideImage size={14} /> Pies de Foto / Orden de Galería
+                 </h4>
+                 <span className="text-[9px] text-stone-400 italic">Arrastra para elegir la portada</span>
+               </div>
+               
+               <DragDropContext onDragEnd={onDragEnd}>
+                 <Droppable droppableId="images-list">
+                   {(provided) => (
+                     <div 
+                       {...provided.droppableProps} 
+                       ref={provided.innerRef}
+                       className="space-y-3"
+                     >
+                       {(formData.images || []).map((img, idx) => (
+                         <Draggable key={`${idx}-${typeof img === 'string' ? img : img.url}`} draggableId={`${idx}-${typeof img === 'string' ? img : img.url}`} index={idx}>
+                           {(provided, snapshot) => (
+                             <div 
+                               ref={provided.innerRef}
+                               {...provided.draggableProps}
+                               className={`flex gap-4 items-center bg-white p-3 rounded-xl border transition-all duration-200 ${
+                                 snapshot.isDragging ? 'shadow-xl border-orange-200 ring-2 ring-orange-50 z-50' : 'border-stone-100 shadow-sm'
+                               }`}
+                             >
+                               <div 
+                                 {...provided.dragHandleProps}
+                                 className="text-stone-300 hover:text-stone-500 cursor-grab active:cursor-grabbing p-1"
+                               >
+                                 <LucideGripVertical size={18} />
+                               </div>
+                               
+                               <div className="relative group/thumb">
+                                 <img src={typeof img === 'string' ? img : img.url} className="w-12 h-12 rounded-lg object-cover bg-stone-100 shadow-inner" alt="" />
+                                 {idx === 0 && (
+                                   <div className="absolute -top-1 -left-1 bg-orange-600 text-[8px] text-white px-1.5 py-0.5 rounded-full font-bold shadow-sm whitespace-nowrap">
+                                     Portada
+                                   </div>
+                                 )}
+                               </div>
+
+                               <div className="flex-1">
+                                 <input 
+                                   className="w-full p-2.5 text-sm bg-stone-50/50 border border-transparent focus:border-stone-200 focus:bg-white rounded-lg outline-none transition-all font-medium text-stone-700"
+                                   placeholder="Contexto o descripción de la imagen..."
+                                   value={typeof img === 'string' ? '' : img.caption}
+                                   onChange={e => {
+                                     const nextImages = [...(formData.images || [])];
+                                     if (typeof nextImages[idx] === 'string') {
+                                       nextImages[idx] = { url: nextImages[idx], caption: e.target.value };
+                                     } else {
+                                       nextImages[idx] = { ...nextImages[idx], caption: e.target.value };
+                                     }
+                                     setFormData({...formData, images: nextImages});
+                                   }}
+                                 />
+                               </div>
+                             </div>
+                           )}
+                         </Draggable>
+                       ))}
+                       {provided.placeholder}
+                     </div>
+                   )}
+                 </Droppable>
+               </DragDropContext>
             </div>
           )}
 

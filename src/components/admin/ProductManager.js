@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo } from 'lucide-react';
+import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { addProduct, updateProduct, deleteProduct, getProducts } from '../../lib/services/products';
 import { ImageUpload } from '../ui/ImageUpload';
 
@@ -43,7 +44,7 @@ export function ProductManager({ products, setProducts, categories, collections,
       stock: product.stock || 1, 
       isPromoted: product.isPromoted || false,
       image: product.image || '',
-      images: product.images || (product.image ? [product.image] : []),
+      images: Array.isArray(product.images) ? product.images.map(img => typeof img === 'string' ? { url: img, caption: '' } : img) : (product.image ? [{ url: product.image, caption: '' }] : []),
       collection: product.collection || '',
       materials: product.materials || '',
       technique: product.technique || '',
@@ -67,7 +68,7 @@ export function ProductManager({ products, setProducts, categories, collections,
 
       const productPayload = {
         ...formData,
-        image: formData.images?.[0] || '',
+        image: typeof formData.images?.[0] === 'string' ? formData.images[0] : (formData.images?.[0]?.url || ''),
         sellerEmail: user.email,
         sellerName: user.name,
       };
@@ -98,6 +99,14 @@ export function ProductManager({ products, setProducts, categories, collections,
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(formData.images || []);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setFormData({ ...formData, images: items });
   };
 
   const handleDelete = (id) => {
@@ -219,13 +228,90 @@ export function ProductManager({ products, setProducts, categories, collections,
           <div className="space-y-4">
             <ImageUpload 
               label="Galería del Producto (Máx 5)" 
-              value={formData.images} 
+              value={(formData.images || []).map(img => typeof img === 'string' ? img : img.url)} 
               path="products" 
               multiple={true}
               maxFiles={5}
-              onChange={urls => setFormData({...formData, images: urls})} 
+              onChange={urls => {
+                const newImages = urls.map(url => {
+                  const existing = (formData.images || []).find(img => (typeof img === 'string' ? img : img.url) === url);
+                  return existing ? (typeof existing === 'string' ? { url: existing, caption: '' } : existing) : { url, caption: '' };
+                });
+                setFormData({...formData, images: newImages});
+              }} 
             />
           </div>
+
+          {(formData.images || []).length > 0 && (
+            <div className="space-y-4 p-6 bg-stone-50 rounded-2xl border border-stone-200">
+               <div className="flex justify-between items-center mb-2">
+                 <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
+                   <LucideImage size={14} /> Pies de Foto / Orden de Galería
+                 </h4>
+                 <span className="text-[9px] text-stone-400 italic">Arrastra para elegir la portada</span>
+               </div>
+               
+               <DragDropContext onDragEnd={onDragEnd}>
+                 <Droppable droppableId="product-images-list">
+                   {(provided) => (
+                     <div 
+                       {...provided.droppableProps} 
+                       ref={provided.innerRef}
+                       className="space-y-3"
+                     >
+                       {(formData.images || []).map((img, idx) => (
+                         <Draggable key={`${idx}-${typeof img === 'string' ? img : img.url}`} draggableId={`${idx}-${typeof img === 'string' ? img : img.url}`} index={idx}>
+                           {(provided, snapshot) => (
+                             <div 
+                               ref={provided.innerRef}
+                               {...provided.draggableProps}
+                               className={`flex gap-4 items-center bg-white p-3 rounded-xl border transition-all duration-200 ${
+                                 snapshot.isDragging ? 'shadow-xl border-orange-200 ring-2 ring-orange-50 z-50' : 'border-stone-100 shadow-sm'
+                               }`}
+                             >
+                               <div 
+                                 {...provided.dragHandleProps}
+                                 className="text-stone-300 hover:text-stone-500 cursor-grab active:cursor-grabbing p-1"
+                               >
+                                 <LucideGripVertical size={18} />
+                               </div>
+                               
+                               <div className="relative group/thumb">
+                                 <img src={typeof img === 'string' ? img : img.url} className="w-12 h-12 rounded-lg object-cover bg-stone-100 shadow-inner" alt="" />
+                                 {idx === 0 && (
+                                   <div className="absolute -top-1 -left-1 bg-orange-600 text-[8px] text-white px-1.5 py-0.5 rounded-full font-bold shadow-sm whitespace-nowrap">
+                                     Portada
+                                   </div>
+                                 )}
+                               </div>
+
+                               <div className="flex-1">
+                                 <input 
+                                   className="w-full p-2.5 text-sm bg-stone-50/50 border border-transparent focus:border-stone-200 focus:bg-white rounded-lg outline-none transition-all font-medium text-stone-700"
+                                   placeholder="Breve detalle (ej: Vista frontal, detalle del punto...)"
+                                   value={typeof img === 'string' ? '' : img.caption}
+                                   onChange={e => {
+                                     const nextImages = [...(formData.images || [])];
+                                     if (typeof nextImages[idx] === 'string') {
+                                       nextImages[idx] = { url: nextImages[idx], caption: e.target.value };
+                                     } else {
+                                       nextImages[idx] = { ...nextImages[idx], caption: e.target.value };
+                                     }
+                                     setFormData({...formData, images: nextImages});
+                                   }}
+                                 />
+                               </div>
+                             </div>
+                           )}
+                         </Draggable>
+                       ))}
+                       {provided.placeholder}
+                     </div>
+                   )}
+                 </Droppable>
+               </DragDropContext>
+            </div>
+          )}
 
           <div className="flex items-center gap-3 p-4 bg-amber-50 rounded-lg border border-amber-100">
             <input type="checkbox" id="promoted" checked={formData.isPromoted} onChange={e => setFormData({...formData, isPromoted: e.target.checked})} className="w-5 h-5 text-amber-600 rounded cursor-pointer"/>
