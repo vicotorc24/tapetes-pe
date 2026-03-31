@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from '../../context/LanguageContext';
 import { LucideCrown, LucidePlus, LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideX, LucideSearch, History as LucideHistory } from 'lucide-react';
 
-export function HomeView({ products, activeCategory, collections = [], activeCollection, onSelectCollection, onSelectCategory, onViewProduct, onAddToCart, onExplore, onCustomOrder, searchTerm = '', onSearch }) {
+export function HomeView({ products, categories = [], activeCategory, collections = [], activeCollection, onSelectCollection, onSelectCategory, onViewProduct, onAddToCart, onExplore, onCustomOrder, searchTerm = '', onSearch }) {
   const { t } = useTranslation();
   
   // Lógica de Filtrado Optimizada con Búsqueda
@@ -21,9 +21,11 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
       p.collection === activeCol.name ||
       p.collection === activeCol.id
     );
-  } else if (activeCategory !== 'Todos') {
-    // 2. Filtrar por Categoría (solo si no hay colección activa para evitar "1 producto")
-    filteredProducts = filteredProducts.filter(p => p.category === activeCategory);
+  } else if (activeCategory && activeCategory !== 'Todos') {
+    // 2. Filtrar por Categoría (Robusto: ignora mayúsculas y espacios)
+    filteredProducts = filteredProducts.filter(p => 
+      p.category?.toString().trim().toLowerCase() === activeCategory.toString().trim().toLowerCase()
+    );
   }
 
   // 3. Filtrar por Término de Búsqueda (Cualquier campo relevante)
@@ -285,18 +287,70 @@ export function HomeView({ products, activeCategory, collections = [], activeCol
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
                  <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mr-2 whitespace-nowrap">{t('catalog.categories_label')}</span>
-                 {[{id: 'Todos', label: t('catalog.cat_all')}, {id: 'Mesa', label: t('catalog.cat_table')}, {id: 'Decoración', label: t('catalog.cat_decor')}, {id: 'Accesorios', label: t('catalog.cat_acc')}].map(cat => (
-                   <button 
-                     key={cat.id} 
-                     onClick={() => { onSearch?.(''); onSelectCategory?.(cat.id); onSelectCollection?.(null); }} 
-                     className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${cat.id === activeCategory && !activeCol ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
-                   >
-                     {cat.label}
-                   </button>
-                 ))}
+                 <button 
+                    onClick={() => { onSearch?.(''); onSelectCategory?.('Todos'); onSelectCollection?.(null); }} 
+                    className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${activeCategory === 'Todos' && !activeCollection ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
+                 >
+                    {t('catalog.cat_all')}
+                 </button>
+                 {categories.map(cat => {
+                   const isActive = cat.name?.toString().trim().toLowerCase() === activeCategory?.toString().trim().toLowerCase() && !activeCollection;
+                   return (
+                     <button 
+                       key={cat.id} 
+                       onClick={() => { onSearch?.(''); onSelectCategory?.(cat.name); onSelectCollection?.(null); }} 
+                       className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${isActive ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
+                     >
+                       {cat.name}
+                     </button>
+                   );
+                 })}
               </div>
            </div>
         </div>
+        
+        {/* Indicadores de Filtros Aplicados (Pills) */}
+        {(activeCategory !== 'Todos' || activeCol || searchTerm) && (
+          <div className="flex flex-wrap items-center gap-3 mb-8 animate-in slide-in-from-left duration-500">
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mr-2">Filtros:</span>
+            
+            {activeCategory !== 'Todos' && (
+              <div className="flex items-center gap-2 bg-stone-100 text-stone-800 px-4 py-2 rounded-full text-xs font-bold border border-stone-200">
+                <span className="text-stone-400 uppercase text-[9px] mr-1 font-black">Categoría</span> {activeCategory}
+                <button onClick={() => onSelectCategory?.('Todos')} className="hover:text-terracotta-600 transition-colors ml-1">
+                  <LucideX size={14} />
+                </button>
+              </div>
+            )}
+            
+            {activeCol && (
+              <div className="flex items-center gap-2 bg-andeansky-50 text-andeansky-900 px-4 py-2 rounded-full text-xs font-bold border border-andeansky-100">
+                <span className="text-andeansky-400 uppercase text-[9px] mr-1 font-black">Colección</span> {activeCol.name}
+                <button onClick={() => onSelectCollection?.(null)} className="hover:text-terracotta-600 transition-colors ml-1">
+                  <LucideX size={14} />
+                </button>
+              </div>
+            )}
+            
+            {searchTerm && (
+              <div className="flex items-center gap-2 bg-stone-900 text-stone-100 px-4 py-2 rounded-full text-xs font-bold border border-stone-800">
+                <span className="text-stone-500 uppercase text-[9px] mr-1 font-black">Búsqueda</span> "{searchTerm}"
+                <button onClick={() => onSearch?.('')} className="hover:text-terracotta-600 transition-colors ml-1">
+                  <LucideX size={14} />
+                </button>
+              </div>
+            )}
+            
+            {(activeCategory !== 'Todos' || activeCol || searchTerm) && (
+              <button 
+                onClick={() => { onSelectCategory?.('Todos'); onSelectCollection?.(null); onSearch?.(''); }}
+                className="text-[10px] font-bold text-terracotta-600 uppercase tracking-widest hover:underline ml-2"
+              >
+                Limpiar Todo
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
           <div>

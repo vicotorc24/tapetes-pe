@@ -183,13 +183,13 @@ export function LegacyManager({ setFeedback }) {
           <div>
             <ImageUpload 
               label="Galería (Máx 5 imágenes)" 
-              value={formData.images.map(img => typeof img === 'string' ? img : img.url)} 
+              value={(formData.images || []).map(img => typeof img === 'string' ? img : img.url)} 
               path="personalities" 
               multiple={true}
               maxFiles={5}
               onChange={urls => {
                 const newImages = urls.map(url => {
-                  const existing = formData.images.find(img => (typeof img === 'string' ? img : img.url) === url);
+                  const existing = (formData.images || []).find(img => (typeof img === 'string' ? img : img.url) === url);
                   return existing ? (typeof existing === 'string' ? { url: existing, caption: '' } : existing) : { url, caption: '' };
                 });
                 setFormData({...formData, images: newImages});
@@ -197,10 +197,10 @@ export function LegacyManager({ setFeedback }) {
             />
           </div>
 
-          {formData.images.length > 0 && (
+          {(formData.images || []).length > 0 && (
             <div className="space-y-4 p-4 bg-stone-50 rounded-xl border border-stone-200">
                <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Pies de Foto (Opcional)</h4>
-               {formData.images.map((img, idx) => (
+               {(formData.images || []).map((img, idx) => (
                  <div key={idx} className="flex gap-4 items-center">
                     <img src={typeof img === 'string' ? img : img.url} className="w-10 h-10 rounded object-cover shrink-0" alt="" />
                     <input 
@@ -208,7 +208,7 @@ export function LegacyManager({ setFeedback }) {
                       placeholder="Contexto o descripción de la imagen..."
                       value={typeof img === 'string' ? '' : img.caption}
                       onChange={e => {
-                        const nextImages = [...formData.images];
+                        const nextImages = [...(formData.images || [])];
                         if (typeof nextImages[idx] === 'string') {
                           nextImages[idx] = { url: nextImages[idx], caption: e.target.value };
                         } else {
@@ -260,7 +260,7 @@ export function LegacyManager({ setFeedback }) {
         </div>
         <button onClick={() => { 
           setEditingPersonality(null); 
-          setFormData({ name: '', role: '', category: CONFIG.LEGACY_CATEGORIES.HISTORY, description: '', image: '', slug: '', isPromoted: false }); 
+          setFormData({ name: '', role: '', category: CONFIG.LEGACY_CATEGORIES.HISTORY, description: '', image: '', images: [], slug: '', isPromoted: false }); 
           setIsCreating(true); 
         }} className="bg-stone-900 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 hover:bg-stone-800 transition shadow-md">
           <LucidePlus size={18} /> Nuevo Registro

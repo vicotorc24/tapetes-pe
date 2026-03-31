@@ -13,12 +13,14 @@ import { HomeView } from '../components/home/HomeView';
 // Services
 import { getProducts } from '../lib/services/products';
 import { getCollections } from '../lib/services/collections';
+import { getCategories } from '../lib/services/categories';
 import { CONFIG } from '../lib/config';
 
 export default function HomePage() {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [collectionsData, setCollectionsData] = useState([]);
+  const [categoriesData, setCategoriesData] = useState([]);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [activeCollection, setActiveCollection] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,8 +32,12 @@ export default function HomePage() {
         const firestoreProducts = await getProducts();
         setProducts(firestoreProducts.length > 0 ? firestoreProducts : initialSeedData);
         
-        const firestoreCollections = await getCollections();
-        setCollectionsData(firestoreCollections);
+        const [col, cat] = await Promise.all([
+          getCollections(),
+          getCategories()
+        ]);
+        setCollectionsData(col);
+        setCategoriesData(cat);
       } catch (error) {
         console.error("Error initData:", error);
       }
@@ -40,7 +46,10 @@ export default function HomePage() {
   }, []);
 
   const handleSelectCollection = (collectionId) => {
-    setActiveCategory('Todos');
+    // Solo resetear categoría si realmente estamos seleccionando una colección
+    if (collectionId) {
+       setActiveCategory('Todos');
+    }
     setActiveCollection(collectionId);
     setTimeout(() => { document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' }); }, 100); 
   };
@@ -53,6 +62,7 @@ export default function HomePage() {
     <HomeView 
       products={products} 
       activeCategory={activeCategory}
+      categories={categoriesData}
       collections={collectionsData}
       activeCollection={activeCollection}
       onSelectCollection={handleSelectCollection}
