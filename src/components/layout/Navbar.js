@@ -113,18 +113,48 @@ export function Navbar() {
                 <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-bold font-sans mt-0.5 group-hover:text-terracotta-600 transition-colors">{t('nav.slogan')}</span>
               </div>
             </Link>
-            <div className="hidden lg:flex items-center space-x-8 text-[13px] font-bold tracking-wide uppercase">
-              <button onClick={() => navigateToCatalog()} className="hover:text-terracotta-600 transition-colors relative group py-2">
-                {t('nav.catalog')}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-terracotta-600 transition-all group-hover:w-full"></span>
-              </button>
-              <Link href="/nosotras" className={`hover:text-terracotta-600 transition-colors relative group py-2 ${pathname === '/nosotras' ? 'text-terracotta-600' : ''}`}>
-                {t('nav.story')}
-              </Link>
-              <Link href="/historia" className={`hover:text-terracotta-600 transition-colors relative group py-2 ${pathname === '/historia' ? 'text-terracotta-600' : ''}`}>
-                {t('nav.heritage')}
-              </Link>
-              <Link href="/unete" className="hover:text-terracotta-600 transition-colors">{t('nav.join')}</Link>
+            <div className="hidden lg:flex items-center space-x-1 text-[12px] uppercase">
+              {[
+                { label: t('nav.catalog'), active: pathname === '/', action: () => navigateToCatalog() },
+                { label: t('nav.story'), active: pathname === '/nosotras', href: '/nosotras' },
+                { label: t('nav.heritage'), active: pathname === '/historia', href: '/historia' },
+                { label: t('nav.join'), active: pathname === '/unete', href: '/unete', isSpecial: true }
+              ].map((item, idx) => {
+                const baseClasses = `
+                  relative group px-6 py-2.5 rounded-full transition-all duration-300 flex flex-col items-center justify-center
+                  ${item.active 
+                    ? 'text-stone-900 font-black scale-[1.02]' 
+                    : 'text-stone-900 font-bold hover:bg-stone-50'
+                  }
+                `;
+                
+                const content = (
+                  <>
+                    <span className="relative z-10">{item.label}</span>
+                    {/* Punto Indicador Moderno */}
+                    <span className={`
+                      absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-terracotta-600 
+                      transition-all duration-500 transform
+                      ${item.active ? 'opacity-100 scale-100' : 'opacity-0 scale-0 group-hover:opacity-30 group-hover:scale-75'}
+                    `}></span>
+                    {/* Fondo Redondeado (Píldora) Activo */}
+                    <span className={`
+                      absolute inset-0 rounded-full transition-all duration-300 -z-0
+                      ${item.active ? 'bg-stone-100/80 shadow-sm border border-stone-200/50' : 'bg-transparent'}
+                    `}></span>
+                  </>
+                );
+
+                return item.href ? (
+                  <Link key={idx} href={item.href} className={baseClasses}>
+                    {content}
+                  </Link>
+                ) : (
+                  <button key={idx} onClick={item.action} className={baseClasses}>
+                    {content}
+                  </button>
+                );
+              })}
             </div>
             <div className="flex items-center gap-4 md:gap-6">
               {/* Desktop Language Switcher */}
