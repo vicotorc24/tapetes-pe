@@ -28,6 +28,10 @@ export const translations = {
       condor: {
         title: "Nido de Cóndores",
         desc: "A 2675 m.s.n.m, Contumazá es un balcón hacia los Andes. Su geografía moldea el carácter de su gente: fuerte, resiliente y profundamente conectada con la tierra y sus tradiciones."
+      },
+      sites: {
+        title: "Lugares con Historia",
+        subtitle: "Explora la riqueza turística y arqueológica de nuestra tierra."
       }
     },
     about: {
@@ -77,6 +81,10 @@ export const translations = {
       condor: {
         title: "Condors' Nest",
         desc: "At 2,675 meters above sea level, Contumazá is a balcony to the Andes. Its geography shapes the character of its people: strong, resilient, and deeply connected to the land and its traditions."
+      },
+      sites: {
+        title: "Historic Landmarks",
+        subtitle: "Explore the touristic and archaeological richness of our land."
       }
     },
     about: {

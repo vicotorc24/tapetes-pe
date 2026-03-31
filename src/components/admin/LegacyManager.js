@@ -4,6 +4,7 @@ import { LucideSearch, LucidePlus, LucideEdit, LucideTrash2, LucideX, LucideUser
 import { getPersonalities, addPersonality, updatePersonality, deletePersonality } from '../../lib/services/personalities';
 import RichTextEditor from '../ui/RichTextEditor';
 import { ImageUpload } from '../ui/ImageUpload';
+import { CONFIG } from '../../lib/config';
 
 export function LegacyManager({ setFeedback }) {
   const [personalities, setPersonalities] = useState([]);
@@ -15,9 +16,10 @@ export function LegacyManager({ setFeedback }) {
   const [formData, setFormData] = useState({ 
     name: '', 
     role: '', 
-    category: 'Historia', 
+    category: CONFIG.LEGACY_CATEGORIES.HISTORY, 
     description: '', 
     image: '', 
+    images: [],
     slug: '',
     isPromoted: false 
   });
@@ -54,9 +56,10 @@ export function LegacyManager({ setFeedback }) {
     setFormData({ 
       name: p.name, 
       role: p.role, 
-      category: p.category || 'Historia', 
+      category: p.category || CONFIG.LEGACY_CATEGORIES.HISTORY, 
       description: p.description || '', 
       image: p.image || '', 
+      images: Array.isArray(p.images) ? p.images.map(img => typeof img === 'string' ? { url: img, caption: '' } : img) : (p.image ? [{ url: p.image, caption: '' }] : []),
       slug: p.slug,
       isPromoted: p.isPromoted || false 
     }); 
@@ -73,10 +76,15 @@ export function LegacyManager({ setFeedback }) {
     }
     try {
       setIsSaving(true);
+      const payload = {
+        ...formData,
+        image: formData.images?.[0]?.url || formData.image || ''
+      };
+      
       if (editingPersonality) { 
-        await updatePersonality(editingPersonality.id, formData);
+        await updatePersonality(editingPersonality.id, payload);
       } else { 
-        await addPersonality(formData);
+        await addPersonality(payload);
       } 
       setIsCreating(false); 
       setEditingPersonality(null);
@@ -84,11 +92,11 @@ export function LegacyManager({ setFeedback }) {
       if (setFeedback) {
         setFeedback({ 
           type: 'success', 
-          message: `La historia de ${formData.name} se ha guardado correctamente.` 
+          message: `El registro "${formData.name}" se ha guardado correctamente.` 
         });
       }
 
-      setFormData({ name: '', role: '', category: 'Historia', description: '', image: '', slug: '', isPromoted: false }); 
+      setFormData({ name: '', role: '', category: CONFIG.LEGACY_CATEGORIES.HISTORY, description: '', image: '', images: [], slug: '', isPromoted: false }); 
       loadPersonalities();
     } catch (error) {
       if (setFeedback) {
@@ -130,20 +138,20 @@ export function LegacyManager({ setFeedback }) {
     return (
       <div className="max-w-3xl bg-white p-8 rounded-xl border border-stone-200 shadow-sm animate-in slide-in-from-right">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-stone-900">{editingPersonality ? 'Editar Personalidad' : 'Nueva Personalidad'}</h2>
+          <h2 className="text-xl font-bold text-stone-900">{editingPersonality ? 'Editar Registro' : 'Nuevo Registro Histórico'}</h2>
           <button onClick={() => setIsCreating(false)} className="text-stone-400 hover:text-stone-600"><LucideX/></button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Nombre Completo</label>
+              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Nombre (Personaje o Sitio)</label>
               <input required className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" 
-                value={formData.name} onChange={handleNameChange} placeholder="Ej: Walter Alva Alva" />
+                value={formData.name} onChange={handleNameChange} placeholder="Ej: Pozo Kuan o Walter Alva" />
             </div>
             <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Función / Rol</label>
+              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Referencia / Ubicación</label>
               <input required className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" 
-                value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} placeholder="Ej: Arqueólogo" />
+                value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} placeholder="Ej: Caserío La Herencia" />
             </div>
           </div>
 
@@ -152,19 +160,9 @@ export function LegacyManager({ setFeedback }) {
               <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Categoría</label>
               <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" 
                 value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                <option>Historia</option>
-                <option>Poetas</option>
-                <option>Literatura</option>
-                <option>Arqueología</option>
-                <option>Música</option>
-                <option>Pintura</option>
-                <option>Educación</option>
-                <option>Religión</option>
-                <option>Política</option>
-                <option>Artesanía</option>
-                <option>Ciencia</option>
-                <option>Científico</option>
-                <option>Otros</option>
+                {Object.values(CONFIG.LEGACY_CATEGORIES).map(cat => (
+                  <option key={cat}>{cat}</option>
+                ))}
               </select>
             </div>
             <div>
@@ -184,12 +182,45 @@ export function LegacyManager({ setFeedback }) {
 
           <div>
             <ImageUpload 
-              label="Retrato del Personaje" 
-              value={formData.image} 
+              label="Galería (Máx 5 imágenes)" 
+              value={formData.images.map(img => typeof img === 'string' ? img : img.url)} 
               path="personalities" 
-              onChange={url => setFormData({...formData, image: url})} 
+              multiple={true}
+              maxFiles={5}
+              onChange={urls => {
+                const newImages = urls.map(url => {
+                  const existing = formData.images.find(img => (typeof img === 'string' ? img : img.url) === url);
+                  return existing ? (typeof existing === 'string' ? { url: existing, caption: '' } : existing) : { url, caption: '' };
+                });
+                setFormData({...formData, images: newImages});
+              }} 
             />
           </div>
+
+          {formData.images.length > 0 && (
+            <div className="space-y-4 p-4 bg-stone-50 rounded-xl border border-stone-200">
+               <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">Pies de Foto (Opcional)</h4>
+               {formData.images.map((img, idx) => (
+                 <div key={idx} className="flex gap-4 items-center">
+                    <img src={typeof img === 'string' ? img : img.url} className="w-10 h-10 rounded object-cover shrink-0" alt="" />
+                    <input 
+                      className="flex-1 p-2 text-sm bg-white border rounded-lg focus:ring-1 focus:ring-orange-200 outline-none"
+                      placeholder="Contexto o descripción de la imagen..."
+                      value={typeof img === 'string' ? '' : img.caption}
+                      onChange={e => {
+                        const nextImages = [...formData.images];
+                        if (typeof nextImages[idx] === 'string') {
+                          nextImages[idx] = { url: nextImages[idx], caption: e.target.value };
+                        } else {
+                          nextImages[idx] = { ...nextImages[idx], caption: e.target.value };
+                        }
+                        setFormData({...formData, images: nextImages});
+                      }}
+                    />
+                 </div>
+               ))}
+            </div>
+          )}
 
           <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg border border-orange-100">
             <input type="checkbox" id="promoted" checked={formData.isPromoted} 
@@ -211,7 +242,7 @@ export function LegacyManager({ setFeedback }) {
                     Guardando...
                   </>
                 ) : (
-                  editingPersonality ? 'Actualizar' : 'Publicar Personaje'
+                  editingPersonality ? 'Actualizar' : 'Publicar Registro'
                 )}
               </button>
           </div>
@@ -229,10 +260,10 @@ export function LegacyManager({ setFeedback }) {
         </div>
         <button onClick={() => { 
           setEditingPersonality(null); 
-          setFormData({ name: '', role: '', category: 'Historia', description: '', image: '', slug: '', isPromoted: false }); 
+          setFormData({ name: '', role: '', category: CONFIG.LEGACY_CATEGORIES.HISTORY, description: '', image: '', slug: '', isPromoted: false }); 
           setIsCreating(true); 
         }} className="bg-stone-900 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 hover:bg-stone-800 transition shadow-md">
-          <LucidePlus size={18} /> Nuevo Personaje
+          <LucidePlus size={18} /> Nuevo Registro
         </button>
       </div>
 

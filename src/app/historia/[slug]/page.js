@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/context/LanguageContext';
 import { getPersonalityBySlug } from '@/lib/services/personalities';
-import { LucideQuote, LucideArrowLeft, LucideCalendar, LucideUser, LucideChevronRight } from 'lucide-react';
+import { LucideQuote, LucideArrowLeft, LucideCalendar, LucideUser, LucideChevronRight, LucideMaximize2, LucideX } from 'lucide-react';
 
 export default function PersonalityPage() {
   const { slug } = useParams();
@@ -11,6 +11,7 @@ export default function PersonalityPage() {
   const router = useRouter();
   const [personality, setPersonality] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -98,6 +99,48 @@ export default function PersonalityPage() {
             </div>
           </div>
 
+          {/* New Multi-Image Gallery */}
+          {personality.images && personality.images.length > 0 && (
+            <div className="mt-20 space-y-10">
+               <div className="flex items-center gap-4">
+                  <div className="h-px bg-stone-100 flex-1"></div>
+                  <h3 className="text-xl font-serif text-stone-400 italic">Galería Fotográfica</h3>
+                  <div className="h-px bg-stone-100 flex-1"></div>
+               </div>
+
+               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                  {personality.images.map((img, idx) => {
+                    const imageUrl = typeof img === 'string' ? img : img.url;
+                    const caption = typeof img === 'string' ? '' : img.caption;
+                    
+                    return (
+                      <div 
+                        key={idx} 
+                        onClick={() => setSelectedImage(img)}
+                        className={`relative flex flex-col gap-3 group transition-all duration-500 ${
+                          idx === 0 ? 'md:col-span-2 md:row-span-2' : ''
+                        }`}
+                      >
+                        <div className={`relative overflow-hidden rounded-3xl cursor-zoom-in shadow-sm hover:shadow-xl transition-all ${
+                           idx === 0 ? 'h-[400px] md:h-[600px]' : 'h-[200px] md:h-[300px]'
+                        }`}>
+                          <img src={imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={caption || personality.name} />
+                          <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/10 transition-colors flex items-center justify-center">
+                            <LucideMaximize2 className="text-white opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 transition-all shadow-lg" size={32} />
+                          </div>
+                        </div>
+                        {caption && (
+                          <p className="text-xs md:text-sm font-serif italic text-stone-500 px-2 line-clamp-2 leading-relaxed">
+                            {caption}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+               </div>
+            </div>
+          )}
+
           <div className="mt-20 pt-12 border-t border-stone-100">
              <div className="bg-stone-50 p-10 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-8 border border-stone-100">
                 <div>
@@ -111,6 +154,33 @@ export default function PersonalityPage() {
           </div>
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-stone-950/95 flex flex-col items-center justify-center p-4 md:p-10 animate-in fade-in duration-300"
+          onClick={() => setSelectedImage(null)}
+        >
+          <button className="absolute top-8 right-8 text-white/70 hover:text-white transition p-2 bg-white/10 rounded-full z-10">
+            <LucideX size={32} />
+          </button>
+          
+          <div className="relative max-w-5xl w-full flex flex-col items-center gap-6 animate-in zoom-in-95 duration-500" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={typeof selectedImage === 'string' ? selectedImage : selectedImage.url} 
+              className="max-h-[80vh] object-contain shadow-2xl rounded-lg" 
+              alt="Fullscreen View"
+            />
+            {typeof selectedImage !== 'string' && selectedImage.caption && (
+               <div className="bg-white/10 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/10 max-w-2xl text-center shadow-2xl">
+                  <p className="text-white text-lg font-serif italic leading-relaxed">
+                    {selectedImage.caption}
+                  </p>
+               </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

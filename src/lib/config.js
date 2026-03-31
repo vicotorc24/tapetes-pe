@@ -22,5 +22,21 @@ export const CONFIG = {
   },
   EXTERNAL_LINKS: {
     MUNICIPALITY: "https://www.municontumaza.gob.pe/"
+  },
+  LEGACY_CATEGORIES: {
+    TOURISM: "Sitios Turísticos",
+    HISTORY: "Historia",
+    POETS: "Poetas",
+    LITERATURE: "Literatura",
+    ARCHAEOLOGY: "Arqueología",
+    MUSIC: "Música",
+    PAINTING: "Pintura",
+    EDUCATION: "Educación",
+    RELIGION: "Religión",
+    POLITICS: "Política",
+    CRAFTS: "Artesanía",
+    SCIENCE: "Ciencia",
+    SCIENTIST: "Científico",
+    OTHER: "Otros"
   }
 };
