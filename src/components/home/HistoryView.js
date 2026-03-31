@@ -139,8 +139,8 @@ export function HistoryView() {
 
         {/* Priority 3: Human Legacy Header */}
         <div className="pt-20 border-t border-stone-100 text-center">
-            <h3 className="text-3xl font-serif text-stone-900 mb-2">Hijos Ilustres de Contumazá</h3>
-            <p className="text-stone-500 max-w-2xl mx-auto">Conoce a las personalidades que han llevado el nombre de nuestra tierra al mundo.</p>
+            <h3 className="text-3xl font-serif text-stone-900 mb-2">{t('history.illustrious_title')}</h3>
+            <p className="text-stone-500 max-w-2xl mx-auto">{t('history.illustrious_desc')}</p>
         </div>
 
         {/* Featured Personality */}

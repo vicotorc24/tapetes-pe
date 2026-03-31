@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { LucideUser, LucideMail, LucideLock, LucidePhone, LucideMapPin, LucideSend, LucideCheckCircle } from 'lucide-react';
+import { useTranslation } from '@/context/LanguageContext';
 import { Navbar } from '../layout/Navbar';
 
 export function RegisterView() {
   const { register } = useAuth();
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,16 +50,15 @@ export function RegisterView() {
             <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8">
               <LucideCheckCircle size={48} />
             </div>
-            <h2 className="text-3xl font-serif font-bold text-stone-900 mb-4">¡Solicitud Enviada!</h2>
+            <h2 className="text-3xl font-serif font-bold text-stone-900 mb-4">{t('unete.success_title')}</h2>
             <p className="text-stone-600 leading-relaxed mb-8">
-              Gracias {formData.name}, tu solicitud para unirte como artesana ha sido recibida correctamente. 
-              Nuestro administrador evaluará tu perfil y te contactará pronto vía email o WhatsApp.
+              {t('unete.success_desc').replace('{name}', formData.name)}
             </p>
             <button 
               onClick={() => window.location.href = '/'}
               className="bg-stone-900 text-white px-10 py-4 rounded-full font-bold hover:bg-terracotta-600 transition-colors"
             >
-              Volver al inicio
+              {t('unete.back_btn')}
             </button>
           </div>
         </div>
@@ -72,13 +73,12 @@ export function RegisterView() {
         <div className="animate-in fade-in slide-in-from-left-8 duration-1000">
           <div className="flex items-center gap-3 mb-6">
             <span className="h-[1px] w-12 bg-terracotta-500"></span>
-            <span className="text-terracotta-600 font-bold tracking-widest text-xs uppercase">Únete al Legado</span>
+            <span className="text-terracotta-600 font-bold tracking-widest text-xs uppercase">{t('unete.tag')}</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold text-stone-900 mb-8 leading-tight">
-            Teje con nosotras <br/>el futuro de <span className="italic text-terracotta-600 font-light underline decoration-terracotta-200">Contumazá</span>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold text-stone-900 mb-8 leading-tight" dangerouslySetInnerHTML={{ __html: t('unete.title').replace('Contumazá', '<span class="italic text-terracotta-600 font-light underline decoration-terracotta-200">Contumazá</span>') }}>
           </h1>
           <p className="text-xl text-stone-600 font-light leading-relaxed mb-10">
-            Buscamos manos talentosas que deseen compartir su arte con el mundo. Al registrarte, entrarás en un proceso de validación para asegurar la autenticidad de nuestra comunidad.
+            {t('unete.desc')}
           </p>
           <div className="space-y-6">
             <div className="flex gap-4 p-4 rounded-2xl bg-stone-50 border border-stone-100 hover:border-terracotta-200 transition-colors">
@@ -86,8 +86,8 @@ export function RegisterView() {
                 <LucideSend size={20} />
               </div>
               <div>
-                <p className="font-bold text-stone-900">Evaluación Directa</p>
-                <p className="text-sm text-stone-500">Revisamos cada solicitud individualmente para mantener la calidad premium.</p>
+                <p className="font-bold text-stone-900">{t('unete.benefit_title')}</p>
+                <p className="text-sm text-stone-500">{t('unete.benefit_desc')}</p>
               </div>
             </div>
           </div>
@@ -99,8 +99,8 @@ export function RegisterView() {
 
            <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-white mb-2">Formulario de Solicitud</h3>
-                <p className="text-stone-400 text-sm">Completa tus datos para iniciar el proceso</p>
+                <h3 className="text-2xl font-bold text-white mb-2">{t('unete.form_title')}</h3>
+                <p className="text-stone-400 text-sm">{t('unete.form_subtitle')}</p>
               </div>
 
               {error && (
@@ -115,7 +115,7 @@ export function RegisterView() {
                   <input 
                     required 
                     type="text" 
-                    placeholder="Nombre Completo"
+                    placeholder={t('unete.name_placeholder')}
                     className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
                     value={formData.name}
                     onChange={e => setFormData({...formData, name: e.target.value})}
@@ -127,7 +127,7 @@ export function RegisterView() {
                   <input 
                     required 
                     type="email" 
-                    placeholder="Correo Electrónico"
+                    placeholder={t('unete.email_placeholder')}
                     className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
                     value={formData.email}
                     onChange={e => setFormData({...formData, email: e.target.value})}
@@ -139,7 +139,7 @@ export function RegisterView() {
                   <input 
                     required 
                     type="password" 
-                    placeholder="Crear Contraseña"
+                    placeholder={t('unete.pass_placeholder')}
                     className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
                     value={formData.password}
                     onChange={e => setFormData({...formData, password: e.target.value})}
@@ -152,7 +152,7 @@ export function RegisterView() {
                     <input 
                       required 
                       type="text" 
-                      placeholder="Teléfono"
+                      placeholder={t('unete.phone_placeholder')}
                       className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
@@ -163,17 +163,16 @@ export function RegisterView() {
                     <input 
                       required 
                       type="text" 
-                      placeholder="Ubicación"
+                      placeholder={t('unete.location_placeholder')}
                       className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
                       value={formData.location}
                       onChange={e => setFormData({...formData, location: e.target.value})}
                     />
                   </div>
                 </div>
-
                 <div>
                   <textarea 
-                    placeholder="Cuéntanos sobre tu especialidad (ej: Tapetes circulares, crochet...)"
+                    placeholder={t('unete.specialty_placeholder')}
                     className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 px-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all resize-none h-24"
                     value={formData.specialty}
                     onChange={e => setFormData({...formData, specialty: e.target.value})}
@@ -186,11 +185,11 @@ export function RegisterView() {
                 disabled={loading}
                 className="w-full bg-terracotta-600 text-white py-4 rounded-2xl font-bold hover:bg-terracotta-500 transition-all shadow-xl shadow-terracotta-900/40 relative overflow-hidden disabled:opacity-50"
               >
-                {loading ? 'Enviando...' : 'Enviar Solicitud'}
+                {loading ? t('unete.loading_btn') : t('unete.submit_btn')}
               </button>
 
               <p className="text-[11px] text-stone-500 text-center px-4">
-                Al enviar tus datos, aceptas que Tapetes.pe guarde tu información para el proceso de selección artesanal.
+                {t('unete.privacy')}
               </p>
            </form>
         </div>

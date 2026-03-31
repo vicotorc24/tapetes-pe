@@ -89,17 +89,17 @@ export function HomeView({ products, categories = [], activeCategory, collection
         <div className="bg-textilemagenta-900 text-white overflow-hidden relative border-y-8 border-terracotta-500 group">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch justify-between">
             <div className="p-12 md:p-20 flex-1 text-center md:text-left z-10 flex flex-col justify-center">
-              <span className="text-wheat-500 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block animate-in fade-in slide-in-from-left-4 duration-500">Tradición & Fe</span>
-              <h2 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white leading-tight drop-shadow-md">Colección Semana Santa</h2>
+              <span className="text-wheat-500 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block animate-in fade-in slide-in-from-left-4 duration-500">{t('catalog.heritage_tag')}</span>
+              <h2 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white leading-tight drop-shadow-md">{t('catalog.heritage_title')}</h2>
               <p className="text-textilemagenta-100 text-lg mb-10 max-w-xl font-light leading-relaxed">
-                Viste tu mesa y tu hogar con nuestra colección especial dedicada a la devoción de nuestro pueblo. Llevemos el arte del tejido a tu celebración santificada.
+                {t('catalog.heritage_desc')}
               </p>
               <div>
                 <button 
                   onClick={() => onSelectCollection?.('Semana Santa')} 
                   className="bg-wheat-500 text-textilemagenta-900 px-12 py-5 rounded-full font-bold hover:bg-white transition-all transform hover:-translate-y-1 shadow-2xl"
                 >
-                  Explorar la Colección
+                  {t('catalog.heritage_cta')}
                 </button>
               </div>
             </div>
@@ -120,10 +120,10 @@ export function HomeView({ products, categories = [], activeCategory, collection
         <div className="bg-stone-900 text-white overflow-hidden relative border-b-8 border-stone-800 group">
           <div className="max-w-7xl mx-auto px-8 py-20 flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="max-w-2xl">
-              <span className="text-terracotta-400 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block">Legado Contumacino</span>
-              <h2 className="text-4xl font-serif font-bold mb-6 italic text-andeansky-100">Tejiendo el Futuro de Nuestra Herencia</h2>
+              <span className="text-terracotta-400 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block">{t('catalog.impact_tag')}</span>
+              <h2 className="text-4xl font-serif font-bold mb-6 italic text-andeansky-100">{t('catalog.impact_title')}</h2>
               <p className="text-stone-400 text-lg font-light leading-relaxed mb-0">
-                Únete a nuestra misión de preservar el arte del crochet y empoderar a las madres tejedoras del Nido de Cóndores.
+                {t('catalog.impact_desc')}
               </p>
             </div>
             <div className="flex gap-4">
@@ -131,7 +131,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                 onClick={() => window.location.href = '/unete'} 
                 className="bg-white text-stone-900 px-10 py-4 rounded-full font-bold hover:bg-terracotta-600 hover:text-white transition-all shadow-xl"
               >
-                Postular como Artesana
+                {t('catalog.impact_cta')}
               </button>
             </div>
           </div>
@@ -230,7 +230,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                   onClick={() => window.location.href = '/historia'} 
                   className="bg-stone-50 text-stone-900 px-14 py-6 rounded-full font-bold hover:bg-terracotta-600 hover:text-white transition-all duration-500 transform hover:-translate-y-2 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] flex items-center gap-4 group/btn text-lg"
                 >
-                  Nuestro Origen
+                  {t('hero.origin_btn')}
                   <LucideArrowRight size={24} className="group-hover/btn:translate-x-3 transition-transform duration-500" />
                 </button>
               </div>
@@ -312,11 +312,11 @@ export function HomeView({ products, categories = [], activeCategory, collection
         {/* Indicadores de Filtros Aplicados (Pills) */}
         {(activeCategory !== 'Todos' || activeCol || searchTerm) && (
           <div className="flex flex-wrap items-center gap-3 mb-8 animate-in slide-in-from-left duration-500">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mr-2">Filtros:</span>
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mr-2">{t('catalog.filters_label')}</span>
             
             {activeCategory !== 'Todos' && (
               <div className="flex items-center gap-2 bg-stone-100 text-stone-800 px-4 py-2 rounded-full text-xs font-bold border border-stone-200">
-                <span className="text-stone-400 uppercase text-[9px] mr-1 font-black">Categoría</span> {activeCategory}
+                <span className="text-stone-400 uppercase text-[9px] mr-1 font-black">{t('catalog.filter_category')}</span> {activeCategory}
                 <button onClick={() => onSelectCategory?.('Todos')} className="hover:text-terracotta-600 transition-colors ml-1">
                   <LucideX size={14} />
                 </button>
@@ -325,7 +325,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
             
             {activeCol && (
               <div className="flex items-center gap-2 bg-andeansky-50 text-andeansky-900 px-4 py-2 rounded-full text-xs font-bold border border-andeansky-100">
-                <span className="text-andeansky-400 uppercase text-[9px] mr-1 font-black">Colección</span> {activeCol.name}
+                <span className="text-andeansky-400 uppercase text-[9px] mr-1 font-black">{t('catalog.filter_collection')}</span> {activeCol.name}
                 <button onClick={() => onSelectCollection?.(null)} className="hover:text-terracotta-600 transition-colors ml-1">
                   <LucideX size={14} />
                 </button>
@@ -334,7 +334,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
             
             {searchTerm && (
               <div className="flex items-center gap-2 bg-stone-900 text-stone-100 px-4 py-2 rounded-full text-xs font-bold border border-stone-800">
-                <span className="text-stone-500 uppercase text-[9px] mr-1 font-black">Búsqueda</span> "{searchTerm}"
+                <span className="text-stone-500 uppercase text-[9px] mr-1 font-black">{t('catalog.filter_search')}</span> "{searchTerm}"
                 <button onClick={() => onSearch?.('')} className="hover:text-terracotta-600 transition-colors ml-1">
                   <LucideX size={14} />
                 </button>
@@ -346,7 +346,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                 onClick={() => { onSelectCategory?.('Todos'); onSelectCollection?.(null); onSearch?.(''); }}
                 className="text-[10px] font-bold text-terracotta-600 uppercase tracking-widest hover:underline ml-2"
               >
-                Limpiar Todo
+                {t('catalog.clear_all')}
               </button>
             )}
           </div>
@@ -388,7 +388,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                className="bg-stone-900 text-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-terracotta-600 transition-all shadow-xl shadow-stone-900/10 transform active:scale-95 group"
             >
                <LucideX size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-               Limpiar Filtros
+               {t('catalog.clear_filters')}
             </button>
           )}
         </div>
@@ -415,16 +415,16 @@ export function HomeView({ products, categories = [], activeCategory, collection
                     <h3 className="text-xl font-serif font-bold text-stone-900 mb-1 group-hover:text-terracotta-600 transition-colors">{p.title}</h3>
                     <p className="text-[10px] text-stone-400 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
                        <span className="w-1.5 h-1.5 bg-terracotta-500 rounded-full"></span>
-                       {p.sellerName || 'Maestra Contumazina'}
+                       {p.sellerName || t('catalog.artisan_default')}
                     </p>
                   </div>
                   <p className="text-sm text-stone-500 line-clamp-2 mb-6 flex-1 font-light leading-relaxed italic">"{p.description}"</p>
                   <div className="flex items-center justify-between pt-6 border-t border-stone-50 mt-auto">
                     <div>
-                      <p className="text-[9px] font-bold text-stone-400 uppercase tracking-widest mb-0.5">Precio de Origen</p>
+                      <p className="text-[9px] font-bold text-stone-400 uppercase tracking-widest mb-0.5">{t('catalog.origin_price')}</p>
                       <span className="text-2xl font-black text-stone-900">S/ {p.price}</span>
                     </div>
-                    <span className="text-[10px] text-terracotta-600 font-black uppercase tracking-widest bg-terracotta-50 px-4 py-2 rounded-xl group-hover:bg-terracotta-600 group-hover:text-white transition-all">Ver Detalle</span>
+                    <span className="text-[10px] text-terracotta-600 font-black uppercase tracking-widest bg-terracotta-50 px-4 py-2 rounded-xl group-hover:bg-terracotta-600 group-hover:text-white transition-all">{t('catalog.view_detail')}</span>
                   </div>
                 </div>
               </div>
@@ -458,31 +458,31 @@ export function HomeView({ products, categories = [], activeCategory, collection
       <div className="bg-ANDEANGREEN border-t-8 border-terracotta-500 text-stone-800 bg-andeangreen-50 py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">Más que una tienda</span>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6 text-andeangreen-900">Tu Compra con Propósito</h2>
-            <p className="text-lg text-stone-600 max-w-2xl mx-auto">Cada tapete que adquieres en nuestra plataforma digital desencadena una serie de impactos positivos directos en la comunidad de Contumazá.</p>
+            <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">{t('impact.section_subtitle')}</span>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6 text-andeangreen-900">{t('impact.section_title')}</h2>
+            <p className="text-lg text-stone-600 max-w-2xl mx-auto">{t('impact.section_desc')}</p>
           </div>
           <div className="grid md:grid-cols-3 gap-10">
             <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-andeangreen-100 hover:shadow-md transition">
               <div className="w-16 h-16 bg-andeansky-100 text-andeansky-700 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
                 <LucideHeart size={32} />
               </div>
-              <h3 className="text-xl font-bold font-serif mb-3 text-andeansky-900">Comercio Justo 100%</h3>
-              <p className="text-stone-600">Eliminamos a los intermediarios. Al comprar, tu dinero va directo a las manos de la artesana que dedicó horas a la pieza.</p>
+              <h3 className="text-xl font-bold font-serif mb-3 text-andeansky-900">{t('impact.card1_title')}</h3>
+              <p className="text-stone-600">{t('impact.card1_desc')}</p>
             </div>
             <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-andeangreen-100 hover:shadow-md transition">
               <div className="w-16 h-16 bg-terracotta-100 text-terracotta-600 rounded-2xl flex items-center justify-center mx-auto mb-6 transform -rotate-3">
                 <LucideGlobe2 size={32} />
               </div>
-              <h3 className="text-xl font-bold font-serif mb-3 text-terracotta-900">Rescate Cultural</h3>
-              <p className="text-stone-600">Al darle valor económico internacional al tejido a crochet, incentivamos a que las nuevas generaciones no dejen morir su arte ancestral.</p>
+              <h3 className="text-xl font-bold font-serif mb-3 text-terracotta-900">{t('impact.card2_title')}</h3>
+              <p className="text-stone-600">{t('impact.card2_desc')}</p>
             </div>
             <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-andeangreen-100 hover:shadow-md transition">
               <div className="w-16 h-16 bg-textilemagenta-100 text-textilemagenta-600 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
                 <LucideUsers size={32} />
               </div>
-              <h3 className="text-xl font-bold font-serif mb-3 text-textilemagenta-900">Empoderamiento</h3>
-              <p className="text-stone-600">Generamos independencia económica para decenas de madres rurales que tejen desde sus casas mientras cuidan a sus familias.</p>
+              <h3 className="text-xl font-bold font-serif mb-3 text-textilemagenta-900">{t('impact.card3_title')}</h3>
+              <p className="text-stone-600">{t('impact.card3_desc')}</p>
             </div>
           </div>
         </div>

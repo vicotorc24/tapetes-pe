@@ -54,8 +54,8 @@ export function AboutView() {
             <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-stone-100 flex items-center justify-center mx-auto mb-6 text-terracotta-600">
                <LucideMapPin size={32} />
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-serif">Nuestra Tierra</h2>
-            <p className="text-xl text-stone-600 font-light">Contumazá, Cajamarca, Perú. A 2,675 m.s.n.m, en el balcón hacia los Andes.</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4 font-serif">{t('about.land_title')}</h2>
+            <p className="text-xl text-stone-600 font-light">{t('about.land_desc')}</p>
           </div>
           
           <div className="rounded-[3rem] overflow-hidden shadow-2xl border border-stone-200/50 h-[500px] w-full relative z-10 bg-stone-100">

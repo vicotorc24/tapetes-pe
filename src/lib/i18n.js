@@ -1,8 +1,50 @@
 export const translations = {
   es: {
     nav: { catalog: "Catálogo", story: "Nosotras", heritage: "Herencia", admin: "Acceso", dashboard: "Mi Taller", join: "Únete", banner: "✨ ¿Tejes un legado? Únete a nuestra comunidad de artesanas • Postula aquí ✨", language: "Idioma", slogan: "Artesanía de Contumazá" },
-    hero: { subtitle: "Artesanía & Tradición", title1: "Tejidos con Alma", title2: "de Contumazá", desc: "Piezas únicas tejidas a mano por madres artesanas bajo la neblina del cerro El Calvario.", cta: "Ver Colección", heritage: "Nuestra Herencia" },
-    catalog: { title: "Colección Exclusiva", featured: "DESTACADO", view: "Ver Detalle", empty: "No hay productos aquí.", search_placeholder: "Buscar tapetes, manteles o artesanas...", categories_label: "Categorías:", cat_all: "Todos", cat_table: "Mesa", cat_decor: "Decoración", cat_acc: "Accesorios", explore: "Explora Colección", no_search: "No encontramos resultados para", future: "Próximamente más tesoros" },
+    hero: { subtitle: "Artesanía & Tradición", title1: "Tejidos con Alma", title2: "de Contumazá", desc: "Piezas únicas tejidas a mano por madres artesanas bajo la neblina del cerro El Calvario.", cta: "Ver Colección", heritage: "Nuestra Herencia", origin_btn: "Nuestro Origen" },
+    catalog: { 
+      title: "Colección Exclusiva", 
+      featured: "DESTACADO", 
+      view: "Ver Detalle", 
+      empty: "No hay productos aquí.", 
+      search_placeholder: "Buscar tapetes, manteles o artesanas...", 
+      categories_label: "Categorías:", 
+      filters_label: "Filtros:",
+      filter_category: "Categoría",
+      filter_collection: "Colección",
+      filter_search: "Búsqueda",
+      clear_all: "Limpiar Todo",
+      clear_filters: "Limpiar Filtros",
+      origin_price: "Precio de Origen",
+      artisan_default: "Maestra Contumazina",
+      view_detail: "Ver Detalle",
+      cat_all: "Todos", 
+      cat_table: "Mesa", 
+      cat_decor: "Decoración", 
+      cat_acc: "Accesorios", 
+      explore: "Explora Colección", 
+      no_search: "No encontramos resultados para", 
+      future: "Próximamente más tesoros",
+      heritage_tag: "Tradición & Fe",
+      heritage_title: "Colección Semana Santa",
+      heritage_desc: "Viste tu mesa y tu hogar con nuestra colección especial dedicada a la devoción de nuestro pueblo. Llevemos el arte del tejido a tu celebración santificada.",
+      heritage_cta: "Explorar la Colección",
+      impact_tag: "Legado Contumacino",
+      impact_title: "Tejiendo el Futuro de Nuestra Herencia",
+      impact_desc: "Únete a nuestra misión de preservar el arte del crochet y empoderar a las madres tejedoras del Nido de Cóndores.",
+      impact_cta: "Postular como Artesana"
+    },
+    impact: {
+      section_title: "Tu Compra con Propósito",
+      section_subtitle: "Más que una tienda",
+      section_desc: "Cada tapete que adquieres en nuestra plataforma digital desencadena una serie de impactos positivos directos en la comunidad de Contumazá.",
+      card1_title: "Comercio Justo 100%",
+      card1_desc: "Eliminamos a los intermediarios. Al comprar, tu dinero va directo a las manos de la artesana que dedicó horas a la pieza.",
+      card2_title: "Rescate Cultural",
+      card2_desc: "Al darle valor económico internacional al tejido a crochet, incentivamos a que las nuevas generaciones no dejen morir su arte ancestral.",
+      card3_title: "Empoderamiento",
+      card3_desc: "Generamos independencia económica para decenas de madres rurales que tejen desde sus casas mientras cuidan a sus familias."
+    },
     product: { back: "Volver al catálogo", add: "Agregar al Pedido", unique: "Pieza Única", by: "Tejido por", support: "Apoyas directamente a su familia.", related: "También te podría gustar", stock: "Disponibles" },
     cart: { title: "Tu Pedido", empty: "Tu canasta está vacía", total: "Total Estimado", pay_method: "Elige cómo pagar:", wa_btn: "Enviar Pedido", card_btn: "Pagar Ahora", wa_desc: "Sin comisión", card_desc: "Pago seguro" },
     history: {
@@ -32,7 +74,9 @@ export const translations = {
       sites: {
         title: "Lugares con Historia",
         subtitle: "Explora la riqueza turística y arqueológica de nuestra tierra."
-      }
+      },
+      illustrious_title: "Hijos Ilustres de Contumazá",
+      illustrious_desc: "Conoce a las personalidades que han llevado el nombre de nuestra tierra al mundo."
     },
     about: {
       essence: "Nuestra Esencia",
@@ -48,14 +92,79 @@ export const translations = {
         pay: "Pago Directo 100%",
         auth: "Autenticidad Garantizada",
         cta: "Escríbenos por WhatsApp"
-      }
+      },
+      land_title: "Nuestra Tierra",
+      land_desc: "Contumazá, Cajamarca, Perú. A 2,675 m.s.n.m, en el balcón hacia los Andes."
+    },
+    unete: {
+      tag: "Únete al Legado",
+      title: "Teje con nosotras el futuro de Contumazá",
+      desc: "Buscamos manos talentosas que deseen compartir su arte con el mundo. Al registrarte, entrarás en un proceso de validación para asegurar la autenticidad de nuestra comunidad.",
+      benefit_title: "Evaluación Directa",
+      benefit_desc: "Revisamos cada solicitud individualmente para mantener la calidad premium.",
+      form_title: "Formulario de Solicitud",
+      form_subtitle: "Completa tus datos para iniciar el proceso",
+      name_placeholder: "Nombre Completo",
+      email_placeholder: "Correo Electrónico",
+      pass_placeholder: "Crear Contraseña",
+      phone_placeholder: "Teléfono",
+      location_placeholder: "Ubicación",
+      specialty_placeholder: "Cuéntanos sobre tu especialidad (ej: Tapetes circulares, crochet...)",
+      submit_btn: "Enviar Solicitud",
+      loading_btn: "Enviando...",
+      privacy: "Al enviar tus datos, aceptas que Tapetes.pe guarde tu información para el proceso de selección artesanal.",
+      success_title: "¡Solicitud Enviada!",
+      success_desc: "Gracias {name}, tu solicitud para unirte como artesana ha sido recibida correctamente. Nuestro administrador evaluará tu perfil y te contactará pronto vía email o WhatsApp.",
+      back_btn: "Volver al inicio"
     },
     footer: { purpose: "Conectando el talento ancestral de las madres de Contumazá con hogares que valoran la autenticidad.", explore: "Explorar", help: "Ayuda", contact: "Contacto", slogan: "Artesanía de Contumazá", impact: "Impacto Social", shipping: "Envíos", care: "Cuidado", faq: "FAQ", legacy: "Legado Ancestral", backed_by: "Respaldado por la", municipality: "Municipalidad Provincial de Contumazá" }
   },
   en: {
     nav: { catalog: "Shop", story: "Our Story", heritage: "Heritage", admin: "Login", dashboard: "Dashboard", join: "Join Us", banner: "✨ Weave a legacy? Join our artisan community • Apply here ✨", language: "Language", slogan: "Crafts of Contumazá" },
-    hero: { subtitle: "Craft & Tradition", title1: "Weavings with Soul", title2: "from the Andes", desc: "Unique pieces handwoven by artisan mothers beneath the mist of Mount Calvario.", cta: "Shop Collection", heritage: "Our Heritage" },
-    catalog: { title: "Exclusive Collection", featured: "FEATURED", view: "View Details", empty: "No products found.", search_placeholder: "Search rugs, tablecloths or artisans...", categories_label: "Categories:", cat_all: "All", cat_table: "Table", cat_decor: "Decor", cat_acc: "Accessories", explore: "Explore Collection", no_search: "We found no results for", future: "More treasures coming soon" },
+    hero: { subtitle: "Craft & Tradition", title1: "Weavings with Soul", title2: "from the Andes", desc: "Unique pieces handwoven by artisan mothers beneath the mist of Mount Calvario.", cta: "Shop Collection", heritage: "Our Heritage", origin_btn: "Our Origin" },
+    catalog: { 
+      title: "Exclusive Collection", 
+      featured: "FEATURED", 
+      view: "View Details", 
+      empty: "No products found.", 
+      search_placeholder: "Search rugs, tablecloths or artisans...", 
+      categories_label: "Categories:", 
+      filters_label: "Filters:",
+      filter_category: "Category",
+      filter_collection: "Collection",
+      filter_search: "Search",
+      clear_all: "Clear All",
+      clear_filters: "Clear Filters",
+      origin_price: "Origin Price",
+      artisan_default: "Contumacina Master",
+      view_detail: "View Details",
+      cat_all: "All", 
+      cat_table: "Table", 
+      cat_decor: "Decor", 
+      cat_acc: "Accessories", 
+      explore: "Explore Collection", 
+      no_search: "We found no results for", 
+      future: "More treasures coming soon",
+      heritage_tag: "Tradition & Faith",
+      heritage_title: "Holy Week Collection",
+      heritage_desc: "Dress your table and your home with our special collection dedicated to the devotion of our people. Let's bring the art of weaving to your sanctified celebration.",
+      heritage_cta: "Explore the Collection",
+      impact_tag: "Contumacino Legacy",
+      impact_title: "Weaving the Future of Our Heritage",
+      impact_desc: "Join our mission to preserve the art of crochet and empower the weaving mothers of the Condors' Nest.",
+      impact_cta: "Apply as Artisan"
+    },
+    impact: {
+      section_title: "Purchase with Purpose",
+      section_subtitle: "More than a store",
+      section_desc: "Every rug you purchase on our digital platform triggers a series of direct positive impacts on the Contumazá community.",
+      card1_title: "100% Fair Trade",
+      card1_desc: "We eliminate intermediaries. When you buy, your money goes directly into the hands of the artisan who dedicated hours to the piece.",
+      card2_title: "Cultural Rescue",
+      card2_desc: "By giving international economic value to crochet weaving, we encourage new generations not to let their ancestral art die.",
+      card3_title: "Empowerment",
+      card3_desc: "We generate economic independence for dozens of rural mothers who weave from their homes while caring for their families."
+    },
     product: { back: "Back to Shop", add: "Add to Order", unique: "One of a Kind", by: "Woven by", support: "Directly supports her family.", related: "You might also like", stock: "Available" },
     cart: { title: "Your Order", empty: "Your cart is empty", total: "Estimated Total", pay_method: "Choose payment method:", wa_btn: "Order via WhatsApp", card_btn: "Pay Now", wa_desc: "No fees", card_desc: "Secure payment" },
     history: {
@@ -85,7 +194,9 @@ export const translations = {
       sites: {
         title: "Historic Landmarks",
         subtitle: "Explore the touristic and archaeological richness of our land."
-      }
+      },
+      illustrious_title: "Illustrious Children of Contumazá",
+      illustrious_desc: "Get to know the personalities who have taken the name of our land to the world."
     },
     about: {
       essence: "Our Essence",
@@ -101,7 +212,30 @@ export const translations = {
         pay: "100% Direct Payment",
         auth: "Guaranteed Authenticity",
         cta: "Message us on WhatsApp"
-      }
+      },
+      land_title: "Our Land",
+      land_desc: "Contumazá, Cajamarca, Peru. At 2,675 m.a.s.l., on the balcony to the Andes."
+    },
+    unete: {
+      tag: "Join the Legacy",
+      title: "Weave the future of Contumazá with us",
+      desc: "We are looking for talented hands who wish to share their art with the world. By registering, you will enter a validation process to ensure the authenticity of our community.",
+      benefit_title: "Direct Evaluation",
+      benefit_desc: "We review each application individually to maintain premium quality.",
+      form_title: "Application Form",
+      form_subtitle: "Complete your details to start the process",
+      name_placeholder: "Full Name",
+      email_placeholder: "Email Address",
+      pass_placeholder: "Create Password",
+      phone_placeholder: "Phone",
+      location_placeholder: "Location",
+      specialty_placeholder: "Tell us about your specialty (e.g., circular rugs, crochet...)",
+      submit_btn: "Submit Application",
+      loading_btn: "Sending...",
+      privacy: "By submitting your data, you agree that Tapetes.pe will store your information for the artisan selection process.",
+      success_title: "Application Submitted!",
+      success_desc: "Thank you {name}, your application to join as an artisan has been successfully received. Our administrator will evaluate your profile and contact you soon via email or WhatsApp.",
+      back_btn: "Back to Home"
     },
     footer: { purpose: "Connecting the ancestral talent of Contumazá mothers with homes that value authenticity.", explore: "Explore", help: "Help", contact: "Contact", slogan: "Crafts of Contumazá", impact: "Social Impact", shipping: "Shipping", care: "Care", faq: "FAQ", legacy: "Ancestral Legacy", backed_by: "Supported by the", municipality: "Provincial Municipality of Contumazá" }
   }
