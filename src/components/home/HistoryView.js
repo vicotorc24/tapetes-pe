@@ -27,7 +27,15 @@ export function HistoryView() {
     ![CONFIG.LEGACY_CATEGORIES.POETS, CONFIG.LEGACY_CATEGORIES.TOURISM, CONFIG.LEGACY_CATEGORIES.HISTORY, CONFIG.LEGACY_CATEGORIES.FESTIVITIES].includes(p.category) && 
     p.id !== featured?.id
   );
-  const festivities = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES);
+  const festivities = personalities
+    .filter(p => p.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES)
+    .sort((a, b) => {
+      const isA = a.slug === 'semana-santa' || a.name.toLowerCase().includes('semana santa');
+      const isB = b.slug === 'semana-santa' || b.name.toLowerCase().includes('semana santa');
+      if (isA) return -1;
+      if (isB) return 1;
+      return 0;
+    });
 
   const goToPersonality = (slug) => {
     window.location.href = `/historia/${slug}`;

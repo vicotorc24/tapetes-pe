@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTranslation } from '@/context/LanguageContext';
 import { getPersonalityBySlug } from '@/lib/services/personalities';
-import { LucideQuote, LucideArrowLeft, LucideCalendar, LucideUser, LucideChevronRight, LucideMaximize2, LucideX } from 'lucide-react';
+import { LucideQuote, LucideArrowLeft, LucideCalendar, LucideUser, LucideChevronRight, LucideMaximize2, LucideX, LucidePartyPopper } from 'lucide-react';
+import { CONFIG } from '@/lib/config';
 
 export default function PersonalityPage() {
   const { slug } = useParams();
@@ -81,16 +82,16 @@ export default function PersonalityPage() {
         <div className="bg-white rounded-[3rem] p-10 md:p-20 shadow-xl -mt-32 relative z-10 border border-stone-100">
           <div className="mb-12 flex flex-wrap gap-8 items-center text-stone-400 text-sm border-b border-stone-100 pb-8 font-sans">
             <div className="flex items-center gap-2">
-              {personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? (
+              {personality.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES ? (
                 <LucidePartyPopper size={18} className="text-terracotta-600" />
               ) : (
                 <LucideUser size={18} className="text-andeansky-700" />
               )}
-              <span>{personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? 'Festividad de Contumazá' : 'Figura Ilustre de Contumazá'}</span>
+              <span>{personality.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES ? 'Festividad de Contumazá' : 'Figura Ilustre de Contumazá'}</span>
             </div>
             <div className="flex items-center gap-2">
-              <LucideCalendar size={18} className={personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? "text-terracotta-600" : "text-andeansky-700"} />
-              <span>{personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? 'Calendario Cultural' : 'Memoria Histórica'}</span>
+              <LucideCalendar size={18} className={personality.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES ? "text-terracotta-600" : "text-andeansky-700"} />
+              <span>{personality.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES ? 'Calendario Cultural' : 'Memoria Histórica'}</span>
             </div>
           </div>
 
