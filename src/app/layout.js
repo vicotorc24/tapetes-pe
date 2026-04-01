@@ -1,6 +1,7 @@
 import React from "react";
 import { Inter, Merriweather } from "next/font/google";
 import { ClientProviders } from "@/components/providers/ClientProviders";
+import { WebVitals } from "@/components/providers/WebVitals";
 import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body className={`${inter.variable} ${merriweather.variable} font-sans bg-[#FFFBF7]`}>
         <ClientProviders>
+          <WebVitals />
           {children}
         </ClientProviders>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />

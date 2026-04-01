@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from '@/context/LanguageContext';
 import { useCart } from '@/context/CartContext';
 import { LucideX, LucideTrash2, LucideShoppingBag, LucidePhone, LucideCreditCard } from 'lucide-react';
+import { AnalyticsEvents } from '@/lib/analytics';
 
 export function CartDrawer() {
   const { cart, cartTotal, isCartOpen, setIsCartOpen, removeFromCart } = useCart();
@@ -24,6 +25,7 @@ export function CartDrawer() {
   if (!isCartOpen) return null;
 
   const handleCheckout = () => {
+    AnalyticsEvents.BEGIN_CHECKOUT(cartTotal, paymentMethod);
     if (paymentMethod === 'whatsapp') {
       const text = `Hola, deseo adquirir: ${cart.map(i => i.title).join(', ')}. Total: S/${cartTotal}`;
       const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '51908513551';
@@ -60,9 +62,12 @@ export function CartDrawer() {
                    <h4 className="font-bold text-sm text-stone-800">{item.title}</h4>
                    <p className="text-andeansky-700 font-bold text-sm font-serif">S/ {item.price}</p>
                  </div>
-                 <button onClick={() => removeFromCart(i)} className="text-stone-300 hover:text-red-500 transition-colors">
-                   <LucideTrash2 size={16}/>
-                 </button>
+                  <button onClick={() => {
+                    AnalyticsEvents.REMOVE_FROM_CART(item);
+                    removeFromCart(i);
+                  }} className="text-stone-300 hover:text-red-500 transition-colors">
+                    <LucideTrash2 size={16}/>
+                  </button>
                </div>
              ))}
              {cart.length === 0 && (

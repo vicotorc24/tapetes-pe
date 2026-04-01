@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { LucideUser, LucideLoader, LucideEye, LucideEyeOff } from 'lucide-react';
+import { AnalyticsEvents } from '@/lib/analytics';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -24,8 +25,10 @@ export default function LoginPage() {
     const result = await login(email, password);
 
     if (result.success) {
+      AnalyticsEvents.LOGIN('email', 'success');
       router.push('/admin');
     } else {
+      AnalyticsEvents.LOGIN('email', 'failure');
       setError('Credenciales incorrectas. Intenta de nuevo.');
       setIsLoggingIn(false);
     }
@@ -40,8 +43,10 @@ export default function LoginPage() {
     setSuccess('');
     const result = await resetPassword(email);
     if (result.success) {
+      AnalyticsEvents.trackEvent('password_reset_request', { email });
       setSuccess('Se ha enviado un correo para restablecer tu contraseña. Revisa tu reserva.');
     } else {
+      setSuccess('');
       setError('No pudimos enviar el correo. Verifica que la dirección sea correcta.');
     }
   };

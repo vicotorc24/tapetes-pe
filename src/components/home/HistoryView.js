@@ -4,6 +4,7 @@ import { useTranslation } from '../../context/LanguageContext';
 import { LucideQuote, LucideMountain, LucideFeather, LucideHistory, LucideCompass } from 'lucide-react';
 import { getPersonalities } from '../../lib/services/personalities';
 import { CONFIG } from '../../lib/config';
+import { AnalyticsEvents } from '../../lib/analytics';
 
 export function HistoryView() {
   const { t } = useTranslation();
@@ -47,8 +48,9 @@ export function HistoryView() {
       return 0;
     });
 
-  const goToPersonality = (slug) => {
-    window.location.href = `/historia/${slug}`;
+  const goToPersonality = (item) => {
+    if (item) AnalyticsEvents.LEGACY_VIEW(item);
+    window.location.href = `/historia/${item.slug || item}`;
   };
 
   return (
@@ -81,7 +83,7 @@ export function HistoryView() {
         {historyItems.length > 0 && (
           <section className="space-y-12">
             {historyItems.map((item, idx) => (
-              <div key={item.id} onClick={() => goToPersonality(item.slug)} className="group cursor-pointer bg-white rounded-[3rem] overflow-hidden border border-stone-100 shadow-sm hover:shadow-xl transition-all duration-700">
+              <div key={item.id} onClick={() => goToPersonality(item)} className="group cursor-pointer bg-white rounded-[3rem] overflow-hidden border border-stone-100 shadow-sm hover:shadow-xl transition-all duration-700">
                 <div className="grid md:grid-cols-2 gap-0">
                   <div className={`relative h-[400px] md:h-auto ${idx % 2 !== 0 ? 'md:order-2' : ''}`}>
                     <img src={item.image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[3000ms]" alt={item.name} />
@@ -139,7 +141,7 @@ export function HistoryView() {
             </div>
             <div className="grid md:grid-cols-2 gap-10">
               {sites.map(site => (
-                <div key={site.id} onClick={() => goToPersonality(site.slug)} className="group relative h-[450px] rounded-[2.5rem] overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-700">
+                <div key={site.id} onClick={() => goToPersonality(site)} className="group relative h-[450px] rounded-[2.5rem] overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-700">
                   <img src={site.image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]" alt={site.name} />
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-900/90 via-stone-900/20 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 p-10 w-full">
@@ -170,7 +172,7 @@ export function HistoryView() {
                   
                   if (isSemanaSanta) {
                     return (
-                      <div key={item.id} onClick={() => goToPersonality(item.slug)} className="relative overflow-hidden rounded-[3rem] group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-500">
+                      <div key={item.id} onClick={() => goToPersonality(item)} className="relative overflow-hidden rounded-[3rem] group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-500">
                         <div className="absolute inset-0 bg-[#3d0a44]"> {/* Purple background from poster */}
                            <img 
                              src={item.image} 
@@ -210,7 +212,7 @@ export function HistoryView() {
                   }
 
                   return (
-                    <div key={item.id} onClick={() => goToPersonality(item.slug)} className="bg-stone-50 rounded-[3rem] p-8 md:p-12 border border-stone-100 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-500">
+                    <div key={item.id} onClick={() => goToPersonality(item)} className="bg-stone-50 rounded-[3rem] p-8 md:p-12 border border-stone-100 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-500">
                        <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
                           <div className="w-full md:w-1/3 aspect-square rounded-[2rem] overflow-hidden shadow-2xl relative">
                              <img src={item.image} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={item.name} />
@@ -248,7 +250,7 @@ export function HistoryView() {
         {/* Featured Personality */}
         {featured && (
           <section className="grid lg:grid-cols-2 gap-12 items-center bg-stone-50/50 p-8 md:p-12 rounded-[3rem] border border-stone-100/50">
-            <div className="order-2 lg:order-1 relative cursor-pointer" onClick={() => goToPersonality(featured.slug)}>
+            <div className="order-2 lg:order-1 relative cursor-pointer" onClick={() => goToPersonality(featured)}>
               <div className="rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl transform -rotate-1 border-4 border-white">
                 <img src={featured.image} className="w-full h-full object-cover transition-transform hover:scale-105 duration-700" alt={featured.name} />
               </div>
@@ -258,7 +260,7 @@ export function HistoryView() {
               <h2 className="text-3xl md:text-4xl font-serif text-stone-900 mb-6">{featured.name}</h2>
               <div className="space-y-4 text-stone-600 leading-relaxed">
                 <div className="text-lg line-clamp-6 prose prose-stone lg:prose-lg" dangerouslySetInnerHTML={{ __html: featured.description?.replace(/&nbsp;/g, ' ') }} />
-                <button onClick={() => goToPersonality(featured.slug)} className="text-andeansky-700 font-bold hover:underline">{t('history.read_more')}</button>
+                <button onClick={() => goToPersonality(featured)} className="text-andeansky-700 font-bold hover:underline">{t('history.read_more')}</button>
               </div>
             </div>
           </section>
@@ -294,7 +296,7 @@ export function HistoryView() {
                      {poets.map((p) => (
                        <button 
                          key={p.id} 
-                         onClick={() => goToPersonality(p.slug)} 
+                         onClick={() => goToPersonality(p)} 
                          className="group/card bg-white h-24 p-2 pr-8 rounded-2xl shadow-sm border border-stone-100 hover:border-terracotta-200 hover:shadow-xl transition-all duration-500 flex items-center gap-5 text-left active:scale-95"
                        >
                          <div className="relative shrink-0">
@@ -335,7 +337,7 @@ export function HistoryView() {
             <h3 className="text-2xl font-serif text-stone-900 text-center">{t('history.others')}</h3>
             <div className="grid md:grid-cols-3 gap-6">
               {others.map(p => (
-                <div key={p.id} onClick={() => goToPersonality(p.slug)} className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-andeansky-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+                <div key={p.id} onClick={() => goToPersonality(p)} className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-andeansky-200 shadow-sm hover:shadow-md transition cursor-pointer group">
                   <div className="w-16 h-16 rounded-full bg-stone-100 mb-4 overflow-hidden border-2 border-white shadow-sm">
                     <img src={p.image} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" alt={p.name} />
                   </div>

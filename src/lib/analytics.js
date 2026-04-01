@@ -48,5 +48,34 @@ export const AnalyticsEvents = {
     item_name: product.title,
     value: parseFloat(product.price) || 0,
     currency: 'PEN'
+  }),
+  LEGACY_VIEW: (item) => trackEvent('legacy_interaction', {
+    legacy_id: item.id || item.slug,
+    legacy_name: item.name,
+    legacy_category: item.category
+  }),
+  LOGIN: (method, status) => trackEvent('login', {
+    method: method || 'email',
+    status: status || 'success'
+  }),
+  JOIN_INTERACTION: (type) => trackEvent('join_community_click', {
+    cta_type: type || 'artisan_registration'
+  }),
+  ABOUT_SECTION_VIEW: (section) => trackEvent('about_us_engagement', {
+    section_name: section
+  }),
+  REMOVE_FROM_CART: (product) => trackEvent('remove_from_cart', {
+    item_id: product.id,
+    item_name: product.title,
+    value: parseFloat(product.price) || 0,
+    currency: 'PEN'
+  }),
+  BEGIN_CHECKOUT: (total, method) => trackEvent('begin_checkout', {
+    value: total,
+    currency: 'PEN',
+    payment_type: method
+  }),
+  IMPACT_VIEW: (section) => trackEvent('social_impact_engagement', {
+    section_name: section
   })
 };

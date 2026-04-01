@@ -2,9 +2,14 @@
 import React from 'react';
 import { useTranslation } from '../../context/LanguageContext';
 import { LucideHeartHandshake, LucideTrendingUp, LucideAward } from 'lucide-react';
+import { AnalyticsEvents } from '@/lib/analytics';
 
 export function ImpactView() {
   const { t } = useTranslation();
+
+  React.useEffect(() => {
+    AnalyticsEvents.IMPACT_VIEW('general');
+  }, []);
 
   return (
     <div className="pt-20 animate-in fade-in">

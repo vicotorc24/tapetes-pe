@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { LucideUser, LucideMail, LucideLock, LucidePhone, LucideMapPin, LucideSend, LucideCheckCircle } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { Navbar } from '../layout/Navbar';
+import { AnalyticsEvents } from '@/lib/analytics';
 
 export function RegisterView() {
   const { register } = useAuth();
@@ -22,6 +23,11 @@ export function RegisterView() {
     status: 'pending' // Estado crucial para la evaluación del admin
   });
 
+  // Tracking de vista del formulario
+  React.useEffect(() => {
+    AnalyticsEvents.JOIN_INTERACTION('form_view');
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -30,8 +36,10 @@ export function RegisterView() {
     try {
       const result = await register(formData.email, formData.password, formData);
       if (result.success) {
+        AnalyticsEvents.JOIN_INTERACTION('form_success');
         setIsSubmitted(true);
       } else {
+        AnalyticsEvents.JOIN_INTERACTION('form_failure');
         setError(result.error || 'Ocurrió un error al enviar tu solicitud.');
       }
     } catch (e) {

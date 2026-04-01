@@ -5,12 +5,19 @@ import { useCart } from '@/context/CartContext';
 import { useTranslation } from '@/context/LanguageContext';
 import { Navbar } from '@/components/layout/Navbar';
 import { CONFIG } from '@/lib/config';
+import { AnalyticsEvents } from '@/lib/analytics';
 
 export function AboutView() {
   const { addToCart } = useCart();
   const { t } = useTranslation();
 
+  // Tracking inicial de página
+  React.useEffect(() => {
+    AnalyticsEvents.ABOUT_SECTION_VIEW('general');
+  }, []);
+
   const handleContact = () => {
+    AnalyticsEvents.JOIN_INTERACTION('about_us_contact');
     window.open(`https://wa.me/${CONFIG.CONTACT.WHATSAPP.replace(/\s+/g, '')}?text=Hola,%20quisiera%20saber%20m%C3%A1s%20sobre%20su%20historia.`);
   };
 
