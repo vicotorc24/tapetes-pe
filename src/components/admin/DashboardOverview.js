@@ -2,9 +2,9 @@
 import React from 'react';
 import { StatCard } from '../ui/StatCard';
 import { SimpleBarChart } from '../ui/SimpleBarChart';
-import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar } from 'lucide-react';
+import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTriangle, LucideRotateCcw } from 'lucide-react';
 
-export function DashboardOverview({ products, user }) {
+export function DashboardOverview({ products, user, onRepair }) {
   return (
     <div className="animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-8">
@@ -13,6 +13,7 @@ export function DashboardOverview({ products, user }) {
           <p className="text-sm text-stone-500">Bienvenido de vuelta, {user.name}</p>
         </div>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatCard title="Ventas del Mes" value="S/ 1,820.00" trend="+15%" trendUp={true} icon={LucideShoppingBag} color="bg-green-100 text-green-700" />
         <StatCard title="Productos Activos" value={products.length} trend="+2" trendUp={true} icon={LucidePackage} color="bg-blue-100 text-blue-700" />

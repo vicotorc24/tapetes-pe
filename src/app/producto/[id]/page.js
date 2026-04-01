@@ -14,7 +14,9 @@ import {
   LucideChevronLeft,
   LucideChevronRight,
   LucideTags,
-  LucideMessageCircle
+  LucideMessageCircle,
+  LucideMaximize2,
+  LucideX
 } from 'lucide-react';
 import Link from 'next/link';
 import { getProductById } from '@/lib/services/products';
@@ -30,6 +32,8 @@ export default function ProductPage({ params }) {
   const [activeImage, setActiveImage] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
 
   const handleMouseMove = (e) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
@@ -58,6 +62,30 @@ export default function ProductPage({ params }) {
     };
     fetchProductAndArtisan();
   }, [productId]);
+
+  // Manejo de Gestos Táctiles para Lightbox
+  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchStart - touchEnd;
+    
+    if (diff > 50) { // Swipe Left (Siguiente)
+      setActiveImage(prev => prev === images.length - 1 ? 0 : prev + 1);
+    } else if (diff < -50) { // Swipe Right (Anterior)
+      setActiveImage(prev => prev === 0 ? images.length - 1 : prev - 1);
+    }
+    setTouchStart(null);
+  };
+
+  // Manejo de Teclado (Esc para cerrar)
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsLightboxOpen(false);
+    };
+    if (isLightboxOpen) window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isLightboxOpen]);
 
   const getWhatsAppLink = () => {
     if (!artisan?.whatsapp && !artisan?.phone) return '#';
@@ -120,10 +148,18 @@ export default function ProductPage({ params }) {
                  ⚡ Destacado
                </div>
              )}
+
+             <button 
+               onClick={(e) => { e.stopPropagation(); setIsLightboxOpen(true); }}
+               className="absolute top-6 right-6 z-20 bg-white/90 backdrop-blur-md text-stone-900 w-10 h-10 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:scale-110 active:scale-95"
+               title="Ver a pantalla completa"
+             >
+               <LucideMaximize2 size={18} />
+             </button>
              
              <div className="w-full h-full relative overflow-hidden">
                 <img 
-                  src={images[activeImage]} 
+                  src={typeof images[activeImage] === 'string' ? images[activeImage] : images[activeImage]?.url} 
                   className={`w-full h-full object-cover transition-transform duration-300 pointer-events-none ${
                     isZoomed ? 'scale-[2.5]' : 'scale-100'
                   }`}
@@ -169,7 +205,7 @@ export default function ProductPage({ params }) {
                     activeImage === idx ? 'border-andeansky-700 scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} className="w-full h-full object-cover" alt="" />
+                  <img src={typeof img === 'string' ? img : img?.url} className="w-full h-full object-cover" alt="" />
                 </button>
               ))}
             </div>
@@ -304,6 +340,68 @@ export default function ProductPage({ params }) {
           </div>
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {isLightboxOpen && (
+        <div 
+          className="fixed inset-0 z-[200] bg-stone-950/98 flex flex-col items-center justify-center p-4 md:p-10 animate-in fade-in duration-300"
+          onClick={() => setIsLightboxOpen(false)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Botón de Cierre */}
+          <button 
+            className="absolute top-6 right-6 md:top-8 md:right-8 text-white/50 hover:text-white transition-all p-3 bg-white/5 rounded-full z-10 hover:rotate-90"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <LucideX size={24} className="md:w-8 md:h-8" />
+          </button>
+          
+          {/* Contenido Principal del Lightbox */}
+          <div className="relative max-w-6xl w-full flex flex-col items-center gap-6 md:gap-8 animate-in zoom-in-95 duration-500" onClick={(e) => e.stopPropagation()}>
+            <div className="relative group/modal w-full flex items-center justify-center">
+              <img 
+                src={typeof images[activeImage] === 'string' ? images[activeImage] : images[activeImage]?.url} 
+                className="max-h-[70vh] md:max-h-[75vh] w-auto object-contain shadow-2xl rounded-2xl border border-white/10 select-none" 
+                alt={product.title}
+                draggable="false"
+              />
+
+              {images.length > 1 && (
+                <>
+                  <button 
+                    onClick={() => setActiveImage(prev => prev === 0 ? images.length - 1 : prev - 1)}
+                    className="absolute left-0 md:-left-20 top-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white/5 hover:bg-white/10 rounded-full hidden md:flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5"
+                  >
+                    <LucideChevronLeft size={32} />
+                  </button>
+                  <button 
+                    onClick={() => setActiveImage(prev => prev === images.length - 1 ? 0 : prev + 1)}
+                    className="absolute right-0 md:-right-20 top-1/2 -translate-y-1/2 w-12 h-12 md:w-16 md:h-16 bg-white/5 hover:bg-white/10 rounded-full hidden md:flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5"
+                  >
+                    <LucideChevronRight size={32} />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Información Inferior */}
+            <div className="flex flex-col items-center text-center max-w-2xl px-6">
+               <h3 className="text-white text-xl md:text-2xl font-serif mb-2">{product.title}</h3>
+               {typeof images[activeImage] !== 'string' && images[activeImage]?.caption ? (
+                  <p className="text-wheat-200/70 text-sm md:text-lg font-serif italic leading-relaxed">
+                    {images[activeImage].caption}
+                  </p>
+               ) : (
+                  <p className="text-white/40 text-[10px] md:text-xs font-bold uppercase tracking-widest">
+                    Imagen {activeImage + 1} de {images.length}
+                    <span className="md:hidden ml-2 opacity-50">• Desliza para navegar</span>
+                  </p>
+               )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

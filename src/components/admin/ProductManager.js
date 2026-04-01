@@ -1,12 +1,12 @@
 "use client";
 import React, { useState } from 'react';
-import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical } from 'lucide-react';
+import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { addProduct, updateProduct, deleteProduct, getProducts } from '../../lib/services/products';
 import { ImageUpload } from '../ui/ImageUpload';
 
-export function ProductManager({ products, setProducts, categories, collections, user, setFeedback }) {
-  const myProducts = user.role === 'superadmin' ? products : products.filter(p => p.sellerEmail === user.email);
+export function ProductManager({ products, setProducts, categories, collections, user, users, setFeedback }) {
+  const myProducts = user.role === 'superadmin' ? products : products.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -25,9 +25,18 @@ export function ProductManager({ products, setProducts, categories, collections,
     technique: '',
     dimensions: '',
     laborDays: '',
-    stitchType: ''
+    stitchType: '',
+    sellerEmail: '',
+    sellerName: ''
   });
+  const [stitchType, setStitchType] = useState(''); // Just for context, line 31 is filter
   const filteredProducts = myProducts.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const canManage = (p) => {
+    const isOwner = p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim();
+    // Permitir si es dueño o si es un producto huérfano y soy superadmin (legacy)
+    return isOwner || (user.role === 'superadmin' && !p.sellerEmail);
+  };
 
   const refreshProducts = async () => {
     const data = await getProducts();
@@ -48,9 +57,11 @@ export function ProductManager({ products, setProducts, categories, collections,
       collection: product.collection || '',
       materials: product.materials || '',
       technique: product.technique || '',
-      dimensions: product.dimensions || '',
-      laborDays: product.laborDays || '',
-      stitchType: product.stitchType || ''
+      dimensions: product.dimensions || '', 
+      laborDays: product.laborDays || '', 
+      stitchType: product.stitchType || '',
+      sellerEmail: product.sellerEmail || '',
+      sellerName: product.sellerName || ''
     }); 
     setIsCreating(true); 
   };
@@ -69,8 +80,8 @@ export function ProductManager({ products, setProducts, categories, collections,
       const productPayload = {
         ...formData,
         image: typeof formData.images?.[0] === 'string' ? formData.images[0] : (formData.images?.[0]?.url || ''),
-        sellerEmail: user.email,
-        sellerName: user.name,
+        sellerEmail: user.role === 'superadmin' ? (formData.sellerEmail || user.email) : user.email,
+        sellerName: user.role === 'superadmin' ? (formData.sellerName || user.name) : user.name,
       };
 
       if (editingProduct) { 
@@ -317,6 +328,58 @@ export function ProductManager({ products, setProducts, categories, collections,
             <input type="checkbox" id="promoted" checked={formData.isPromoted} onChange={e => setFormData({...formData, isPromoted: e.target.checked})} className="w-5 h-5 text-amber-600 rounded cursor-pointer"/>
             <label htmlFor="promoted" className="text-sm font-bold text-amber-800 flex items-center gap-2 cursor-pointer"><LucideCrown size={16}/> Destacar como Producto Premium</label>
           </div>
+          
+          {user.role === 'superadmin' && (
+            <div className="p-6 bg-stone-900 rounded-2xl border border-stone-800 space-y-4 shadow-xl">
+              <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-2">
+                <LucideShield size={14} className="text-purple-400" /> Control de Propiedad (Admin)
+              </h4>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-stone-500 uppercase mb-2 block">Asignar a Artesana (Vendedor)</label>
+                  <select 
+                    className="w-full p-2.5 text-sm bg-stone-800 border border-stone-700 text-white rounded-lg outline-none focus:ring-1 focus:ring-purple-500 transition-all cursor-pointer"
+                    value={formData.sellerEmail || ''}
+                    onChange={e => {
+                      const selectedUser = (users || []).find(u => u.email === e.target.value);
+                      if (selectedUser) {
+                        setFormData({
+                          ...formData, 
+                          sellerEmail: selectedUser.email,
+                          sellerName: selectedUser.name
+                        });
+                      } else {
+                        // Si selecciona el vacío, vuelve al admin por defecto o queda vacío
+                        setFormData({
+                          ...formData,
+                          sellerEmail: '',
+                          sellerName: ''
+                        });
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar Artesana...</option>
+                    {(users || []).filter(u => u.role === 'seller' || u.role === 'artisan').map(u => (
+                      <option key={u.id} value={u.email}>
+                        {u.name} — {u.email}
+                      </option>
+                    ))}
+                    <option value="divider" disabled>──────────</option>
+                    <option value="admin@tapetes.pe">Admin (Self)</option>
+                  </select>
+                </div>
+              </div>
+              {formData.sellerEmail && (
+                <div className="flex items-center gap-2 text-[10px] text-purple-300 bg-purple-900/30 p-2 rounded-lg border border-purple-800/50">
+                  <LucideCheckCircle size={12} />
+                  <span>Se asignará a: <strong>{formData.sellerName}</strong> ({formData.sellerEmail})</span>
+                </div>
+              )}
+              <p className="text-[9px] text-stone-500 italic mt-2">
+                * Cambiar estos valores transferirá el producto al taller de la artesana seleccionada.
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4 border-t">
             <button type="button" onClick={() => setIsCreating(false)} className="px-6 py-2 text-stone-600 font-bold hover:bg-stone-100 rounded-lg transition" disabled={isSaving}>Cancelar</button>
@@ -342,11 +405,94 @@ export function ProductManager({ products, setProducts, categories, collections,
 
   return (
     <div className="animate-in fade-in">
-      <div className="flex justify-between items-center mb-6"><div><h2 className="text-2xl font-bold text-stone-900">Mis Productos</h2><p className="text-stone-500 text-sm">Gestiona tu catálogo y stock</p></div><button onClick={() => { setEditingProduct(null); setFormData({ title: '', price: '', category: categories[0]?.name || '', description: '', stock: 1, isPromoted: false, image: '', images: [], collection: '', materials: '', technique: '', dimensions: '' }); setIsCreating(true); }} className="bg-orange-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-orange-800 transition"><LucidePlus size={18} /> Nuevo</button></div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-stone-900">Mis Productos</h2>
+          <p className="text-stone-500 text-sm">Gestiona tu catálogo y stock</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => { setEditingProduct(null); setFormData({ title: '', price: '', category: categories[0]?.name || '', description: '', stock: 1, isPromoted: false, image: '', images: [], collection: '', materials: '', technique: '', dimensions: '' }); setIsCreating(true); }} className="bg-orange-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-orange-800 transition"><LucidePlus size={18} /> Nuevo</button>
+        </div>
+      </div>
       <div className="mb-6 relative max-w-md"><LucideSearch className="absolute left-3 top-2.5 text-stone-400" size={20}/><input type="text" placeholder="Buscar producto..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-100" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/></div>
       <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full text-left"><thead className="bg-stone-50 border-b border-stone-200 text-xs font-bold uppercase text-stone-500"><tr><th className="p-4">Producto</th><th className="p-4">Categoría</th><th className="p-4">Stock</th><th className="p-4">Precio</th><th className="p-4 text-right">Acciones</th></tr></thead>
-           <tbody className="divide-y divide-stone-100">{filteredProducts.map(p => (<tr key={p.id} className="hover:bg-stone-50 transition"><td className="p-4"><div className="flex items-center gap-4"><img src={p.image} className="w-12 h-12 rounded-lg object-cover bg-stone-200" alt=""/><div><p className="font-bold text-stone-900 flex items-center gap-2">{p.title} {p.isPromoted && <LucideCrown size={14} className="text-amber-500 fill-amber-500"/>}</p><p className="text-xs text-stone-400">ID: {p.id}</p></div></div></td><td className="p-4"><span className="bg-stone-100 text-stone-600 px-2 py-1 rounded text-xs font-bold">{p.category}</span></td><td className="p-4 text-sm font-medium text-stone-600">{p.stock || 1} un.</td><td className="p-4 font-bold text-stone-800">S/ {p.price}</td><td className="p-4 text-right"><div className="flex justify-end gap-2"><button onClick={() => handleEditClick(p)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"><LucideEdit size={18}/></button><button onClick={() => handleDelete(p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"><LucideTrash2 size={18}/></button></div></td></tr>))}</tbody>
+        <table className="w-full text-left">
+          <thead className="bg-stone-50 border-b border-stone-200 text-xs font-bold uppercase text-stone-500">
+            <tr>
+              <th className="p-4">Producto</th>
+              {user.role === 'superadmin' && <th className="p-4">Vendedor</th>}
+              <th className="p-4">Categoría</th>
+              <th className="p-4">Stock</th>
+              <th className="p-4">Precio</th>
+              <th className="p-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-100">
+            {filteredProducts.map(p => (
+              <tr key={p.id} className="hover:bg-stone-50 transition">
+                <td className="p-4">
+                  <div className="flex items-center gap-4">
+                    <img src={p.image} className="w-12 h-12 rounded-lg object-cover bg-stone-200" alt=""/>
+                    <div>
+                      <p className="font-bold text-stone-900 flex items-center gap-2">
+                        {p.title} {p.isPromoted && <LucideCrown size={14} className="text-amber-500 fill-amber-500"/>}
+                      </p>
+                      <p className="text-xs text-stone-400">ID: {p.id}</p>
+                    </div>
+                  </div>
+                </td>
+                {user.role === 'superadmin' && (
+                  <td className="p-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-stone-800 text-sm">{p.sellerName || 'Sin nombre'}</span>
+                      <span className="text-[10px] text-stone-400 italic">{p.sellerEmail}</span>
+                    </div>
+                  </td>
+                )}
+                <td className="p-4">
+                  <span className="bg-stone-100 text-stone-600 px-2 py-1 rounded text-xs font-bold">{p.category}</span>
+                </td>
+                <td className="p-4 text-sm font-medium text-stone-600">{p.stock || 1} un.</td>
+                <td className="p-4 font-bold text-stone-800">S/ {p.price}</td>
+                <td className="p-4 text-right">
+                  <div className="flex justify-end items-center gap-2">
+                    {!canManage(p) && (
+                      <div className="group relative">
+                        <LucideInfo size={14} className="text-amber-500 cursor-help" />
+                        <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-stone-900 text-white text-[10px] rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                          Solo lectura: Debes usar "Ver como" para editar este producto.
+                        </div>
+                      </div>
+                    )}
+                    <button 
+                      onClick={() => handleEditClick(p)} 
+                      disabled={!canManage(p)}
+                      className={`p-2 rounded-lg transition ${
+                        canManage(p) 
+                          ? 'text-blue-600 hover:bg-blue-50' 
+                          : 'text-stone-300 cursor-not-allowed'
+                      }`}
+                      title={canManage(p) ? "Editar producto" : "Acceso restringido"}
+                    >
+                      <LucideEdit size={18}/>
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(p.id)} 
+                      disabled={!canManage(p)}
+                      className={`p-2 rounded-lg transition ${
+                        canManage(p) 
+                          ? 'text-red-600 hover:bg-red-50' 
+                          : 'text-stone-300 cursor-not-allowed'
+                      }`}
+                      title={canManage(p) ? "Eliminar producto" : "Acceso restringido"}
+                    >
+                      <LucideTrash2 size={18}/>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
         {filteredProducts.length === 0 && <div className="p-10 text-center text-stone-400 italic">No se encontraron productos.</div>}
       </div>

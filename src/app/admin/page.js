@@ -14,6 +14,7 @@ import { UserManager } from '@/components/admin/UserManager';
 import { LegacyManager } from '@/components/admin/LegacyManager';
 import { CollectionManager } from '@/components/admin/CollectionManager';
 import { InfoModal } from '@/components/ui/InfoModal';
+import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
 
 // Services
 import { getProducts } from '@/lib/services/products';
@@ -27,7 +28,7 @@ import { db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
 export default function AdminDashboard() {
-  const { user, loading, logout, register } = useAuth();
+  const { user, effectiveUser, impersonatedUser, loading, logout, register, startImpersonating } = useAuth();
   const router = useRouter();
   
   // States
@@ -67,6 +68,13 @@ export default function AdminDashboard() {
     };
     loadData();
   }, [user]);
+
+  // Si empezamos a suplantar, volvemos al resumen para ver el estado del nuevo usuario
+  useEffect(() => {
+    if (impersonatedUser) {
+      setDashboardView('overview');
+    }
+  }, [impersonatedUser]);
 
   if (loading || !user) {
     return (
@@ -190,23 +198,26 @@ export default function AdminDashboard() {
     }
   };
 
+
   return (
-    <div className="bg-stone-50 min-h-screen animate-in fade-in">
+    <div className={`bg-stone-50 min-h-screen animate-in fade-in ${impersonatedUser ? 'pt-14' : ''}`}>
+      <ImpersonationBanner />
       <DashboardLayout 
-        user={user} 
+        user={effectiveUser} 
         currentView={dashboardView} 
         setView={setDashboardView} 
         onLogout={logout} 
         onHome={() => router.push('/')}
       >
-        {dashboardView === 'overview' && <DashboardOverview products={products} user={user} />}
+        {dashboardView === 'overview' && <DashboardOverview products={products} user={effectiveUser} />}
         {dashboardView === 'products' && (
           <ProductManager 
             products={products} 
             setProducts={setProducts} 
             categories={categoriesData} 
             collections={collectionsData} 
-            user={user} 
+            user={effectiveUser} 
+            users={usersList}
             setFeedback={setFeedback} 
           />
         )}
@@ -229,16 +240,17 @@ export default function AdminDashboard() {
             setFeedback={setFeedback} 
           />
         )}
-        {dashboardView === 'profile' && <ProfileManager user={user} />}
-        {dashboardView === 'legacy' && (user.role === 'superadmin' || user.role === 'redactor') && (
+        {dashboardView === 'profile' && <ProfileManager user={effectiveUser} />}
+        {dashboardView === 'legacy' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
            <LegacyManager setFeedback={setFeedback} />
         )}
-        {dashboardView === 'users' && user.role === 'superadmin' && (
+        {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (
            <UserManager 
               users={usersList} 
               onAdd={handleAddUser} 
               onEdit={handleEditUser} 
               onDelete={handleDeleteUser} 
+              onImpersonate={startImpersonating}
               setFeedback={setFeedback}
            />
         )}

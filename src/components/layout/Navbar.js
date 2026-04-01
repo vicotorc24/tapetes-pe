@@ -13,11 +13,12 @@ import {
   LucideGlobe, 
   ArrowRight as LucideArrowRight 
 } from 'lucide-react';
+import { ImpersonationBanner } from './ImpersonationBanner';
 
 export function Navbar() {
   const { t, language, setLanguage } = useTranslation();
   const { cart, setIsCartOpen } = useCart();
-  const { user } = useAuth();
+  const { user, effectiveUser, impersonatedUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -47,6 +48,7 @@ export function Navbar() {
 
   return (
     <div className="fixed top-0 left-0 w-full z-[100]">
+      <ImpersonationBanner />
       {/* Menú Mobile Full Screen Overlay */}
       {menuOpen && (
         <div className="fixed inset-0 bg-white z-[120] lg:hidden flex flex-col overflow-y-auto pt-0">
@@ -83,8 +85,8 @@ export function Navbar() {
             </div>
 
             <div className="space-y-4 pt-12 pb-8">
-               <Link href={user ? "/admin" : "/login"} onClick={() => setMenuOpen(false)} className="w-full bg-stone-900 text-white py-6 rounded-2xl flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em] font-bold shadow-2xl shadow-stone-900/20">
-                  {user ? <><LucideUser size={18}/> {t('nav.dashboard')}</> : t('nav.admin')}
+               <Link href={effectiveUser ? "/admin" : "/login"} onClick={() => setMenuOpen(false)} className="w-full bg-stone-900 text-white py-6 rounded-2xl flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em] font-bold shadow-2xl shadow-stone-900/20">
+                  {effectiveUser ? <><LucideUser size={18}/> {t('nav.dashboard')}</> : t('nav.admin')}
                </Link>
                
                <button onClick={() => { setLanguage(language === 'es' ? 'en' : 'es'); }} className="w-full border border-stone-200 py-6 rounded-2xl flex items-center justify-center gap-3 text-sm uppercase tracking-[0.2em] font-bold text-stone-500 active:bg-stone-50 transition-colors">
@@ -96,7 +98,7 @@ export function Navbar() {
       )}
 
       {/* Main Bar Wrapper */}
-      <div className="relative z-50">
+      <div className={`relative z-50 transition-all duration-500 ${impersonatedUser ? 'mt-14' : ''}`}>
         <Link 
           href="/unete"
           className="block w-full bg-stone-900 overflow-hidden relative group transition-all"
@@ -169,12 +171,12 @@ export function Navbar() {
               
               {/* Desktop Login Link */}
               <Link 
-                href={user ? "/admin" : "/login"} 
+                href={effectiveUser ? "/admin" : "/login"} 
                 className="hidden lg:flex items-center gap-1.5 text-stone-500 hover:text-terracotta-600 font-bold uppercase tracking-widest text-[11px] transition-colors"
-                title={user ? t('nav.dashboard') : t('nav.admin')}
+                title={effectiveUser ? t('nav.dashboard') : t('nav.admin')}
               >
                 <LucideUser size={18} />
-                <span className="hidden xl:inline">{user ? t('nav.dashboard') : t('nav.admin')}</span>
+                <span className="hidden xl:inline">{effectiveUser ? t('nav.dashboard') : t('nav.admin')}</span>
               </Link>
               <button className="relative p-2 text-stone-800 hover:text-terracotta-600 transition-all group" onClick={() => setIsCartOpen(true)}>
                 <LucideShoppingCart className="group-hover:scale-110 transition-transform" size={24} />

@@ -15,30 +15,45 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [impersonatedUser, setImpersonatedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const effectiveUser = impersonatedUser || user;
+
+  const startImpersonating = (targetUser) => {
+    if (user?.role === 'superadmin') {
+      setImpersonatedUser(targetUser);
+      return true;
+    }
+    return false;
+  };
+
+  const stopImpersonating = () => {
+    setImpersonatedUser(null);
+  };
 
   useEffect(() => {
     // Escuchar cambios en la sesión de Firebase
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Si hay usuario, buscamos sus datos extra (Rol) en Firestore
+        // Redundancia: si hay usuario real, limpiamos cualquier suplantación o bypass previo
         const docRef = doc(db, "users", firebaseUser.uid);
         const docSnap = await getDoc(docRef);
         
         if (docSnap.exists()) {
-          // Combinamos datos de Auth (Email) + Firestore (Rol, Foto)
           setUser({ 
             uid: firebaseUser.uid, 
             email: firebaseUser.email, 
             ...docSnap.data() 
           });
         } else {
-          // Usuario nuevo sin perfil en DB (Fallback)
           setUser({ uid: firebaseUser.uid, email: firebaseUser.email, role: 'guest' });
         }
       } else {
-        setUser(null);
+        // Si no hay firebaseUser, PERO el usuario actual es el Admin Bypass, no cerramos sesión
+        // Solo cerramos sesión si no estamos en modo bypass
+        setUser(prev => (prev?.uid === 'admin-override' ? prev : null));
       }
       setLoading(false);
     });
@@ -108,7 +123,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, resetPassword, register }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      effectiveUser,
+      impersonatedUser,
+      loading, 
+      login, 
+      logout, 
+      resetPassword, 
+      register,
+      startImpersonating,
+      stopImpersonating
+    }}>
       {children}
     </AuthContext.Provider>
   );
