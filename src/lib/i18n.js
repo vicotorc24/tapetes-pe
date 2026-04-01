@@ -76,7 +76,20 @@ export const translations = {
         subtitle: "Explora la riqueza turística y arqueológica de nuestra tierra."
       },
       illustrious_title: "Hijos Ilustres de Contumazá",
-      illustrious_desc: "Conoce a las personalidades que han llevado el nombre de nuestra tierra al mundo."
+      illustrious_desc: "Conoce a las personalidades que han llevado el nombre de nuestra tierra al mundo.",
+      festivities: {
+        title: "Tradiciones y Fervor",
+        semana_santa: {
+          title: "Semana Santa de Contumazá",
+          tag: "Patrimonio Cultural de la Nación",
+          desc: "Una celebración única en el Perú, reconocida por su solemnidad, sus cristos articulados y la devoción de su gente. Es considerada la mejor del norte peruano."
+        },
+        san_mateo: {
+          title: "Fiesta Patronal de San Mateo",
+          date: "Setiembre",
+          desc: "La fiesta principal que une a todos los contumacinos en una celebración de fe, danza y tradición en honor a nuestro santo patrón."
+        }
+      }
     },
     about: {
       essence: "Nuestra Esencia",
@@ -196,7 +209,20 @@ export const translations = {
         subtitle: "Explore the touristic and archaeological richness of our land."
       },
       illustrious_title: "Illustrious Children of Contumazá",
-      illustrious_desc: "Get to know the personalities who have taken the name of our land to the world."
+      illustrious_desc: "Get to know the personalities who have taken the name of our land to the world.",
+      festivities: {
+        title: "Traditions and Fervor",
+        semana_santa: {
+          title: "Holy Week in Contumazá",
+          tag: "National Cultural Heritage",
+          desc: "A unique celebration in Peru, renowned for its solemnity, articulated Christs, and the devotion of its people. Considered the best in northern Peru."
+        },
+        san_mateo: {
+          title: "Saint Matthew Patronal Feast",
+          date: "September",
+          desc: "The main festival uniting all Contumacinos in a celebration of faith, dance, and tradition in honor of our patron saint."
+        }
+      }
     },
     about: {
       essence: "Our Essence",

@@ -137,6 +137,74 @@ export function HistoryView() {
           </section>
         )}
 
+        {/* Priority 2: Traditions & Festivities Section [NEW] */}
+        <section className="space-y-12">
+            <div className="text-center space-y-4">
+              <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest">{t('history.festivities.title')}</span>
+              <h3 className="text-4xl md:text-5xl font-serif text-stone-900">Nuestra Cultura Viva</h3>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8">
+              {/* Semana Santa - Patrimonio Cultural (Prominent) */}
+              <div className="relative overflow-hidden rounded-[3rem] group">
+                <div className="absolute inset-0 bg-[#3d0a44]"> {/* Purple background from poster */}
+                   <img 
+                     src="/images/landmarks/CALVARIO.jpeg" 
+                     className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-[5000ms]" 
+                     alt="Semana Santa Contumazá" 
+                   />
+                   <div className="absolute inset-0 bg-gradient-to-r from-[#3d0a44] via-[#3d0a44]/80 to-transparent"></div>
+                </div>
+                
+                <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row items-center gap-10">
+                   <div className="flex-1 space-y-6">
+                      <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/20 border border-amber-400/30">
+                         <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                         <span className="text-amber-400 text-[10px] font-bold uppercase tracking-widest">
+                           {t('history.festivities.semana_santa.tag')}
+                         </span>
+                      </div>
+                      <h4 className="text-4xl md:text-6xl font-serif text-white leading-tight">
+                        {t('history.festivities.semana_santa.title')}
+                      </h4>
+                      <p className="text-stone-300 text-lg leading-relaxed max-w-xl italic border-l-2 border-amber-400/50 pl-6">
+                        {t('history.festivities.semana_santa.desc')}
+                      </p>
+                   </div>
+                   <div className="shrink-0 relative">
+                      <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-amber-400/20 p-4 animate-spin-slow">
+                         <div className="w-full h-full rounded-full border-2 border-amber-400/40"></div>
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                         <LucideQuote size={40} className="text-amber-400 opacity-50" />
+                      </div>
+                   </div>
+                </div>
+              </div>
+
+              {/* San Mateo - Patronal Feast */}
+              <div className="bg-stone-50 rounded-[3rem] p-8 md:p-12 border border-stone-100 relative overflow-hidden group">
+                 <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
+                    <div className="w-full md:w-1/3 aspect-square rounded-[2rem] overflow-hidden shadow-2xl relative">
+                       <img src="/images/landmarks/san_mateo.jpg" className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="San Mateo" />
+                       <div className="absolute inset-0 bg-orange-600/10"></div>
+                    </div>
+                    <div className="flex-1 space-y-4">
+                       <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                         <span className="w-8 h-px bg-terracotta-200"></span> {t('history.festivities.san_mateo.date')}
+                       </span>
+                       <h4 className="text-3xl md:text-5xl font-serif text-stone-900">
+                         {t('history.festivities.san_mateo.title')}
+                       </h4>
+                       <p className="text-stone-600 text-lg leading-relaxed">
+                         {t('history.festivities.san_mateo.desc')}
+                       </p>
+                    </div>
+                 </div>
+              </div>
+            </div>
+        </section>
+
         {/* Priority 3: Human Legacy Header */}
         <div className="pt-20 border-t border-stone-100 text-center">
             <h3 className="text-3xl font-serif text-stone-900 mb-2">{t('history.illustrious_title')}</h3>
@@ -162,27 +230,68 @@ export function HistoryView() {
           </section>
         )}
 
-        {/* Poets Section */}
+        {/* Priority 3: Poets Section (The Intellectual Core) */}
         {poets.length > 0 && (
-          <section className="bg-stone-50 rounded-[2.5rem] p-8 md:p-16 relative overflow-hidden border border-stone-100">
-             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
-                <LucideFeather size={150} />
-             </div>
-             <div className="max-w-3xl mx-auto text-center relative z-10">
-                <LucideQuote className="text-terracotta-400 mx-auto mb-6" size={40} />
-                <h2 className="text-3xl font-serif text-stone-900 mb-4">{t('history.poets.title')}</h2>
-                <p className="text-xl font-serif italic text-stone-700 mb-8 leading-relaxed">
-                  "{t('history.poets.desc')}"
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                   {poets.map((p) => (
-                     <button key={p.id} onClick={() => goToPersonality(p.slug)} className="bg-white p-1.5 pr-5 rounded-full shadow-sm border border-stone-100 text-sm font-medium text-stone-800 hover:bg-orange-50 hover:border-orange-200 transition flex items-center gap-3">
-                       {p.image && <img src={p.image} className="w-8 h-8 rounded-full object-cover shadow-sm bg-stone-100" alt={p.name} />}
-                       {p.name}
-                     </button>
-                   ))}
-                </div>
-             </div>
+          <section className="relative overflow-hidden group">
+            {/* Fondo Estilo Stone-50 con Borde Decorativo */}
+            <div className="bg-stone-50 rounded-[3rem] p-8 md:p-14 border border-stone-200/60 relative z-10 shadow-sm">
+               {/* Línea Decorativa Interna */}
+               <div className="absolute inset-4 border border-stone-100 rounded-[2.5rem] pointer-events-none"></div>
+               
+               <div className="absolute top-0 right-0 p-12 opacity-[0.03] pointer-events-none group-hover:opacity-[0.07] transition-opacity duration-1000">
+                  <LucideFeather size={280} strokeWidth={1} />
+               </div>
+
+               <div className="max-w-4xl mx-auto text-center relative z-20">
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-16 h-px bg-terracotta-200 mb-6"></div>
+                    <LucideQuote className="text-terracotta-500/80 mb-6 animate-pulse" size={48} strokeWidth={1.5} />
+                    <h2 className="text-4xl md:text-6xl font-serif text-stone-900 mb-2 tracking-tight">
+                      {t('history.poets.title')}
+                    </h2>
+                    <span className="text-stone-400 font-bold text-[10px] uppercase tracking-[0.4em]">Cuna de la intelectualidad</span>
+                  </div>
+
+                  <p className="text-2xl md:text-3xl font-serif italic text-stone-800 mb-12 leading-relaxed max-w-2xl mx-auto">
+                    "{t('history.poets.desc')}"
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                     {poets.map((p) => (
+                       <button 
+                         key={p.id} 
+                         onClick={() => goToPersonality(p.slug)} 
+                         className="group/card bg-white h-24 p-2 pr-8 rounded-2xl shadow-sm border border-stone-100 hover:border-terracotta-200 hover:shadow-xl transition-all duration-500 flex items-center gap-5 text-left active:scale-95"
+                       >
+                         <div className="relative shrink-0">
+                            <div className="w-20 h-20 rounded-xl overflow-hidden shadow-md border-2 border-stone-50 group-hover/card:rotate-2 transition-transform duration-500">
+                              {p.image ? (
+                                <img src={p.image} className="w-full h-full object-cover" alt={p.name} />
+                              ) : (
+                                <div className="w-full h-full bg-stone-100 flex items-center justify-center text-stone-300">
+                                  <LucideFeather size={24} />
+                                </div>
+                              )}
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 bg-terracotta-600 text-white p-1 rounded-md opacity-0 group-hover/card:opacity-100 transition-opacity translate-y-2 group-hover/card:translate-y-0 duration-500">
+                               <LucideFeather size={10} />
+                            </div>
+                         </div>
+                         <div className="flex flex-col">
+                           <span className="text-xs text-stone-400 uppercase tracking-widest mb-1 italic">Poeta Contumacino</span>
+                           <h4 className="font-serif text-xl text-stone-900 group-hover/card:text-terracotta-800 transition-colors">{p.name}</h4>
+                         </div>
+                       </button>
+                     ))}
+                  </div>
+
+                  <div className="mt-16 w-32 h-px bg-stone-200 mx-auto opacity-40"></div>
+               </div>
+            </div>
+            
+            {/* Adornos en las esquinas */}
+            <div className="absolute top-6 left-6 w-12 h-12 border-t-2 border-l-2 border-stone-200 rounded-tl-2xl opacity-40 pointer-events-none"></div>
+            <div className="absolute bottom-6 right-6 w-12 h-12 border-b-2 border-r-2 border-stone-200 rounded-br-2xl opacity-40 pointer-events-none"></div>
           </section>
         )}
 
