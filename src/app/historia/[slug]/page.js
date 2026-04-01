@@ -81,12 +81,16 @@ export default function PersonalityPage() {
         <div className="bg-white rounded-[3rem] p-10 md:p-20 shadow-xl -mt-32 relative z-10 border border-stone-100">
           <div className="mb-12 flex flex-wrap gap-8 items-center text-stone-400 text-sm border-b border-stone-100 pb-8 font-sans">
             <div className="flex items-center gap-2">
-              <LucideUser size={18} className="text-andeansky-700" />
-              <span>Figura Ilustre de Contumazá</span>
+              {personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? (
+                <LucidePartyPopper size={18} className="text-terracotta-600" />
+              ) : (
+                <LucideUser size={18} className="text-andeansky-700" />
+              )}
+              <span>{personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? 'Festividad de Contumazá' : 'Figura Ilustre de Contumazá'}</span>
             </div>
             <div className="flex items-center gap-2">
-              <LucideCalendar size={18} className="text-andeansky-700" />
-              <span>Memoria Histórica</span>
+              <LucideCalendar size={18} className={personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? "text-terracotta-600" : "text-andeansky-700"} />
+              <span>{personality.category === (require('@/lib/config').CONFIG.LEGACY_CATEGORIES.FESTIVITIES) ? 'Calendario Cultural' : 'Memoria Histórica'}</span>
             </div>
           </div>
 

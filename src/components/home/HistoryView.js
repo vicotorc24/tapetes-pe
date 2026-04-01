@@ -24,9 +24,10 @@ export function HistoryView() {
   const poets = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.POETS);
   const sites = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.TOURISM);
   const others = personalities.filter(p => 
-    ![CONFIG.LEGACY_CATEGORIES.POETS, CONFIG.LEGACY_CATEGORIES.TOURISM, CONFIG.LEGACY_CATEGORIES.HISTORY].includes(p.category) && 
+    ![CONFIG.LEGACY_CATEGORIES.POETS, CONFIG.LEGACY_CATEGORIES.TOURISM, CONFIG.LEGACY_CATEGORIES.HISTORY, CONFIG.LEGACY_CATEGORIES.FESTIVITIES].includes(p.category) && 
     p.id !== featured?.id
   );
+  const festivities = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES);
 
   const goToPersonality = (slug) => {
     window.location.href = `/historia/${slug}`;
@@ -137,73 +138,88 @@ export function HistoryView() {
           </section>
         )}
 
-        {/* Priority 2: Traditions & Festivities Section [NEW] */}
-        <section className="space-y-12">
-            <div className="text-center space-y-4">
-              <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest">{t('history.festivities.title')}</span>
-              <h3 className="text-4xl md:text-5xl font-serif text-stone-900">Nuestra Cultura Viva</h3>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8">
-              {/* Semana Santa - Patrimonio Cultural (Prominent) */}
-              <div className="relative overflow-hidden rounded-[3rem] group">
-                <div className="absolute inset-0 bg-[#3d0a44]"> {/* Purple background from poster */}
-                   <img 
-                     src="/images/landmarks/CALVARIO.jpeg" 
-                     className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-[5000ms]" 
-                     alt="Semana Santa Contumazá" 
-                   />
-                   <div className="absolute inset-0 bg-gradient-to-r from-[#3d0a44] via-[#3d0a44]/80 to-transparent"></div>
-                </div>
-                
-                <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row items-center gap-10">
-                   <div className="flex-1 space-y-6">
-                      <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/20 border border-amber-400/30">
-                         <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                         <span className="text-amber-400 text-[10px] font-bold uppercase tracking-widest">
-                           {t('history.festivities.semana_santa.tag')}
-                         </span>
-                      </div>
-                      <h4 className="text-4xl md:text-6xl font-serif text-white leading-tight">
-                        {t('history.festivities.semana_santa.title')}
-                      </h4>
-                      <p className="text-stone-300 text-lg leading-relaxed max-w-xl italic border-l-2 border-amber-400/50 pl-6">
-                        {t('history.festivities.semana_santa.desc')}
-                      </p>
-                   </div>
-                   <div className="shrink-0 relative">
-                      <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-amber-400/20 p-4 animate-spin-slow">
-                         <div className="w-full h-full rounded-full border-2 border-amber-400/40"></div>
-                      </div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                         <LucideQuote size={40} className="text-amber-400 opacity-50" />
-                      </div>
-                   </div>
-                </div>
+        {/* Priority 2: Traditions & Festivities Section (Dynamic) */}
+        {festivities.length > 0 && (
+          <section className="space-y-12">
+              <div className="text-center space-y-4">
+                <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest">{t('history.festivities.title')}</span>
+                <h3 className="text-4xl md:text-5xl font-serif text-stone-900">Nuestra Cultura Viva</h3>
               </div>
 
-              {/* San Mateo - Patronal Feast */}
-              <div className="bg-stone-50 rounded-[3rem] p-8 md:p-12 border border-stone-100 relative overflow-hidden group">
-                 <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
-                    <div className="w-full md:w-1/3 aspect-square rounded-[2rem] overflow-hidden shadow-2xl relative">
-                       <img src="/images/landmarks/san_mateo.jpg" className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="San Mateo" />
-                       <div className="absolute inset-0 bg-orange-600/10"></div>
+              <div className="grid grid-cols-1 gap-8">
+                {festivities.map((item) => {
+                  const isSemanaSanta = item.slug === 'semana-santa' || item.name.toLowerCase().includes('semana santa');
+                  
+                  if (isSemanaSanta) {
+                    return (
+                      <div key={item.id} onClick={() => goToPersonality(item.slug)} className="relative overflow-hidden rounded-[3rem] group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-500">
+                        <div className="absolute inset-0 bg-[#3d0a44]"> {/* Purple background from poster */}
+                           <img 
+                             src={item.image} 
+                             className="w-full h-full object-cover opacity-20 group-hover:scale-105 transition-transform duration-[5000ms]" 
+                             alt={item.name} 
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-r from-[#3d0a44] via-[#3d0a44]/80 to-transparent"></div>
+                        </div>
+                        
+                        <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row items-center gap-10">
+                           <div className="flex-1 space-y-6">
+                              <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/20 border border-amber-400/30">
+                                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                                 <span className="text-amber-400 text-[10px] font-bold uppercase tracking-widest">
+                                   Patrimonio Cultural de la Nación
+                                 </span>
+                              </div>
+                              <h4 className="text-4xl md:text-6xl font-serif text-white leading-tight">
+                                {item.name}
+                              </h4>
+                              <div 
+                                className="text-stone-300 text-lg leading-relaxed max-w-xl italic border-l-2 border-amber-400/50 pl-6 line-clamp-3 prose prose-invert"
+                                dangerouslySetInnerHTML={{ __html: item.description?.replace(/&nbsp;/g, ' ') }}
+                              />
+                           </div>
+                           <div className="shrink-0 relative hidden md:block">
+                              <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-amber-400/20 p-4 animate-spin-slow">
+                                 <div className="w-full h-full rounded-full border-2 border-amber-400/40"></div>
+                              </div>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                 <LucideQuote size={40} className="text-amber-400 opacity-50" />
+                              </div>
+                           </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={item.id} onClick={() => goToPersonality(item.slug)} className="bg-stone-50 rounded-[3rem] p-8 md:p-12 border border-stone-100 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-500">
+                       <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
+                          <div className="w-full md:w-1/3 aspect-square rounded-[2rem] overflow-hidden shadow-2xl relative">
+                             <img src={item.image} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt={item.name} />
+                             <div className="absolute inset-0 bg-orange-600/10"></div>
+                          </div>
+                          <div className="flex-1 space-y-4">
+                             <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                               <span className="w-8 h-px bg-terracotta-200"></span> {item.role}
+                             </span>
+                             <h4 className="text-3xl md:text-5xl font-serif text-stone-900 group-hover:text-terracotta-800 transition-colors">
+                               {item.name}
+                             </h4>
+                             <div 
+                                className="text-stone-600 text-lg leading-relaxed line-clamp-3 prose prose-stone"
+                                dangerouslySetInnerHTML={{ __html: item.description?.replace(/&nbsp;/g, ' ') }}
+                             />
+                             <button className="text-terracotta-700 font-bold flex items-center gap-2 group/btn mt-4">
+                               Ver detalle <div className="w-6 h-px bg-terracotta-200 group-hover/btn:w-10 transition-all"></div>
+                             </button>
+                          </div>
+                       </div>
                     </div>
-                    <div className="flex-1 space-y-4">
-                       <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
-                         <span className="w-8 h-px bg-terracotta-200"></span> {t('history.festivities.san_mateo.date')}
-                       </span>
-                       <h4 className="text-3xl md:text-5xl font-serif text-stone-900">
-                         {t('history.festivities.san_mateo.title')}
-                       </h4>
-                       <p className="text-stone-600 text-lg leading-relaxed">
-                         {t('history.festivities.san_mateo.desc')}
-                       </p>
-                    </div>
-                 </div>
+                  );
+                })}
               </div>
-            </div>
-        </section>
+          </section>
+        )}
 
         {/* Priority 3: Human Legacy Header */}
         <div className="pt-20 border-t border-stone-100 text-center">

@@ -33,6 +33,7 @@ export const CONFIG = {
     PAINTING: "Pintura",
     EDUCATION: "Educación",
     RELIGION: "Religión",
+    FESTIVITIES: "Festividad",
     POLITICS: "Política",
     CRAFTS: "Artesanía",
     SCIENCE: "Ciencia",

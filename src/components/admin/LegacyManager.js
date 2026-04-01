@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getPersonalities, addPersonality, updatePersonality, deletePersonality } from '../../lib/services/personalities';
 import RichTextEditor from '../ui/RichTextEditor';
 import { ImageUpload } from '../ui/ImageUpload';
+import { Autocomplete } from '../ui/Autocomplete';
 import { CONFIG } from '../../lib/config';
 
 export function LegacyManager({ setFeedback }) {
@@ -158,21 +159,35 @@ export function LegacyManager({ setFeedback }) {
                 value={formData.name} onChange={handleNameChange} placeholder="Ej: Pozo Kuan o Walter Alva" />
             </div>
             <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Referencia / Ubicación</label>
+              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">
+                {formData.category === CONFIG.LEGACY_CATEGORIES.POETS ? 'Ocupación / Rol' :
+                 formData.category === CONFIG.LEGACY_CATEGORIES.TOURISM ? 'Ubicación' :
+                 formData.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES ? 'Fecha de celebración' :
+                 formData.category === CONFIG.LEGACY_CATEGORIES.HISTORY ? 'Periodo / Contexto' :
+                 'Referencia / Ubicación'}
+              </label>
               <input required className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" 
-                value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} placeholder="Ej: Caserío La Herencia" />
+                value={formData.role} 
+                onChange={e => setFormData({...formData, role: e.target.value})} 
+                placeholder={
+                  formData.category === CONFIG.LEGACY_CATEGORIES.POETS ? 'Ej: Poeta y Escritor' :
+                  formData.category === CONFIG.LEGACY_CATEGORIES.TOURISM ? 'Ej: A 5km de la ciudad' :
+                  formData.category === CONFIG.LEGACY_CATEGORIES.FESTIVITIES ? 'Ej: Marzo / Abril o Setiembre' :
+                  'Ej: Caserío La Herencia'
+                } 
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Categoría</label>
-              <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" 
-                value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                {Object.values(CONFIG.LEGACY_CATEGORIES).map(cat => (
-                  <option key={cat}>{cat}</option>
-                ))}
-              </select>
+              <Autocomplete 
+                options={Object.values(CONFIG.LEGACY_CATEGORIES)} 
+                value={formData.category} 
+                onChange={val => setFormData({...formData, category: val})} 
+                placeholder="Seleccionar categoría..."
+              />
             </div>
             <div>
               <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Slug (URL)</label>
