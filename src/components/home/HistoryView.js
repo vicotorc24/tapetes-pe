@@ -20,11 +20,21 @@ export function HistoryView() {
   }, []);
 
   const historyItems = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.HISTORY);
-  const featured = personalities.find(p => p.isPromoted && ![CONFIG.LEGACY_CATEGORIES.POETS, CONFIG.LEGACY_CATEGORIES.TOURISM, CONFIG.LEGACY_CATEGORIES.HISTORY].includes(p.category)) || personalities.find(p => ![CONFIG.LEGACY_CATEGORIES.POETS, CONFIG.LEGACY_CATEGORIES.TOURISM, CONFIG.LEGACY_CATEGORIES.HISTORY].includes(p.category));
+  
+  // Categorías que NO deben aparecer en la sección general/destacada (Hijos Ilustres)
+  const excludedFromGeneral = [
+    CONFIG.LEGACY_CATEGORIES.POETS, 
+    CONFIG.LEGACY_CATEGORIES.TOURISM, 
+    CONFIG.LEGACY_CATEGORIES.HISTORY, 
+    CONFIG.LEGACY_CATEGORIES.FESTIVITIES
+  ];
+
+  const featured = personalities.find(p => p.isPromoted && !excludedFromGeneral.includes(p.category)) || 
+                   personalities.find(p => !excludedFromGeneral.includes(p.category));
   const poets = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.POETS);
   const sites = personalities.filter(p => p.category === CONFIG.LEGACY_CATEGORIES.TOURISM);
   const others = personalities.filter(p => 
-    ![CONFIG.LEGACY_CATEGORIES.POETS, CONFIG.LEGACY_CATEGORIES.TOURISM, CONFIG.LEGACY_CATEGORIES.HISTORY, CONFIG.LEGACY_CATEGORIES.FESTIVITIES].includes(p.category) && 
+    !excludedFromGeneral.includes(p.category) && 
     p.id !== featured?.id
   );
   const festivities = personalities

@@ -113,7 +113,7 @@ export default function PersonalityPage() {
                   <div className="h-px bg-stone-100 flex-1"></div>
                </div>
 
-               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                   {personality.images.map((img, idx) => {
                     const imageUrl = typeof img === 'string' ? img : img.url;
                     const caption = typeof img === 'string' ? '' : img.caption;
@@ -123,11 +123,11 @@ export default function PersonalityPage() {
                         key={idx} 
                         onClick={() => setSelectedImage(img)}
                         className={`relative flex flex-col gap-3 group transition-all duration-500 ${
-                          idx === 0 ? 'md:col-span-2 md:row-span-2' : ''
+                          idx === 0 ? 'col-span-2 md:row-span-2' : 'col-span-1'
                         }`}
                       >
                         <div className={`relative overflow-hidden rounded-3xl cursor-zoom-in shadow-sm hover:shadow-xl transition-all ${
-                           idx === 0 ? 'h-[400px] md:h-[600px]' : 'h-[200px] md:h-[300px]'
+                           idx === 0 ? 'h-[300px] md:h-[600px]' : 'h-[180px] md:h-[300px]'
                         }`}>
                           <img src={imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt={caption || personality.name} />
                           <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/10 transition-colors flex items-center justify-center">
