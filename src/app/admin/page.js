@@ -240,7 +240,7 @@ export default function AdminDashboard() {
             setFeedback={setFeedback} 
           />
         )}
-        {dashboardView === 'profile' && <ProfileManager user={effectiveUser} />}
+        {dashboardView === 'profile' && <ProfileManager user={effectiveUser} setFeedback={setFeedback} />}
         {dashboardView === 'legacy' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
            <LegacyManager setFeedback={setFeedback} />
         )}

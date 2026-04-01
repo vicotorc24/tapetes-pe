@@ -131,9 +131,13 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
           <div className="flex items-center gap-6">
              <div className="text-right hidden sm:block">
                 <span className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
-                  user.role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 'bg-orange-50 text-orange-600'
+                  user.role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 
+                  user.role === 'redactor' ? 'bg-blue-100 text-blue-700' :
+                  'bg-orange-50 text-orange-600'
                 }`}>
-                  {user.role === 'superadmin' ? 'Super Usuario' : 'Artesana'}
+                  {user.role === 'superadmin' ? 'Super Usuario' : 
+                   user.role === 'redactor' ? 'Redactor' : 
+                   'Artesana'}
                 </span>
              </div>
              <div className="w-10 h-10 rounded-xl bg-stone-100 overflow-hidden border border-stone-200 shadow-inner">

@@ -17,6 +17,8 @@ export function UserFormModal({ user, onClose, onSave }) {
     status: user?.status || 'active',
     photo: user?.photo || '',
     bio: user?.bio || '',
+    instagram: user?.instagram || '',
+    facebook: user?.facebook || '',
     password: ''
   });
   
@@ -80,6 +82,10 @@ export function UserFormModal({ user, onClose, onSave }) {
                     value={formData.bio}
                     onChange={e=>setFormData({...formData, bio:e.target.value})}
                   />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Instagram</label><input className="w-full p-3 border rounded-lg" value={formData.instagram} onChange={e=>setFormData({...formData, instagram:e.target.value})} placeholder="@usuario"/></div>
+                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Facebook</label><input className="w-full p-3 border rounded-lg" value={formData.facebook} onChange={e=>setFormData({...formData, facebook:e.target.value})} placeholder="Nombre en FB"/></div>
                 </div>
               </>
             )}
