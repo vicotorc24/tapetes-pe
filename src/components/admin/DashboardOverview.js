@@ -4,20 +4,49 @@ import { StatCard } from '../ui/StatCard';
 import { SimpleBarChart } from '../ui/SimpleBarChart';
 import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTriangle, LucideRotateCcw } from 'lucide-react';
 
-export function DashboardOverview({ products, user, onRepair }) {
+export function DashboardOverview({ products, user }) {
+  // Cálculos reales basados en la data del usuario
+  const activeProductsCount = products.length;
+  const profileViews = user.profileViews || 0;
+  const whatsappClicks = user.whatsappClicks || 0;
+  
+  // Estimación de ventas (puedes ajustar el ticket medio)
+  const estimatedRevenue = whatsappClicks * 150; // Ejemplo: S/ 150 por clic como intención
+
   return (
     <div className="animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-stone-900">Resumen del Taller</h2>
-          <p className="text-sm text-stone-500">Bienvenido de vuelta, {user.name}</p>
+          <h2 className="text-2xl font-bold text-stone-900 tracking-tight font-serif italic">Resumen del Taller</h2>
+          <p className="text-sm text-stone-500">Estadísticas reales de tu presencia digital</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard title="Ventas del Mes" value="S/ 1,820.00" trend="+15%" trendUp={true} icon={LucideShoppingBag} color="bg-green-100 text-green-700" />
-        <StatCard title="Productos Activos" value={products.length} trend="+2" trendUp={true} icon={LucidePackage} color="bg-blue-100 text-blue-700" />
-        <StatCard title="Visitas al Perfil" value="892" trend="-5%" trendUp={false} icon={LucideEye} color="bg-purple-100 text-purple-700" />
+        <StatCard 
+          title="Intención de Venta" 
+          value={`${whatsappClicks} Clics`} 
+          trend="WhatsApp" 
+          trendUp={true} 
+          icon={LucideShoppingBag} 
+          color="bg-green-100 text-green-700" 
+        />
+        <StatCard 
+          title="Productos Activos" 
+          value={activeProductsCount} 
+          trend="+ Catálogo" 
+          trendUp={true} 
+          icon={LucidePackage} 
+          color="bg-blue-100 text-blue-700" 
+        />
+        <StatCard 
+          title="Visitas al Perfil" 
+          value={profileViews} 
+          trend="Alcance Real" 
+          trendUp={profileViews > 0} 
+          icon={LucideEye} 
+          color="bg-purple-100 text-purple-700" 
+        />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2"><SimpleBarChart /></div>

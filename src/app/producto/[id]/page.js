@@ -21,6 +21,8 @@ import {
 import Link from 'next/link';
 import { getProductById } from '@/lib/services/products';
 import { getUserByEmail } from '@/lib/services/users';
+import { AnalyticsEvents } from '@/lib/analytics';
+import { recordProfileView, recordWhatsappClick } from '@/lib/services/interactions';
 
 export default function ProductPage({ params }) {
   const { addToCart } = useCart();
@@ -62,6 +64,24 @@ export default function ProductPage({ params }) {
     };
     fetchProductAndArtisan();
   }, [productId]);
+
+  // Registro de Visitas (Analytics + DB)
+  useEffect(() => {
+    if (product) {
+      AnalyticsEvents.PRODUCT_VIEW(product);
+      if (artisan?.id) {
+        recordProfileView(artisan.id);
+        AnalyticsEvents.PROFILE_VIEW(artisan);
+      }
+    }
+  }, [product, artisan]);
+
+  const handleWhatsappAction = () => {
+    if (product && artisan) {
+      AnalyticsEvents.WHATSAPP_CLICK(product, artisan);
+      if (artisan.id) recordWhatsappClick(artisan.id);
+    }
+  };
 
   // Manejo de Gestos Táctiles para Lightbox
   const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
@@ -284,6 +304,7 @@ export default function ProductPage({ params }) {
               href={getWhatsAppLink()}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={handleWhatsappAction}
               className="flex-1 bg-[#25D366] text-white py-4 px-6 rounded-2xl font-black text-xs hover:bg-[#128C7E] transition-all shadow-xl shadow-green-100 flex items-center justify-center gap-3 active:scale-95"
             >
               <LucideMessageCircle size={20} className="shrink-0" /> 

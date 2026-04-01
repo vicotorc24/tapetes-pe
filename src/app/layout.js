@@ -1,6 +1,7 @@
 import React from "react";
 import { Inter, Merriweather } from "next/font/google";
 import { ClientProviders } from "@/components/providers/ClientProviders";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 
 const inter = Inter({ 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
         <ClientProviders>
           {children}
         </ClientProviders>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
   );
