@@ -15,6 +15,7 @@ import { getProducts } from '../lib/services/products';
 import { getCollections } from '../lib/services/collections';
 import { getCategories } from '../lib/services/categories';
 import { CONFIG } from '../lib/config';
+import { AnalyticsEvents } from '../lib/analytics';
 
 export default function HomePage() {
   const { addToCart } = useCart();
@@ -45,6 +46,22 @@ export default function HomePage() {
     initData();
   }, []);
 
+  // Tracking de Búsqueda y Filtros
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      const timer = setTimeout(() => {
+        AnalyticsEvents.SEARCH(searchTerm);
+      }, 1500); // Debounce para no saturar GA
+      return () => clearTimeout(timer);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (activeCategory !== 'Todos' || activeCollection) {
+      AnalyticsEvents.FILTER(activeCategory, activeCollection);
+    }
+  }, [activeCategory, activeCollection]);
+
   const handleSelectCollection = (collectionId) => {
     // Solo resetear categoría si realmente estamos seleccionando una colección
     if (collectionId) {
@@ -70,7 +87,10 @@ export default function HomePage() {
       searchTerm={searchTerm}
       onSearch={setSearchTerm}
       onViewProduct={handleViewProduct} 
-      onAddToCart={addToCart}
+      onAddToCart={(p) => {
+        AnalyticsEvents.ADD_TO_CART(p);
+        addToCart(p);
+      }}
       onExplore={() => {
         setActiveCategory('Todos');
         setActiveCollection(null);

@@ -83,6 +83,13 @@ export default function ProductPage({ params }) {
     }
   };
 
+  const handleAddToCart = () => {
+    if (product) {
+      AnalyticsEvents.ADD_TO_CART(product);
+      addToCart(product);
+    }
+  };
+
   // Manejo de Gestos Táctiles para Lightbox
   const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
   const handleTouchEnd = (e) => {
@@ -311,8 +318,8 @@ export default function ProductPage({ params }) {
               <span className="tracking-tight uppercase">CONSULTAR POR WHATSAPP</span>
             </a>
             <div className="flex gap-4 flex-1">
-              <button 
-                onClick={() => addToCart(product)}
+               <button 
+                onClick={handleAddToCart}
                 disabled={product.stock <= 0}
                 className="flex-1 bg-stone-900 text-white py-4 px-4 rounded-2xl font-black text-xs hover:bg-andeansky-700 transition-all shadow-xl shadow-stone-200 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
               >
