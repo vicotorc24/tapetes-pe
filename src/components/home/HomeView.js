@@ -70,7 +70,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                {/* Badge de Impacto Permanente en Hero */}
                <div className="flex items-center gap-3 px-6 py-3 bg-andeangreen-50 border border-andeangreen-100 rounded-2xl shadow-sm animate-pulse lg:ml-4">
                   <LucideHeart size={18} className="text-andeangreen-600 fill-andeangreen-600"/>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-andeangreen-900">100% Comercio Justo</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-andeangreen-900">{t('hero.fair_trade_badge')}</span>
                </div>
             </div>
           </div>
@@ -84,8 +84,8 @@ export function HomeView({ products, categories = [], activeCategory, collection
              />
              <div className="absolute bottom-10 left-10 z-20">
                 <div className="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-white/20">
-                   <p className="text-[10px] text-terracotta-600 font-bold uppercase tracking-widest mb-1">Mano de Obra:</p>
-                   <p className="text-sm font-serif text-stone-900 font-bold">100% Auténtico de Contumazá</p>
+                   <p className="text-[10px] text-terracotta-600 font-bold uppercase tracking-widest mb-1">{t('hero.workforce_label')}</p>
+                   <p className="text-sm font-serif text-stone-900 font-bold">{t('hero.authentic_label')}</p>
                 </div>
              </div>
           </div>
@@ -156,8 +156,8 @@ export function HomeView({ products, categories = [], activeCategory, collection
           <div className="max-w-6xl mx-auto px-4">
             <div className="mb-8 flex justify-between items-end">
               <div>
-                <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest block mb-2">Inspiración</span>
-                <h2 className="text-3xl font-serif font-bold text-stone-900">Colecciones Oficiales</h2>
+                <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest block mb-2">{t('catalog.collections_subtitle')}</span>
+                <h2 className="text-3xl font-serif font-bold text-stone-900">{t('catalog.collections_title')}</h2>
               </div>
             </div>
             <div className="flex overflow-x-auto gap-6 pb-8 snap-x hide-scrollbar">
@@ -183,7 +183,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                     </div>
                   </div>
                   <div className="p-4 flex justify-between items-center text-sm">
-                    <span className="text-stone-500 line-clamp-1 flex-1 pr-4">{col.description || 'Explora esta colección exclusiva'}</span>
+                    <span className="text-stone-500 line-clamp-1 flex-1 pr-4">{col.description || t('catalog.collection_default_desc')}</span>
                     <LucideArrowRight size={16} className="text-terracotta-500 group-hover:translate-x-1 transition"/>
                   </div>
                 </div>
@@ -199,10 +199,10 @@ export function HomeView({ products, categories = [], activeCategory, collection
           <div className="absolute top-0 right-0 w-64 h-64 bg-andeangreen-200/20 blur-[100px] -z-0"></div>
           <div className="max-w-6xl mx-auto relative z-10">
             <div className="text-center mb-16">
-              <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">{impactData.hero?.subtitle || t('impact.section_subtitle')}</span>
-              <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-900 mb-8 tracking-tighter leading-none">{impactData.hero?.title || t('impact.section_title')}</h2>
+              <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">{t('impact.section_subtitle')}</span>
+              <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-900 mb-8 tracking-tighter leading-none">{t('impact.section_title')}</h2>
               <div className="w-24 h-1 bg-andeangreen-300 mx-auto mb-8 rounded-full"></div>
-              <p className="text-xl text-stone-600 max-w-2xl mx-auto font-light leading-relaxed">{impactData.hero?.description || t('impact.section_desc')}</p>
+              <p className="text-xl text-stone-600 max-w-2xl mx-auto font-light leading-relaxed">{t('impact.section_desc')}</p>
             </div>
             <div className="grid md:grid-cols-3 gap-10">
               {impactData.stats?.slice(0, 3).map((stat, idx) => (
@@ -213,7 +213,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
                     {idx === 2 && <LucideUsers size={40} />}
                   </div>
                   <h3 className="text-2xl font-bold font-serif mb-4 text-stone-900">{stat.value}</h3>
-                  <p className="text-stone-500 leading-relaxed font-light">{stat.label}</p>
+                  <p className="text-stone-500 leading-relaxed font-light">{t(`impact.stat${idx + 1}_label`) || stat.label}</p>
                 </div>
               ))}
             </div>
@@ -244,12 +244,12 @@ export function HomeView({ products, categories = [], activeCategory, collection
             <div className="lg:col-span-7 animate-in fade-in slide-in-from-left-12 duration-1000">
               <div className="flex items-center gap-4 mb-8">
                 <span className="h-[1.5px] w-16 bg-terracotta-500 shadow-[0_0_10px_rgba(202,103,77,0.5)]"></span>
-                <span className="text-wheat-400 font-bold tracking-[0.5em] text-xs md:text-sm uppercase drop-shadow-md">Herencia Viva</span>
+                <span className="text-wheat-400 font-bold tracking-[0.5em] text-xs md:text-sm uppercase drop-shadow-md">{t('banner.heritage_badge')}</span>
               </div>
               
               <h2 className="text-7xl md:text-[7.5rem] font-serif font-bold mb-10 leading-[0.95] tracking-tighter text-white">
-                El Nido de <br/> 
-                <span className="italic text-andeansky-200 font-light drop-shadow-xl underline decoration-terracotta-500/30">Cóndores</span>
+                {t('banner.title_nest')} <br/> 
+                <span className="italic text-andeansky-200 font-light drop-shadow-xl underline decoration-terracotta-500/30">{t('banner.title_condors')}</span>
               </h2>
               
               <div className="relative p-1 md:p-1.5 mb-12 max-w-xl group/card">
@@ -257,14 +257,14 @@ export function HomeView({ products, categories = [], activeCategory, collection
                  <div className="absolute inset-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl transition-transform duration-700"></div>
                  <div className="relative p-8 md:p-10">
                     <p className="text-xl md:text-2xl text-stone-100 font-light leading-relaxed mb-6">
-                      "Bajo el cielo de Contumazá, el tiempo se detiene en cada lazada." Descubre el legado de un pueblo que teje su historia con hilos de sol y niebla.
+                      {t('banner.desc')}
                     </p>
                     <div className="flex items-center gap-3 text-wheat-500 font-bold uppercase tracking-widest text-[10px] md:text-xs italic">
                        <span className="relative flex h-3 w-3">
                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-wheat-400 opacity-75"></span>
                          <span className="relative inline-flex rounded-full h-3 w-3 bg-wheat-500"></span>
                        </span>
-                       Desde la Plaza de Armas hasta el Mirador La Ermita
+                       {t('banner.location_badge')}
                     </div>
                  </div>
               </div>
@@ -290,8 +290,8 @@ export function HomeView({ products, categories = [], activeCategory, collection
                     alt="Manos artesanas de Contumazá"
                   />
                   <div className="absolute -bottom-8 -left-8 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/50 max-w-[200px]">
-                     <p className="text-[10px] text-terracotta-600 font-bold uppercase tracking-widest mb-1">Mano de Obra</p>
-                     <p className="text-sm font-serif text-stone-900 font-bold italic">Arte que trasciende generaciones</p>
+                     <p className="text-[10px] text-terracotta-600 font-bold uppercase tracking-widest mb-1">{t('banner.hands_label')}</p>
+                     <p className="text-sm font-serif text-stone-900 font-bold italic">{t('banner.hands_desc')}</p>
                   </div>
                </div>
             </div>

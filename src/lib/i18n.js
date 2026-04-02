@@ -1,7 +1,18 @@
 export const translations = {
   es: {
     nav: { catalog: "Catálogo", story: "Nosotras", heritage: "Herencia", impact: "Impacto", admin: "Acceso", dashboard: "Mi Taller", join: "Únete", banner: "✨ ¿Tejes un legado? Únete a nuestra comunidad de artesanas • Postula aquí ✨", language: "Idioma", slogan: "Artesanía de Contumazá" },
-    hero: { subtitle: "Artesanía & Tradición", title1: "Tejidos con Alma", title2: "de Contumazá", desc: "Piezas únicas tejidas a mano por madres artesanas bajo la neblina del cerro El Calvario.", cta: "Ver Colección", heritage: "Nuestra Herencia", origin_btn: "Nuestro Origen" },
+    hero: { 
+      subtitle: "Artesanía & Tradición", 
+      title1: "Tejidos con Alma", 
+      title2: "de Contumazá", 
+      desc: "Piezas únicas tejidas a mano por madres artesanas bajo la neblina del cerro El Calvario.", 
+      cta: "Ver Colección", 
+      heritage: "Nuestra Herencia", 
+      origin_btn: "Nuestro Origen",
+      fair_trade_badge: "100% Comercio Justo",
+      workforce_label: "Mano de Obra:",
+      authentic_label: "100% Auténtico de Contumazá"
+    },
     catalog: { 
       title: "Colección Exclusiva", 
       featured: "DESTACADO", 
@@ -32,19 +43,35 @@ export const translations = {
       impact_tag: "Legado Contumacino",
       impact_title: "Tejiendo el Futuro de Nuestra Herencia",
       impact_desc: "Únete a nuestra misión de preservar el arte del crochet y empoderar a las madres tejedoras del Nido de Cóndores.",
-      impact_cta: "Postular como Artesana"
+      impact_cta: "Postular como Artesana",
+      collections_subtitle: "Inspiración",
+      collections_title: "Colecciones Oficiales",
+      collection_default_desc: "Explora esta colección exclusiva"
     },
     impact: {
-      section_subtitle: 'Nacidas de Contumazá',
-      section_title: 'Tu Compra con Propósito',
-      section_desc: 'Más que un accesorio, cada pieza es una oportunidad de desarrollo para la mujer artesana y la preservación de nuestra cultura.',
+      section_subtitle: 'Nuestro Motor de Desarrollo',
+      section_title: 'El Impacto de Tapetes.pe',
+      section_desc: 'Conectamos la herencia viva de Contumazá con el mercado digital, generando una economía autosostenible para nuestras mujeres tejedoras.',
       card1_title: 'Mujeres Líderes',
       card1_desc: 'El 100% de nuestros ingresos brutos regresan directamente a manos de las artesanas.',
       card2_title: 'Crecimiento Local',
       card2_desc: 'Al comprar, fortaleces la economía de las provincias andinas alejadas.',
       card3_title: 'Arte Ancestral',
       card3_desc: 'Mantenemos viva la técnica del crochet que es parte de nuestra identidad histórica.',
-      fair_trade_badge: 'COMERCIO JUSTO'
+      fair_trade_badge: 'COMERCIO JUSTO',
+      impact_cta: "Ver Detalle de Impacto Social →",
+      stat1_label: "Ganancia Directa a la Artesana Creadora",
+      stat2_label: "De capacitación digital y negocios por año",
+      stat3_label: "Legado Asegurado para Contumazá"
+    },
+    banner: {
+      heritage_badge: "Herencia Viva",
+      title_nest: "El Nido de",
+      title_condors: "Cóndores",
+      desc: '"Bajo el cielo de Contumazá, el tiempo se detiene en cada lazada." Descubre el legado de un pueblo que teje su historia con hilos de sol y niebla.',
+      location_badge: "Desde la Plaza de Armas hasta el Mirador La Ermita",
+      hands_label: "Mano de Obra",
+      hands_desc: "Arte que trasciende generaciones"
     },
     product: { back: "Volver al catálogo", add: "Agregar al Pedido", unique: "Pieza Única", by: "Tejido por", support: "Apoyas directamente a su familia.", related: "También te podría gustar", stock: "Disponibles" },
     cart: { title: "Tu Pedido", empty: "Tu canasta está vacía", total: "Total Estimado", pay_method: "Elige cómo pagar:", wa_btn: "Enviar Pedido", card_btn: "Pagar Ahora", wa_desc: "Sin comisión", card_desc: "Pago seguro" },
@@ -135,7 +162,18 @@ export const translations = {
   },
   en: {
     nav: { catalog: "Shop", story: "Our Story", heritage: "Heritage", impact: "Impact", admin: "Login", dashboard: "Dashboard", join: "Join Us", banner: "✨ Weave a legacy? Join our artisan community • Apply here ✨", language: "Language", slogan: "Crafts of Contumazá" },
-    hero: { subtitle: "Craft & Tradition", title1: "Weavings with Soul", title2: "from the Andes", desc: "Unique pieces handwoven by artisan mothers beneath the mist of Mount Calvario.", cta: "Shop Collection", heritage: "Our Heritage", origin_btn: "Our Origin" },
+    hero: { 
+      subtitle: "Craft & Tradition", 
+      title1: "Weavings with Soul", 
+      title2: "from the Andes", 
+      desc: "Unique pieces handwoven by artisan mothers beneath the mist of Mount Calvario.", 
+      cta: "Shop Collection", 
+      heritage: "Our Heritage", 
+      origin_btn: "Our Origin",
+      fair_trade_badge: "100% Fair Trade",
+      workforce_label: "Workmanship:",
+      authentic_label: "100% Authentic from Contumazá"
+    },
     catalog: { 
       title: "Exclusive Collection", 
       featured: "FEATURED", 
@@ -166,19 +204,35 @@ export const translations = {
       impact_tag: "Contumacino Legacy",
       impact_title: "Weaving the Future of Our Heritage",
       impact_desc: "Join our mission to preserve the art of crochet and empower the weaving mothers of the Condors' Nest.",
-      impact_cta: "Apply as Artisan"
+      impact_cta: "Apply as Artisan",
+      collections_subtitle: "Inspiration",
+      collections_title: "Official Collections",
+      collection_default_desc: "Explore this exclusive collection"
     },
     impact: {
-      section_subtitle: 'Born in Contumazá',
-      section_title: 'Shopping with Purpose',
-      section_desc: 'More than an accessory, each piece is an opportunity for artisan women and the preservation of our culture.',
+      section_subtitle: 'Our Development Engine',
+      section_title: 'The Impact of Tapetes.pe',
+      section_desc: 'We connect the living heritage of Contumazá with the digital market, generating a self-sustaining economy for our weaving women.',
       card1_title: 'Leading Women',
       card1_desc: '100% of our gross revenue returns directly to the hands of the artisans.',
       card2_title: 'Local Growth',
       card2_desc: 'By purchasing, you strengthen the economy of remote Andean provinces.',
       card3_title: 'Ancestral Art',
       card3_desc: 'We keep alive the crochet technique that is part of our historical identity.',
-      fair_trade_badge: 'FAIR TRADE'
+      fair_trade_badge: 'FAIR TRADE',
+      impact_cta: "View Social Impact Details →",
+      stat1_label: "Direct Profit to the Creator Artisan",
+      stat2_label: "Digital and Business training sessions per year",
+      stat3_label: "Secured Legacy for Contumazá"
+    },
+    banner: {
+      heritage_badge: "Living Heritage",
+      title_nest: "The Nest of",
+      title_condors: "Condors",
+      desc: '"Beneath the sky of Contumazá, time stops in every stitch." Discover the legacy of a people who weave their history with threads of sun and mist.',
+      location_badge: "From Plaza de Armas to the Ermita Viewpoint",
+      hands_label: "Workmanship",
+      hands_desc: "Art that transcends generations"
     },
     product: { back: "Back to Shop", add: "Add to Order", unique: "One of a Kind", by: "Woven by", support: "Directly supports her family.", related: "You might also like", stock: "Available" },
     cart: { title: "Your Order", empty: "Your cart is empty", total: "Estimated Total", pay_method: "Choose payment method:", wa_btn: "Order via WhatsApp", card_btn: "Pay Now", wa_desc: "No fees", card_desc: "Secure payment" },
