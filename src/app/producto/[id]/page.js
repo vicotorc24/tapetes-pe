@@ -65,16 +65,20 @@ export default function ProductPage({ params }) {
     fetchProductAndArtisan();
   }, [productId]);
 
-  // Registro de Visitas (Analytics + DB)
+  // Registro de Visita de Producto (Analíticas Internas + GA4)
   useEffect(() => {
-    if (product) {
+    if (product?.id) {
       AnalyticsEvents.PRODUCT_VIEW(product);
-      if (artisan?.id) {
-        recordProfileView(artisan.id);
-        AnalyticsEvents.PROFILE_VIEW(artisan);
-      }
     }
-  }, [product, artisan]);
+  }, [product?.id]);
+
+  // Registro de Visita de Perfil de Artesana
+  useEffect(() => {
+    if (artisan?.id) {
+      recordProfileView(artisan.id);
+      AnalyticsEvents.PROFILE_VIEW(artisan);
+    }
+  }, [artisan?.id]);
 
   const handleWhatsappAction = () => {
     if (product && artisan) {
