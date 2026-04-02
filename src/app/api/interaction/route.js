@@ -26,9 +26,11 @@ export async function POST(request) {
         city = 'Entorno_Local';
     }
 
-    // Sanitización ESTRICTA: Solo letras, números y espacios
-    const cleanCity = city.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Ciudad_Desconocida';
-    const cleanCountry = country.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Pais_Desconocido';
+    // Sanitización mejorada: Soporta acentos y eñes, elimina caracteres prohibidos ([ ] / . ~ * )
+    const sanitize = (text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, '').trim();
+    
+    const cleanCity = sanitize(city) || 'Ciudad_Desconocida';
+    const cleanCountry = sanitize(country) || 'Pais_Desconocido';
 
     if (!productId && !artisanId) {
       return NextResponse.json({ error: 'Faltan parámetros' }, { status: 400 });
@@ -43,42 +45,41 @@ export async function POST(request) {
 
     // 1. Actualizar estadísticas del producto (si aplica)
     if (productId) {
-      try {
-        const productRef = doc(db, 'products', productId);
-        const pField = type === 'click' ? 'stats.whatsappClicks' : 'stats.views';
-        await updateDoc(productRef, { [pField]: increment(1) });
-      } catch (e) { console.warn(`Error updating product ${productId}:`, e.message); }
+      const productRef = doc(db, 'products', productId);
+      const pField = type === 'click' ? 'stats.whatsappClicks' : 'stats.views';
+      await updateDoc(productRef, { [pField]: increment(1) }).catch(err => {
+        console.warn(`Warning: Product stats update failed for ${productId}:`, err.message);
+      });
     }
 
     // 2. Actualizar estadísticas de la artesana (Regional)
     if (artisanId) {
-      try {
-        const userRef = doc(db, 'users', artisanId);
-        const userGeoRef = doc(db, 'users', artisanId, 'stats', 'locations');
-        const field = type === 'click' ? 'whatsappClicks' : 'profileViews';
-        
-        await updateDoc(userRef, { [field]: increment(1) }).catch(() => {});
-        
-        // REPARACIÓN: Usamos updateDoc para dot-notation puro. Si falla, usamos setDoc estructurado.
-        await updateDoc(userGeoRef, updatePayload).catch(async () => {
-          await setDoc(userGeoRef, {
-            cities: { [cleanCity]: { [baseField]: 1 } },
-            countries: { [cleanCountry]: { [baseField]: 1 } }
-          }, { merge: true });
-        });
-      } catch (e) { console.error('Error in artisan analytics:', e); }
-    }
-
-    // 3. Registro Geográfico Global (Solo para Dashboard)
-    try {
-      const statsRef = doc(db, 'stats', 'locations');
-      await updateDoc(statsRef, updatePayload).catch(async () => {
-        await setDoc(statsRef, {
+      const userRef = doc(db, 'users', artisanId);
+      const userGeoRef = doc(db, 'users', artisanId, 'stats', 'locations');
+      const field = type === 'click' ? 'whatsappClicks' : 'profileViews';
+      
+      // Actualizamos contador básico
+      await updateDoc(userRef, { [field]: increment(1) }).catch(() => {});
+      
+      // Registro geográfico por artesana
+      await updateDoc(userGeoRef, updatePayload).catch(async () => {
+        await setDoc(userGeoRef, {
           cities: { [cleanCity]: { [baseField]: 1 } },
           countries: { [cleanCountry]: { [baseField]: 1 } }
         }, { merge: true });
       });
-    } catch (e) { console.error('Error in global analytics:', e); }
+    }
+
+    // 3. Registro Geográfico Global (Solo para Dashboard)
+    // Lanzaremos error si esto falla para verlo en los logs de Vercel como un 500
+    const statsRef = doc(db, 'stats', 'locations');
+    await updateDoc(statsRef, updatePayload).catch(async (err) => {
+      console.log("Global update failed, attempting setDoc...", err.message);
+      await setDoc(statsRef, {
+        cities: { [cleanCity]: { [baseField]: 1 } },
+        countries: { [cleanCountry]: { [baseField]: 1 } }
+      }, { merge: true });
+    });
 
     return NextResponse.json({ 
       success: true, 
@@ -87,6 +88,10 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('CRITICAL Error en API de estadísticas:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // IMPORTANTE: En producción, queremos ver el error real
+    return NextResponse.json({ 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
   }
 }
