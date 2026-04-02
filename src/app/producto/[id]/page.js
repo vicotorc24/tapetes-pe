@@ -68,8 +68,9 @@ export default function ProductPage({ params }) {
   const viewRecorded = React.useRef(false);
 
   // Registro de Visita de Producto (Analíticas Internas + GA4)
+  // Esperamos a que la artesana esté cargada para que el dato llegue a su dashboard personal
   useEffect(() => {
-    if (product?.id && !viewRecorded.current) {
+    if (product?.id && artisan?.id && !viewRecorded.current) {
       AnalyticsEvents.PRODUCT_VIEW(product, artisan);
       viewRecorded.current = true;
     }

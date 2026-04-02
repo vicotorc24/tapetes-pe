@@ -11,8 +11,7 @@ export const recordInteraction = async (productId, metric, artisanId) => {
 
   try {
     // Usamos fetch hacia nuestra API interna para capturar la IP/Geolocalización en el servidor (Vercel)
-    // No esperamos la respuesta para no bloquear la UI del usuario (Fire and forget)
-    fetch('/api/interaction', {
+    const response = await fetch('/api/interaction', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -20,10 +19,17 @@ export const recordInteraction = async (productId, metric, artisanId) => {
         productId, 
         artisanId 
       }),
-    }).catch(err => console.warn('Silent analytics error:', err));
+    });
+
+    if (process.env.NODE_ENV === 'development') {
+      const data = await response.json();
+      console.log(`📊 Analytics (${type}):`, data.success ? '✅ Success' : '❌ Failed', data.geo);
+    }
 
   } catch (error) {
     // Silenciamos errores de red en analíticas para no interrumpir al usuario
-    console.debug('Analytics failed:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Analytics Critical Error:', error);
+    }
   }
 };

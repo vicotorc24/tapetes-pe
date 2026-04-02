@@ -181,12 +181,24 @@ export function DashboardOverview({ products: allProducts, user }) {
 
         {/* Nueva Sección: Alcance Geográfico */}
         <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col">
-          <h3 className="font-bold text-stone-800 mb-6 flex items-center justify-between">
+          <h3 className="font-bold text-stone-800 mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <LucideGlobe size={18} className="text-blue-500" /> Alcance Geográfico
             </div>
             <span className="text-[9px] text-stone-400 font-bold uppercase tracking-wider">Top Ciudades</span>
           </h3>
+          
+          {/* Leyenda de Iconos */}
+          <div className="flex gap-4 mb-6 text-[9px] font-bold uppercase tracking-widest border-b border-stone-50 pb-3">
+             <div className="flex items-center gap-1.5 text-purple-400">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
+                <LucideEye size={12}/> Vistas (Interés)
+             </div>
+             <div className="flex items-center gap-1.5 text-green-500">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                <LucideMessageSquare size={12}/> Clics (Intención)
+             </div>
+          </div>
 
             <div className="space-y-6 flex-1">
                {topCities.length === 0 ? (
