@@ -12,8 +12,12 @@ export function DashboardOverview({ products, user }) {
   const totalViews = products.reduce((acc, p) => acc + (p.stats?.views || 0), 0) + (user.profileViews || 0);
   const totalWhatsappClicks = products.reduce((acc, p) => acc + (p.stats?.whatsappClicks || 0), 0) + (user.whatsappClicks || 0);
   
-  // Estimación de ventas basada en intención real
-  const estimatedRevenue = totalWhatsappClicks * 150; 
+  // Estimación de ventas basada en el valor REAL de los productos con los que interactúan
+  const estimatedRevenue = products.reduce((acc, p) => {
+    const price = parseFloat(p.price) || 0;
+    const clicks = p.stats?.whatsappClicks || 0;
+    return acc + (price * clicks);
+  }, 0); 
 
   // Ordenamos productos por popularidad (vistas + clics) para el TOP REAL
   const sortedProducts = [...products].sort((a, b) => {
@@ -22,7 +26,7 @@ export function DashboardOverview({ products, user }) {
     return scoreB - scoreA;
   });
 
-  const topProducts = sortedProducts.slice(0, 4);
+  const topProducts = sortedProducts.slice(0, 10);
   const maxScore = topProducts.length > 0 
     ? (topProducts[0].stats?.views || 0) + (topProducts[0].stats?.whatsappClicks || 0) * 2 
     : 1;
@@ -67,7 +71,7 @@ export function DashboardOverview({ products, user }) {
            <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm h-full flex flex-col justify-between">
               <div>
                  <h3 className="font-bold text-stone-800 mb-2">Proyección de Impacto</h3>
-                 <p className="text-xs text-stone-400 mb-6">Basado en el valor promedio de la artesanía de Contumazá (S/ 150)</p>
+                 <p className="text-xs text-stone-400 mb-6">Basado en el valor REAL de los productos cliqueados</p>
               </div>
               <div className="py-10 text-center">
                  <span className="text-stone-300 text-6xl font-black block mb-2 opacity-20">S/ {estimatedRevenue.toLocaleString()}</span>
@@ -87,7 +91,7 @@ export function DashboardOverview({ products, user }) {
              </div>
              <span className="text-[10px] font-black text-stone-300 uppercase tracking-widest">Popularidad</span>
            </h3>
-           <div className="space-y-6">
+           <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
               {topProducts.length === 0 && (
                 <div className="py-20 text-center italic text-stone-300 text-xs">
                    Aún no hay interacciones registradas.
