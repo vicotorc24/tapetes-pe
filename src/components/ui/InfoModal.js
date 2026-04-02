@@ -66,12 +66,70 @@ export function InfoModal({ type, message, onClose, onConfirm }) {
           )}
 
           {!isFeedback && (
-            <div className="text-left">
-              <h3 className="text-2xl font-serif font-bold text-stone-900 mb-6 border-b pb-4 capitalize">{type.replace('-', ' ')}</h3>
-              <div className="max-h-[60vh] overflow-y-auto pr-2 text-stone-600 space-y-4 text-sm leading-relaxed">
-                <p>Bienvenido a la sección de {type}. Aquí encontrarás los detalles legales y términos de uso de nuestra plataforma de artesanas de Contumazá.</p>
-                <p>Nuestra misión es conectar el talento local con el mundo, garantizando comercio justo y preservación cultural.</p>
-                {/* Agregaremos más contenido real según se requiera */}
+            <div className="text-left animate-in fade-in slide-in-from-bottom-2">
+              <div className="flex items-center gap-3 mb-6 border-b pb-4">
+                 <div className="w-10 h-10 bg-stone-50 rounded-xl flex items-center justify-center text-stone-900 border border-stone-100 italic font-serif">?</div>
+                 <h3 className="text-2xl font-serif font-bold text-stone-900 capitalize">{type.replace('-', ' ')}</h3>
+              </div>
+              
+              <div className="max-h-[60vh] overflow-y-auto pr-2 text-stone-600 space-y-6 text-sm leading-relaxed">
+                {type === 'envios' && (
+                  <>
+                    <div className="bg-andeansky-50/50 p-4 rounded-2xl border border-andeansky-100">
+                      <p className="font-bold text-andeansky-900 mb-1">Ruta del Tesoro:</p>
+                      <p>Cada pieza viaja directamente desde las manos de la artesana en <strong>Contumazá, Cajamarca</strong> hasta tu hogar.</p>
+                    </div>
+                    <ul className="space-y-4 list-disc pl-4 opacity-80">
+                      <li><strong>Cobertura:</strong> Envíos a todo el Perú vía Olva Courier o Shalom.</li>
+                      <li><strong>Tiempo:</strong> Entre 3 a 7 días hábiles según la lejanía del destino.</li>
+                      <li><strong>Internacional:</strong> Gestionamos envíos vía Serpost (consultar tiempos).</li>
+                    </ul>
+                  </>
+                )}
+
+                {type === 'cuidado' && (
+                  <>
+                    <p className="italic bg-stone-50 p-4 rounded-xl border border-stone-100">"Un tapete de Contumazá es una obra de arte que puede durar generaciones con el cuidado adecuado."</p>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-terracotta-500 rounded-full"></div>
+                        <span><strong>Lavado:</strong> A mano con agua fría y jabón suave.</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-terracotta-500 rounded-full"></div>
+                        <span><strong>Secado:</strong> Siempre a la sombra, en superficie plana.</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
+                        <span><strong>Natural:</strong> No usar blanqueadores ni secadora.</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {type === 'preguntas' && (
+                  <div className="space-y-6">
+                    <div className="border-l-2 border-terracotta-200 pl-4">
+                      <p className="font-bold text-stone-900 mb-1">¿Cómo realizo el pago?</p>
+                      <p>Puedes finalizar tu compra vía WhatsApp para coordinar con la artesana, o usar nuestra pasarela de pago segura con tarjeta.</p>
+                    </div>
+                    <div className="border-l-2 border-terracotta-200 pl-4">
+                      <p className="font-bold text-stone-900 mb-1">¿Recibiré el producto exacto?</p>
+                      <p>Sí, cada registro fotográfico corresponde a la pieza única que estás viendo en el catálogo. No son réplicas industriales.</p>
+                    </div>
+                    <div className="border-l-2 border-terracotta-200 pl-4">
+                      <p className="font-bold text-stone-900 mb-1">¿Es comercio justo?</p>
+                      <p>Absolutamente. El 100% del valor de venta va directamente a la maestra artesana, sin intermediarios comerciales.</p>
+                    </div>
+                  </div>
+                )}
+                
+                {!['envios', 'cuidado', 'preguntas'].includes(type) && (
+                  <>
+                    <p>Bienvenido a la sección de {type}. Aquí encontrarás los detalles legales y términos de uso de nuestra plataforma de artesanas de Contumazá.</p>
+                    <p>Nuestra misión es conectar el talento local con el mundo, garantizando comercio justo y preservación cultural.</p>
+                  </>
+                )}
               </div>
             </div>
           )}

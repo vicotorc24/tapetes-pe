@@ -11,6 +11,7 @@ import {
   LucideX, 
   LucideUser, 
   LucideGlobe, 
+  LucideHeart,
   ArrowRight as LucideArrowRight 
 } from 'lucide-react';
 import { ImpersonationBanner } from './ImpersonationBanner';
@@ -68,12 +69,13 @@ export function Navbar() {
                 { label: t('nav.catalog'), action: () => navigateToCatalog() },
                 { label: t('nav.story'), href: '/nosotras' },
                 { label: t('nav.heritage'), href: '/historia' },
+                { label: t('nav.impact'), href: '/impacto', isImpact: true },
                 { label: t('nav.join'), href: '/unete', isSpecial: true }
               ].map((item, idx) => (
                 item.href ? (
                   <Link key={idx} href={item.href} onClick={() => setMenuOpen(false)} className="py-4 border-b border-stone-100 flex justify-between items-center group">
-                    <span className={`text-3xl font-serif font-bold ${item.isSpecial ? 'text-terracotta-600 italic underline decoration-terracotta-200' : 'text-stone-900'}`}>{item.label}</span>
-                    <LucideArrowRight size={24} className={item.isSpecial ? 'text-terracotta-300' : 'text-stone-300'} />
+                    <span className={`text-3xl font-serif font-bold ${item.isSpecial ? 'text-terracotta-600 italic underline decoration-terracotta-200' : item.isImpact ? 'text-andeangreen-600' : 'text-stone-900'}`}>{item.label}</span>
+                    <LucideArrowRight size={24} className={item.isSpecial ? 'text-terracotta-300' : item.isImpact ? 'text-andeangreen-300' : 'text-stone-300'} />
                   </Link>
                 ) : (
                   <button key={idx} onClick={item.action} className="text-left py-4 border-b border-stone-100 flex justify-between items-center group">
@@ -120,6 +122,7 @@ export function Navbar() {
                 { label: t('nav.catalog'), active: pathname === '/', action: () => navigateToCatalog() },
                 { label: t('nav.story'), active: pathname === '/nosotras', href: '/nosotras' },
                 { label: t('nav.heritage'), active: pathname === '/historia', href: '/historia' },
+                { label: t('nav.impact'), active: pathname === '/impacto', href: '/impacto', isImpact: true },
                 { label: t('nav.join'), active: pathname === '/unete', href: '/unete', isSpecial: true }
               ].map((item, idx) => {
                 const baseClasses = `
@@ -135,8 +138,9 @@ export function Navbar() {
                     <span className="relative z-10">{item.label}</span>
                     {/* Punto Indicador Moderno */}
                     <span className={`
-                      absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-terracotta-600 
+                      absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full 
                       transition-all duration-500 transform
+                      ${item.isImpact ? 'bg-andeangreen-600' : 'bg-terracotta-600'}
                       ${item.active ? 'opacity-100 scale-100' : 'opacity-0 scale-0 group-hover:opacity-30 group-hover:scale-75'}
                     `}></span>
                     {/* Fondo Redondeado (Píldora) Activo */}

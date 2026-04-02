@@ -1,10 +1,17 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../context/LanguageContext';
-import { LucideCrown, LucidePlus, LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideX, LucideSearch, History as LucideHistory } from 'lucide-react';
+import { AnalyticsEvents } from '@/lib/analytics';
+import { LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideSearch, LucideX, LucidePlus, LucideCrown } from 'lucide-react';
+import { getImpactData } from '@/lib/services/impact';
 
 export function HomeView({ products, categories = [], activeCategory, collections = [], activeCollection, onSelectCollection, onSelectCategory, onViewProduct, onAddToCart, onExplore, onCustomOrder, searchTerm = '', onSearch }) {
   const { t } = useTranslation();
+  const [impactData, setImpactData] = useState(null);
+  
+  useEffect(() => {
+    getImpactData().then(setImpactData).catch(console.error);
+  }, []);
   
   // Lógica de Filtrado Optimizada con Búsqueda
   let filteredProducts = products;
@@ -53,13 +60,18 @@ export function HomeView({ products, categories = [], activeCategory, collection
             <p className="text-xl text-stone-500 leading-relaxed mb-12 font-light max-w-xl mx-auto lg:mx-0">
               {t('hero.desc')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start items-center">
                <button onClick={onExplore} className="bg-stone-900 text-white px-12 py-5 rounded-full font-bold hover:bg-terracotta-600 transition-all duration-300 shadow-2xl transform hover:-translate-y-1">
                  {t('hero.cta')}
                </button>
                <button onClick={() => window.location.href = '/historia'} className="px-12 py-5 rounded-full font-bold text-stone-600 bg-white/50 backdrop-blur-md border border-stone-200 hover:border-stone-900 hover:text-stone-900 transition-all duration-300">
                  {t('hero.heritage')}
                </button>
+               {/* Badge de Impacto Permanente en Hero */}
+               <div className="flex items-center gap-3 px-6 py-3 bg-andeangreen-50 border border-andeangreen-100 rounded-2xl shadow-sm animate-pulse lg:ml-4">
+                  <LucideHeart size={18} className="text-andeangreen-600 fill-andeangreen-600"/>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-andeangreen-900">100% Comercio Justo</span>
+               </div>
             </div>
           </div>
           
@@ -156,7 +168,6 @@ export function HomeView({ products, categories = [], activeCategory, collection
                   className="min-w-[280px] md:min-w-[320px] bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer snap-start group border border-stone-100"
                 >
                   <div className="aspect-[4/3] bg-stone-100 relative overflow-hidden">
-                    {/* Prioritize DB Image, then Hardcoded Theme Fallback, then Generic T.pe */}
                     {col.image || col.coverImage || col.name.includes('Renacimiento') ? (
                       <img 
                         src={col.image || col.coverImage || (col.name.includes('Renacimiento') ? '/images/renacimiento_authentic.png' : '')} 
@@ -177,6 +188,39 @@ export function HomeView({ products, categories = [], activeCategory, collection
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reubicando Sección Impacto Social: Mayor Visibilidad antes del Catálogo */}
+      {!activeCollection && impactData && (
+        <div className="bg-ANDEANGREEN border-y-8 border-terracotta-500 text-stone-800 bg-andeangreen-50 py-24 px-4 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-andeangreen-200/20 blur-[100px] -z-0"></div>
+          <div className="max-w-6xl mx-auto relative z-10">
+            <div className="text-center mb-16">
+              <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">{impactData.hero?.subtitle || t('impact.section_subtitle')}</span>
+              <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-900 mb-8 tracking-tighter leading-none">{impactData.hero?.title || t('impact.section_title')}</h2>
+              <div className="w-24 h-1 bg-andeangreen-300 mx-auto mb-8 rounded-full"></div>
+              <p className="text-xl text-stone-600 max-w-2xl mx-auto font-light leading-relaxed">{impactData.hero?.description || t('impact.section_desc')}</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-10">
+              {impactData.stats?.slice(0, 3).map((stat, idx) => (
+                <div key={idx} className="bg-white p-8 rounded-[2.5rem] shadow-sm text-center border border-andeangreen-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 transform ${idx % 2 === 0 ? 'rotate-3 bg-andeansky-100 text-andeansky-700' : '-rotate-3 bg-terracotta-100 text-terracotta-600'}`}>
+                    {idx === 0 && <LucideHeart size={40} />}
+                    {idx === 1 && <LucideGlobe2 size={40} />}
+                    {idx === 2 && <LucideUsers size={40} />}
+                  </div>
+                  <h3 className="text-2xl font-bold font-serif mb-4 text-stone-900">{stat.value}</h3>
+                  <p className="text-stone-500 leading-relaxed font-light">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-16 text-center">
+               <button onClick={() => window.location.href = '/impacto'} className="text-andes-neutral-900 font-bold border-b-2 border-andeangreen-300 hover:border-andeangreen-600 transition-all text-sm uppercase tracking-widest pb-1 mt-4">
+                  {t('impact.impact_cta') || 'Ver más sobre nuestro compromiso social →'}
+               </button>
             </div>
           </div>
         </div>
@@ -416,6 +460,9 @@ export function HomeView({ products, categories = [], activeCategory, collection
                     <p className="text-[10px] text-stone-400 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
                        <span className="w-1.5 h-1.5 bg-terracotta-500 rounded-full"></span>
                        {p.sellerName || t('catalog.artisan_default')}
+                       <span className="ml-auto flex items-center gap-1 text-[8px] text-andeangreen-600 font-black px-2 py-0.5 bg-andeangreen-50 rounded-full border border-andeangreen-100">
+                          <LucideHeart size={8} className="fill-andeangreen-600"/> {t('impact.fair_trade_badge') || 'JUSTO'}
+                       </span>
                     </p>
                   </div>
                   <p className="text-sm text-stone-500 line-clamp-2 mb-6 flex-1 font-light leading-relaxed italic">"{p.description}"</p>
@@ -454,39 +501,6 @@ export function HomeView({ products, categories = [], activeCategory, collection
         )}
       </div>
 
-      {/* Sección Impacto Social */}
-      <div className="bg-ANDEANGREEN border-t-8 border-terracotta-500 text-stone-800 bg-andeangreen-50 py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">{t('impact.section_subtitle')}</span>
-            <h2 className="text-3xl md:text-5xl font-serif font-bold text-stone-900 mb-6 text-andeangreen-900">{t('impact.section_title')}</h2>
-            <p className="text-lg text-stone-600 max-w-2xl mx-auto">{t('impact.section_desc')}</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-10">
-            <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-andeangreen-100 hover:shadow-md transition">
-              <div className="w-16 h-16 bg-andeansky-100 text-andeansky-700 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
-                <LucideHeart size={32} />
-              </div>
-              <h3 className="text-xl font-bold font-serif mb-3 text-andeansky-900">{t('impact.card1_title')}</h3>
-              <p className="text-stone-600">{t('impact.card1_desc')}</p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-andeangreen-100 hover:shadow-md transition">
-              <div className="w-16 h-16 bg-terracotta-100 text-terracotta-600 rounded-2xl flex items-center justify-center mx-auto mb-6 transform -rotate-3">
-                <LucideGlobe2 size={32} />
-              </div>
-              <h3 className="text-xl font-bold font-serif mb-3 text-terracotta-900">{t('impact.card2_title')}</h3>
-              <p className="text-stone-600">{t('impact.card2_desc')}</p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-andeangreen-100 hover:shadow-md transition">
-              <div className="w-16 h-16 bg-textilemagenta-100 text-textilemagenta-600 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
-                <LucideUsers size={32} />
-              </div>
-              <h3 className="text-xl font-bold font-serif mb-3 text-textilemagenta-900">{t('impact.card3_title')}</h3>
-              <p className="text-stone-600">{t('impact.card3_desc')}</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

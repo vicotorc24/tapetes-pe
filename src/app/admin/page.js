@@ -13,6 +13,7 @@ import { ProfileManager } from '@/components/admin/ProfileManager';
 import { UserManager } from '@/components/admin/UserManager';
 import { LegacyManager } from '@/components/admin/LegacyManager';
 import { CollectionManager } from '@/components/admin/CollectionManager';
+import { ImpactManager } from '@/components/admin/ImpactManager';
 import { InfoModal } from '@/components/ui/InfoModal';
 import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
 
@@ -253,6 +254,9 @@ export default function AdminDashboard() {
               onImpersonate={startImpersonating}
               setFeedback={setFeedback}
            />
+        )}
+        {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
+           <ImpactManager setFeedback={setFeedback} />
         )}
       </DashboardLayout>
 

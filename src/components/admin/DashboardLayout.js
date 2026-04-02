@@ -12,7 +12,8 @@ import {
   LucideUserCircle,
   LucideLibrary,
   LucideMenu,
-  LucideX
+  LucideX,
+  LucideHeartHandshake
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -43,6 +44,7 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
       title: 'Cultura y Equipo',
       items: [
         { id: 'legacy', label: 'Legado Cultural', icon: LucideLibrary, roles: ['superadmin', 'redactor'] }, 
+        { id: 'impact', label: 'Impacto Social', icon: LucideHeartHandshake, roles: ['superadmin', 'redactor'] }, 
         { id: 'users', label: 'Gestión Usuarios', icon: LucideUsers, roles: ['superadmin'] }, 
       ]
     },

@@ -77,5 +77,6 @@ export const AnalyticsEvents = {
   }),
   IMPACT_VIEW: (section) => trackEvent('social_impact_engagement', {
     section_name: section
-  })
+  }),
+  trackEvent: (eventName, params) => trackEvent(eventName, params)
 };

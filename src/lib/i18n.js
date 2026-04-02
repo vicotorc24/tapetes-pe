@@ -1,6 +1,6 @@
 export const translations = {
   es: {
-    nav: { catalog: "Catálogo", story: "Nosotras", heritage: "Herencia", admin: "Acceso", dashboard: "Mi Taller", join: "Únete", banner: "✨ ¿Tejes un legado? Únete a nuestra comunidad de artesanas • Postula aquí ✨", language: "Idioma", slogan: "Artesanía de Contumazá" },
+    nav: { catalog: "Catálogo", story: "Nosotras", heritage: "Herencia", impact: "Impacto", admin: "Acceso", dashboard: "Mi Taller", join: "Únete", banner: "✨ ¿Tejes un legado? Únete a nuestra comunidad de artesanas • Postula aquí ✨", language: "Idioma", slogan: "Artesanía de Contumazá" },
     hero: { subtitle: "Artesanía & Tradición", title1: "Tejidos con Alma", title2: "de Contumazá", desc: "Piezas únicas tejidas a mano por madres artesanas bajo la neblina del cerro El Calvario.", cta: "Ver Colección", heritage: "Nuestra Herencia", origin_btn: "Nuestro Origen" },
     catalog: { 
       title: "Colección Exclusiva", 
@@ -35,15 +35,16 @@ export const translations = {
       impact_cta: "Postular como Artesana"
     },
     impact: {
-      section_title: "Tu Compra con Propósito",
-      section_subtitle: "Más que una tienda",
-      section_desc: "Cada tapete que adquieres en nuestra plataforma digital desencadena una serie de impactos positivos directos en la comunidad de Contumazá.",
-      card1_title: "Comercio Justo 100%",
-      card1_desc: "Eliminamos a los intermediarios. Al comprar, tu dinero va directo a las manos de la artesana que dedicó horas a la pieza.",
-      card2_title: "Rescate Cultural",
-      card2_desc: "Al darle valor económico internacional al tejido a crochet, incentivamos a que las nuevas generaciones no dejen morir su arte ancestral.",
-      card3_title: "Empoderamiento",
-      card3_desc: "Generamos independencia económica para decenas de madres rurales que tejen desde sus casas mientras cuidan a sus familias."
+      section_subtitle: 'Nacidas de Contumazá',
+      section_title: 'Tu Compra con Propósito',
+      section_desc: 'Más que un accesorio, cada pieza es una oportunidad de desarrollo para la mujer artesana y la preservación de nuestra cultura.',
+      card1_title: 'Mujeres Líderes',
+      card1_desc: 'El 100% de nuestros ingresos brutos regresan directamente a manos de las artesanas.',
+      card2_title: 'Crecimiento Local',
+      card2_desc: 'Al comprar, fortaleces la economía de las provincias andinas alejadas.',
+      card3_title: 'Arte Ancestral',
+      card3_desc: 'Mantenemos viva la técnica del crochet que es parte de nuestra identidad histórica.',
+      fair_trade_badge: 'COMERCIO JUSTO'
     },
     product: { back: "Volver al catálogo", add: "Agregar al Pedido", unique: "Pieza Única", by: "Tejido por", support: "Apoyas directamente a su familia.", related: "También te podría gustar", stock: "Disponibles" },
     cart: { title: "Tu Pedido", empty: "Tu canasta está vacía", total: "Total Estimado", pay_method: "Elige cómo pagar:", wa_btn: "Enviar Pedido", card_btn: "Pagar Ahora", wa_desc: "Sin comisión", card_desc: "Pago seguro" },
@@ -133,7 +134,7 @@ export const translations = {
     footer: { purpose: "Conectando el talento ancestral de las madres de Contumazá con hogares que valoran la autenticidad.", explore: "Explorar", help: "Ayuda", contact: "Contacto", slogan: "Artesanía de Contumazá", impact: "Impacto Social", shipping: "Envíos", care: "Cuidado", faq: "FAQ", legacy: "Legado Ancestral", backed_by: "Respaldado por la", municipality: "Municipalidad Provincial de Contumazá" }
   },
   en: {
-    nav: { catalog: "Shop", story: "Our Story", heritage: "Heritage", admin: "Login", dashboard: "Dashboard", join: "Join Us", banner: "✨ Weave a legacy? Join our artisan community • Apply here ✨", language: "Language", slogan: "Crafts of Contumazá" },
+    nav: { catalog: "Shop", story: "Our Story", heritage: "Heritage", impact: "Impact", admin: "Login", dashboard: "Dashboard", join: "Join Us", banner: "✨ Weave a legacy? Join our artisan community • Apply here ✨", language: "Language", slogan: "Crafts of Contumazá" },
     hero: { subtitle: "Craft & Tradition", title1: "Weavings with Soul", title2: "from the Andes", desc: "Unique pieces handwoven by artisan mothers beneath the mist of Mount Calvario.", cta: "Shop Collection", heritage: "Our Heritage", origin_btn: "Our Origin" },
     catalog: { 
       title: "Exclusive Collection", 
@@ -168,15 +169,16 @@ export const translations = {
       impact_cta: "Apply as Artisan"
     },
     impact: {
-      section_title: "Purchase with Purpose",
-      section_subtitle: "More than a store",
-      section_desc: "Every rug you purchase on our digital platform triggers a series of direct positive impacts on the Contumazá community.",
-      card1_title: "100% Fair Trade",
-      card1_desc: "We eliminate intermediaries. When you buy, your money goes directly into the hands of the artisan who dedicated hours to the piece.",
-      card2_title: "Cultural Rescue",
-      card2_desc: "By giving international economic value to crochet weaving, we encourage new generations not to let their ancestral art die.",
-      card3_title: "Empowerment",
-      card3_desc: "We generate economic independence for dozens of rural mothers who weave from their homes while caring for their families."
+      section_subtitle: 'Born in Contumazá',
+      section_title: 'Shopping with Purpose',
+      section_desc: 'More than an accessory, each piece is an opportunity for artisan women and the preservation of our culture.',
+      card1_title: 'Leading Women',
+      card1_desc: '100% of our gross revenue returns directly to the hands of the artisans.',
+      card2_title: 'Local Growth',
+      card2_desc: 'By purchasing, you strengthen the economy of remote Andean provinces.',
+      card3_title: 'Ancestral Art',
+      card3_desc: 'We keep alive the crochet technique that is part of our historical identity.',
+      fair_trade_badge: 'FAIR TRADE'
     },
     product: { back: "Back to Shop", add: "Add to Order", unique: "One of a Kind", by: "Woven by", support: "Directly supports her family.", related: "You might also like", stock: "Available" },
     cart: { title: "Your Order", empty: "Your cart is empty", total: "Estimated Total", pay_method: "Choose payment method:", wa_btn: "Order via WhatsApp", card_btn: "Pay Now", wa_desc: "No fees", card_desc: "Secure payment" },

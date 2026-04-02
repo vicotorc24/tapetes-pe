@@ -37,19 +37,19 @@ export function Footer({ onOpenInfo, onCategory, onAbout, onHistory, onImpact })
         <div>
           <h4 className="text-white font-bold mb-8 uppercase text-[10px] tracking-[0.3em]">{t('footer.explore')}</h4>
           <ul className="space-y-4 text-sm font-medium">
-            <li><button onClick={() => onCategory('Todos')} className="hover:text-terracotta-500 transition-colors text-left flex items-center gap-2 group">{t('nav.catalog')} <div className="w-1 h-1 bg-terracotta-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div></button></li>
-            <li><button onClick={onAbout} className="hover:text-terracotta-500 transition-colors text-left flex items-center gap-2 group">{t('nav.story')} <div className="w-1 h-1 bg-terracotta-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div></button></li>
-            <li><button onClick={onHistory} className="hover:text-terracotta-500 transition-colors text-left flex items-center gap-2 group">{t('nav.heritage')} <div className="w-1 h-1 bg-terracotta-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div></button></li>
-            <li><button onClick={onImpact} className="text-terracotta-500 font-bold hover:text-white transition-colors text-left italic">{t('footer.impact')}</button></li>
+            <li><button onClick={() => onCategory('Todos')} className="hover:text-terracotta-500 transition-all text-left flex items-center gap-2 group hover:translate-x-1 duration-300">{t('nav.catalog')} <div className="w-1 h-1 bg-terracotta-500 rounded-full opacity-0 group-hover:opacity-100 transition-all"></div></button></li>
+            <li><button onClick={onAbout} className="hover:text-terracotta-500 transition-all text-left flex items-center gap-2 group hover:translate-x-1 duration-300">{t('nav.story')} <div className="w-1 h-1 bg-terracotta-500 rounded-full opacity-0 group-hover:opacity-100 transition-all"></div></button></li>
+            <li><button onClick={onHistory} className="hover:text-terracotta-500 transition-all text-left flex items-center gap-2 group hover:translate-x-1 duration-300">{t('nav.heritage')} <div className="w-1 h-1 bg-terracotta-500 rounded-full opacity-0 group-hover:opacity-100 transition-all"></div></button></li>
+            <li><button onClick={onImpact} className="inline-block text-terracotta-500 font-bold hover:text-white transition-all text-left italic hover:scale-105 duration-300">{t('footer.impact')}</button></li>
           </ul>
         </div>
 
         <div>
           <h4 className="text-white font-bold mb-8 uppercase text-[10px] tracking-[0.3em]">{t('footer.help')}</h4>
           <ul className="space-y-4 text-sm font-medium">
-            <li><button onClick={() => onOpenInfo('envios')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideTruck size={18} className="text-stone-600"/> {t('footer.shipping')}</button></li>
-            <li><button onClick={() => onOpenInfo('cuidado')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideHeart size={18} className="text-stone-600"/> {t('footer.care')}</button></li>
-            <li><button onClick={() => onOpenInfo('preguntas')} className="hover:text-white flex items-center gap-3 transition-colors opacity-70 hover:opacity-100"><LucideHelpCircle size={18} className="text-stone-600"/> {t('footer.faq')}</button></li>
+            <li><button onClick={() => onOpenInfo('envios')} className="hover:text-white flex items-center gap-3 transition-all opacity-70 hover:opacity-100 hover:translate-x-1 duration-300"><LucideTruck size={18} className="text-stone-500"/> {t('footer.shipping')}</button></li>
+            <li><button onClick={() => onOpenInfo('cuidado')} className="hover:text-white flex items-center gap-3 transition-all opacity-70 hover:opacity-100 hover:translate-x-1 duration-300"><LucideHeart size={18} className="text-stone-500"/> {t('footer.care')}</button></li>
+            <li><button onClick={() => onOpenInfo('preguntas')} className="hover:text-white flex items-center gap-3 transition-all opacity-70 hover:opacity-100 hover:translate-x-1 duration-300"><LucideHelpCircle size={18} className="text-stone-500"/> {t('footer.faq')}</button></li>
           </ul>
         </div>
 
