@@ -21,6 +21,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Faltan parámetros' }, { status: 400 });
     }
 
+    // Definición de los datos geográficos para actualización atómica (Dual: Vistas y Clics)
+    const baseField = type === 'click' ? 'clicks' : 'views';
+    const updatePayload = {
+      [`countries.${country}.${baseField}`]: increment(1),
+      [`cities.${city}.${baseField}`]: increment(1)
+    };
+
     // 1. Actualizar estadísticas del producto (si aplica)
     if (productId) {
       const productRef = doc(db, 'products', productId);
