@@ -1,4 +1,5 @@
 import { sendGTMEvent } from '@next/third-parties/google';
+import { recordInteraction } from './services/stats';
 
 /**
  * Registra un evento personalizado en Google Analytics
@@ -15,27 +16,37 @@ export const trackEvent = (eventName, params = {}) => {
  * Eventos Predefinidos para Tapetes.pe
  */
 export const AnalyticsEvents = {
-  WHATSAPP_CLICK: (product, seller) => trackEvent('whatsapp_interaction', {
-    item_id: product.id,
-    item_name: product.title,
-    item_category: product.category,
-    value: parseFloat(product.price) || 0,
-    currency: 'PEN',
-    seller_name: seller.name,
-    seller_email: seller.email
-  }),
+  WHATSAPP_CLICK: (product, seller) => {
+    // Registro GA4
+    trackEvent('whatsapp_interaction', {
+      item_id: product.id,
+      item_name: product.title,
+      item_category: product.category,
+      value: parseFloat(product.price) || 0,
+      currency: 'PEN',
+      seller_name: seller.name,
+      seller_email: seller.email
+    });
+    // Registro Firestore para Dashboard Interno
+    recordInteraction(product.id, 'whatsappClicks');
+  },
   PROFILE_VIEW: (artisan) => trackEvent('artisan_profile_view', {
     artisan_id: artisan.id,
     artisan_name: artisan.name,
     specialty: artisan.specialty
   }),
-  PRODUCT_VIEW: (product) => trackEvent('view_item', {
-    item_id: product.id,
-    item_name: product.title,
-    item_category: product.category,
-    value: parseFloat(product.price) || 0,
-    currency: 'PEN'
-  }),
+  PRODUCT_VIEW: (product) => {
+    // Registro GA4
+    trackEvent('view_item', {
+      item_id: product.id,
+      item_name: product.title,
+      item_category: product.category,
+      value: parseFloat(product.price) || 0,
+      currency: 'PEN'
+    });
+    // Registro Firestore para Dashboard Interno
+    recordInteraction(product.id, 'views');
+  },
   SEARCH: (query) => trackEvent('search', {
     search_term: query
   }),
