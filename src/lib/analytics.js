@@ -27,25 +27,26 @@ export const AnalyticsEvents = {
       seller_name: seller.name,
       seller_email: seller.email
     });
-    // Registro Firestore para Dashboard Interno
-    recordInteraction(product.id, 'whatsappClicks');
+    // Registro Firestore para Dashboard Interno (via API con Geo)
+    recordInteraction(product.id, 'whatsappClicks', seller?.id);
   },
   PROFILE_VIEW: (artisan) => trackEvent('artisan_profile_view', {
     artisan_id: artisan.id,
     artisan_name: artisan.name,
     specialty: artisan.specialty
   }),
-  PRODUCT_VIEW: (product) => {
+  PRODUCT_VIEW: (product, artisan) => {
     // Registro GA4
     trackEvent('view_item', {
       item_id: product.id,
       item_name: product.title,
       item_category: product.category,
       value: parseFloat(product.price) || 0,
-      currency: 'PEN'
+      currency: 'PEN',
+      seller_name: artisan?.name || 'Unknown'
     });
-    // Registro Firestore para Dashboard Interno
-    recordInteraction(product.id, 'views');
+    // Registro Firestore para Dashboard Interno (via API con Geo)
+    recordInteraction(product.id, 'views', artisan?.id);
   },
   SEARCH: (query) => trackEvent('search', {
     search_term: query

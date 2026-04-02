@@ -1,8 +1,9 @@
-"use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatCard } from '../ui/StatCard';
 import { SimpleBarChart } from '../ui/SimpleBarChart';
-import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTriangle, LucideRotateCcw, LucideInfo } from 'lucide-react';
+import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTriangle, LucideRotateCcw, LucideInfo, LucideGlobe, LucideMapPin } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export function DashboardOverview({ products: allProducts, user }) {
   // Filtramos los productos según el rol del usuario para que el dashboard sea personal
@@ -35,6 +36,31 @@ export function DashboardOverview({ products: allProducts, user }) {
   const maxScore = topProducts.length > 0 
     ? (topProducts[0].stats?.views || 0) + (topProducts[0].stats?.whatsappClicks || 0) * 2 
     : 1;
+
+  // Seguimiento Geográfico en Tiempo Real
+  const [geoStats, setGeoStats] = useState({ countries: {}, cities: {} });
+
+  useEffect(() => {
+    // Si es superadmin, vemos stats globales. Si no, las de su taller.
+    const statsPath = user.role === 'superadmin' 
+      ? doc(db, 'stats', 'locations')
+      : doc(db, 'users', user.id, 'stats', 'locations');
+    
+    const unsubscribe = onSnapshot(statsPath, (doc) => {
+      if (doc.exists()) {
+        setGeoStats(doc.data());
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user.id, user.role]);
+
+  // Procesamiento de datos geográficos para el ranking
+  const topCities = Object.entries(geoStats.cities || {})
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5);
+
+  const totalGeoInteractions = Object.values(geoStats.cities || {}).reduce((acc, val) => acc + val, 0) || 1;
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -144,7 +170,64 @@ export function DashboardOverview({ products: allProducts, user }) {
                 );
               })}
            </div>
-        </div>
+         </div>
+
+         {/* Nueva Sección: Alcance Geográfico */}
+         <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+            <h3 className="font-bold text-stone-800 mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <LucideGlobe size={18} className="text-blue-500"/> Alcance Geográfico
+              </div>
+              <span className="text-[9px] text-stone-400 font-bold uppercase tracking-wider">Top Ciudades</span>
+            </h3>
+
+            <div className="space-y-5 flex-1">
+               {topCities.length === 0 ? (
+                 <div className="py-20 text-center flex flex-col items-center gap-3">
+                   <div className="w-12 h-12 bg-stone-50 rounded-full flex items-center justify-center text-stone-200">
+                     <LucideMapPin size={20} />
+                   </div>
+                   <p className="italic text-stone-300 text-[10px]">Aún no tenemos datos de ubicación.</p>
+                 </div>
+               ) : (
+                 topCities.map(([city, count], idx) => {
+                   const percentage = (count / totalGeoInteractions) * 100;
+                   return (
+                     <div key={city} className="space-y-1.5 animate-in slide-in-from-right" style={{ animationDelay: `${idx * 100}ms` }}>
+                       <div className="flex justify-between text-[11px] font-bold">
+                         <span className="text-stone-800 flex items-center gap-2">
+                           <span className="text-stone-300">#{idx + 1}</span> {city}
+                         </span>
+                         <span className="text-stone-400">{count} visitas</span>
+                       </div>
+                       <div className="h-1.5 w-full bg-stone-50 rounded-full overflow-hidden">
+                         <div 
+                           className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                           style={{ width: `${percentage}%` }}
+                         ></div>
+                       </div>
+                     </div>
+                   )
+                 })
+               )}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-stone-50 flex items-center justify-between">
+               <div className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">Países Activos</div>
+               <div className="flex -space-x-2">
+                  {Object.keys(geoStats.countries || {}).slice(0, 3).map((code) => (
+                    <div key={code} className="w-6 h-6 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-600" title={code}>
+                      {code.substring(0, 2)}
+                    </div>
+                  ))}
+                  {Object.keys(geoStats.countries || {}).length > 3 && (
+                    <div className="w-6 h-6 rounded-full bg-stone-900 border-2 border-white flex items-center justify-center text-[8px] font-bold text-white">
+                      +{Object.keys(geoStats.countries || {}).length - 3}
+                    </div>
+                  )}
+               </div>
+            </div>
+         </div>
       </div>
     </div>
   );

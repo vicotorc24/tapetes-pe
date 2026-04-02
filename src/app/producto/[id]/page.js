@@ -65,12 +65,15 @@ export default function ProductPage({ params }) {
     fetchProductAndArtisan();
   }, [productId]);
 
+  const viewRecorded = React.useRef(false);
+
   // Registro de Visita de Producto (Analíticas Internas + GA4)
   useEffect(() => {
-    if (product?.id) {
-      AnalyticsEvents.PRODUCT_VIEW(product);
+    if (product?.id && !viewRecorded.current) {
+      AnalyticsEvents.PRODUCT_VIEW(product, artisan);
+      viewRecorded.current = true;
     }
-  }, [product?.id]);
+  }, [product?.id, artisan?.id]);
 
   // Registro de Visita de Perfil de Artesana
   useEffect(() => {
