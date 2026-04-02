@@ -2,17 +2,22 @@
 import React from 'react';
 import { StatCard } from '../ui/StatCard';
 import { SimpleBarChart } from '../ui/SimpleBarChart';
-import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTriangle, LucideRotateCcw } from 'lucide-react';
+import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTriangle, LucideRotateCcw, LucideInfo } from 'lucide-react';
 
-export function DashboardOverview({ products, user }) {
-  // Cálculos reales basados en el catálogo completo
+export function DashboardOverview({ products: allProducts, user }) {
+  // Filtramos los productos según el rol del usuario para que el dashboard sea personal
+  const products = user.role === 'superadmin' 
+    ? allProducts 
+    : allProducts.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
+
+  // Cálculos reales basados en el catálogo filtrado (el del propio artesano)
   const activeProductsCount = products.length;
   
-  // Sumamos las estadísticas de todos los productos para métricas globales
+  // Sumamos las estadísticas de los productos filtrados para métricas individuales
   const totalViews = products.reduce((acc, p) => acc + (p.stats?.views || 0), 0) + (user.profileViews || 0);
   const totalWhatsappClicks = products.reduce((acc, p) => acc + (p.stats?.whatsappClicks || 0), 0) + (user.whatsappClicks || 0);
   
-  // Estimación de ventas basada en el valor REAL de los productos con los que interactúan
+  // Estimación de ventas basada en el valor REAL de los productos del artesano
   const estimatedRevenue = products.reduce((acc, p) => {
     const price = parseFloat(p.price) || 0;
     const clicks = p.stats?.whatsappClicks || 0;
@@ -35,8 +40,12 @@ export function DashboardOverview({ products, user }) {
     <div className="animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-stone-900 tracking-tight font-serif italic">Resumen del Taller</h2>
-          <p className="text-sm text-stone-500">Inteligencia de mercado basada en datos reales</p>
+          <h2 className="text-3xl font-bold text-stone-900 tracking-tight font-serif italic">¡Hola, {user.name?.split(' ')[0]}! 🏮</h2>
+          <p className="text-sm text-stone-500">
+             {user.role === 'superadmin' 
+               ? 'Estas son las estadísticas generales de la plataforma' 
+               : `Aquí tienes el resumen de actividad de tu taller artesanal`}
+          </p>
         </div>
       </div>
 
@@ -89,7 +98,18 @@ export function DashboardOverview({ products, user }) {
              <div className="flex items-center gap-2">
                 <LucideStar size={18} className="text-yellow-500"/> Top Productos
              </div>
-             <span className="text-[10px] font-black text-stone-300 uppercase tracking-widest">Popularidad</span>
+             <span className="text-[10px] font-black text-stone-300 uppercase tracking-widest flex items-center gap-1 group relative cursor-help">
+                Popularidad
+                <LucideInfo size={12} />
+                <div className="absolute bottom-full right-0 mb-2 w-48 p-4 bg-stone-900 text-white text-[9px] rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 leading-relaxed font-medium normal-case tracking-normal border border-white/10">
+                   <p className="font-bold mb-2 border-b border-white/10 pb-1 text-orange-400">¿Cómo se calcula?</p>
+                   <div className="space-y-1">
+                      <p>• **Vistas:** 1 punto</p>
+                      <p>• **Clics WhatsApp:** 2 puntos</p>
+                      <p className="mt-2 text-stone-400 italic">El producto #1 marca el 100%. Los demás muestran su rendimiento relativo al líder.</p>
+                   </div>
+                </div>
+             </span>
            </h3>
            <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
               {topProducts.length === 0 && (
