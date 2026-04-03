@@ -352,7 +352,7 @@ export default function ProductPage({ params }) {
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideLayers size={16} /></div>
-                <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Punto</p><p className="text-sm font-bold text-stone-700">{product.stitchType || 'Artesanal'}</p></div>
+                <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Punto</p><p className="text-sm font-bold text-stone-700">{Array.isArray(product.stitchType) ? product.stitchType.join(', ') : (product.stitchType || 'Artesanal')}</p></div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideBox size={16} /></div>

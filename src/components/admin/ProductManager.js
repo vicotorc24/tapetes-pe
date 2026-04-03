@@ -25,10 +25,30 @@ export function ProductManager({ products, setProducts, categories, collections,
     technique: '',
     dimensions: '',
     laborDays: '',
-    stitchType: '',
+    stitchType: [],
     sellerEmail: '',
     sellerName: ''
   });
+  
+  const STITCH_OPTIONS = [
+    { id: 'jersey', name: 'Punto Jersey', desc: 'Clásico del tejido a dos agujas.' },
+    { id: 'santa_clara', name: 'Punto Santa Clara', desc: 'Punto bobo o musgo.' },
+    { id: 'arroz', name: 'Punto Arroz', desc: 'Textura granulada elegante.' },
+    { id: 'pina', name: 'Punto Piña', desc: 'Formas de ananá en relieve.' },
+    { id: 'garbanzo', name: 'Punto Garbanzo', desc: 'Puntos popcorn con volumen.' },
+    { id: 'salomon', name: 'Punto Salomón', desc: 'Encaje abierto y ligero.' },
+    { id: 'abanico', name: 'Punto Abanico', desc: 'Bordes en forma de concha.' },
+    { id: 'cruzado', name: 'Punto Cruzado', desc: 'Líneas que se entrelazan.' },
+    { id: 'filet', name: 'Malla / Filet', desc: 'Ideal para diseños figurativos.' },
+    { id: 'varetas', name: 'Varetas / Pto. Alto', desc: 'Básico y versátil.' },
+    { id: 'nieve', name: 'Punto de Nieve', desc: 'Especialidad concéntrica.' },
+    { id: 'vortices', name: 'Vórtices', desc: 'Espirales en relieve.' },
+    { id: 'ingles', name: 'Punto Inglés', desc: 'Punto con relieve y elasticidad.' },
+    { id: 'trenza', name: 'Punto de Ocho / Trenza', desc: 'Entrelazados clásicos de abrigo.' },
+    { id: 'calado', name: 'Punto Calado', desc: 'Diseños con huecos y transparencias.' },
+    { id: 'panal', name: 'Punto Panal', desc: 'Textura hexagonal elegante.' },
+    { id: 'elastico', name: 'Punto Elástico', desc: 'Ideal para puños y cuellos.' }
+  ];
   const [stitchType, setStitchType] = useState(''); // Just for context, line 31 is filter
   const filteredProducts = myProducts.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -59,7 +79,8 @@ export function ProductManager({ products, setProducts, categories, collections,
       technique: product.technique || '',
       dimensions: product.dimensions || '', 
       laborDays: product.laborDays || '', 
-      stitchType: product.stitchType || '',
+      laborDays: product.laborDays || '', 
+      stitchType: Array.isArray(product.stitchType) ? product.stitchType : (product.stitchType ? [product.stitchType] : []),
       sellerEmail: product.sellerEmail || '',
       sellerName: product.sellerName || ''
     }); 
@@ -219,20 +240,35 @@ export function ProductManager({ products, setProducts, categories, collections,
               <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Días de Labor / Dedicación</label>
               <input type="number" className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.laborDays} onChange={e => setFormData({...formData, laborDays: e.target.value})} placeholder="Ej: 15" />
             </div>
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Punto Maestro Predominante</label>
-              <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.stitchType} onChange={e => setFormData({...formData, stitchType: e.target.value})}>
-                <option value="">(Seleccionar punto)</option>
-                <option value="Punto Piña">Punto Piña (Ananá)</option>
-                <option value="Punto Garbanzo">Punto Garbanzo / Popcorn</option>
-                <option value="Punto Salomón">Punto Salomón</option>
-                <option value="Punto Abanico">Punto Abanico / Shell</option>
-                <option value="Punto Cruzado">Punto Cruzado</option>
-                <option value="Malla / Filet">Malla / Filet</option>
-                <option value="Varetas / Punto Alto">Varetas / Punto Alto</option>
-                <option value="Punto de Nieve y Piña Concéntrica">Punto de Nieve y Piña Concéntrica (Especialidad)</option>
-                <option value="Vórtices / Punto Cruzado en Espiral">Vórtices / Punto Cruzado en Espiral</option>
-              </select>
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {STITCH_OPTIONS.map(opt => {
+                  const isSelected = (formData.stitchType || []).includes(opt.name);
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
+                        const next = isSelected 
+                          ? current.filter(s => s !== opt.name)
+                          : [...current, opt.name];
+                        setFormData({ ...formData, stitchType: next });
+                      }}
+                      className={`flex flex-col p-3 rounded-xl border text-left transition-all duration-200 ${
+                        isSelected 
+                          ? 'bg-orange-50 border-orange-200 ring-2 ring-orange-50' 
+                          : 'bg-stone-50 border-stone-100 hover:border-stone-200'
+                      }`}
+                    >
+                      <span className={`text-xs font-bold ${isSelected ? 'text-orange-700' : 'text-stone-700'}`}>{opt.name}</span>
+                      <span className="text-[9px] text-stone-400 line-clamp-1 mt-0.5">{opt.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-stone-400 italic mt-3">* Puedes seleccionar varios puntos para una misma pieza.</p>
             </div>
           </div>
 

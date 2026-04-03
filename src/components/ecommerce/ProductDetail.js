@@ -118,7 +118,9 @@ export function ProductDetail({ product, allProducts, userInterests, onBack, onA
               {product.stitchType && (
                 <div>
                   <p className="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-1">Punto Maestro</p>
-                  <p className="text-sm font-medium text-stone-900">{product.stitchType}</p>
+                  <p className="text-sm font-medium text-stone-900">
+                    {Array.isArray(product.stitchType) ? product.stitchType.join(', ') : product.stitchType}
+                  </p>
                 </div>
               )}
             </div>
