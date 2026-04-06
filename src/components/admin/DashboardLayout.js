@@ -13,7 +13,8 @@ import {
   LucideLibrary,
   LucideMenu,
   LucideX,
-  LucideHeartHandshake
+  LucideHeartHandshake,
+  LucideShield
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -52,6 +53,7 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
       title: 'Sistema',
       items: [
         { id: 'profile', label: 'Mi Perfil', icon: LucideUserCircle, roles: ['superadmin', 'seller', 'redactor'] },
+        { id: 'audit', label: 'Auditoría Técnica', icon: LucideShield, roles: ['superadmin'] },
       ]
     }
   ];
@@ -71,6 +73,7 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
       <aside className={`
         fixed inset-y-0 left-0 w-72 bg-white border-r border-stone-200 z-[120] 
         flex flex-col shadow-2xl lg:shadow-sm transition-transform duration-300 ease-in-out
+        print:hidden
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="h-20 flex items-center justify-between px-8 border-b border-stone-100 bg-stone-50/50 shrink-0">

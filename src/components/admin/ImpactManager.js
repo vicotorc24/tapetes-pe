@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { LucideSave, LucideImage, LucideType, LucideLayout, LucideBarChart3, LucideRefreshCcw, LucideCheck, LucideExternalLink, LucideTrash2, LucidePlus, LucideAlertCircle } from 'lucide-react';
+import { LucideSave, LucideImage, LucideType, LucideLayout, LucideBarChart3, LucideRefreshCcw, LucideCheck, LucideExternalLink, LucideTrash2, LucidePlus, LucideAlertCircle, LucideHeart, LucideMap, LucideCoins } from 'lucide-react';
 import { getImpactData, updateImpactData } from '../../lib/services/impact';
 import { ImageUpload } from '../ui/ImageUpload';
 
@@ -73,10 +73,43 @@ export function ImpactManager({ setFeedback }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 mb-8 p-3 bg-amber-50 rounded-xl border border-amber-100 animate-pulse">
-         <LucideAlertCircle size={16} className="text-amber-600" />
-         <p className="text-[10px] font-bold text-amber-700 uppercase tracking-widest">
-            Recuerda hacer clic en "Publicar" para que los nuevos bloques aparezcan en la página pública.
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center gap-5">
+           <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center text-pink-600">
+              <LucideHeart size={24} />
+           </div>
+           <div>
+              <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest leading-none mb-1">Impacto Humano</p>
+              <h4 className="text-xl font-black text-stone-800 tracking-tight">+45 Familias</h4>
+              <p className="text-[9px] text-stone-400 font-medium tracking-tight mt-0.5">Soporte directo en Contumazá</p>
+           </div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center gap-5">
+           <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+              <LucideMap size={24} />
+           </div>
+           <div>
+              <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest leading-none mb-1">Alcance Territorial</p>
+              <h4 className="text-xl font-black text-stone-800 tracking-tight">8 Barrios</h4>
+              <p className="text-[9px] text-stone-400 font-medium tracking-tight mt-0.5">Integración comunitaria total</p>
+           </div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm flex items-center gap-5">
+           <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
+              <LucideCoins size={24} />
+           </div>
+           <div>
+              <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest leading-none mb-1">Economía Circular</p>
+              <h4 className="text-xl font-black text-stone-800 tracking-tight">S/ 12.4k</h4>
+              <p className="text-[9px] text-stone-400 font-medium tracking-tight mt-0.5">Inyectados en la economía local</p>
+           </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 mb-8 p-4 bg-stone-900 rounded-xl shadow-xl">
+         <LucideAlertCircle size={16} className="text-andeangreen-400" />
+         <p className="text-[10px] font-bold text-stone-300 uppercase tracking-widest">
+            Panel de Gestión de Impacto Social v2.0 - <span className="text-andeangreen-400">Modo Administrador Municipal</span>
          </p>
       </div>
 

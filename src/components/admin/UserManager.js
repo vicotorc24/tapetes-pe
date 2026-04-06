@@ -92,13 +92,27 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
                   </div>
                 </td>
                 <td className="p-4">
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                    u.role === 'superadmin' ? 'bg-purple-50 text-purple-700 border-purple-100' : 
-                    u.role === 'redactor' ? 'bg-blue-50 text-blue-700 border-blue-100' : 
-                    'bg-orange-50 text-orange-700 border-orange-100'
-                  }`}>
-                    {u.role === 'superadmin' ? 'Super Admin' : u.role === 'redactor' ? 'Redactor' : 'Artesana'}
-                  </span>
+                  <div className="flex flex-wrap gap-1.5 max-w-[150px]">
+                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter border ${
+                      u.role === 'superadmin' ? 'bg-purple-100 text-purple-700 border-purple-200' : 
+                      u.role === 'redactor' ? 'bg-blue-100 text-blue-700 border-blue-200' : 
+                      'bg-orange-100 text-orange-700 border-orange-200'
+                    }`}>
+                      {u.role === 'superadmin' ? 'Super Admin' : u.role === 'redactor' ? 'Redactor' : 'Artesana'}
+                    </span>
+                    {u.role === 'superadmin' && (
+                      <>
+                        <span className="px-2 py-0.5 rounded-md text-[8px] font-bold bg-stone-100 text-stone-500 border border-stone-200 uppercase tracking-tighter">Auditoría Full</span>
+                        <span className="px-2 py-0.5 rounded-md text-[8px] font-bold bg-stone-100 text-stone-500 border border-stone-200 uppercase tracking-tighter">Config. Sistema</span>
+                      </>
+                    )}
+                    {(u.role === 'superadmin' || u.role === 'redactor') && (
+                      <span className="px-2 py-0.5 rounded-md text-[8px] font-bold bg-stone-100 text-stone-500 border border-stone-200 uppercase tracking-tighter">Gestión Contenido</span>
+                    )}
+                    {u.role === 'seller' && (
+                      <span className="px-2 py-0.5 rounded-md text-[8px] font-bold bg-stone-100 text-stone-500 border border-stone-200 uppercase tracking-tighter">Solo Catálogo</span>
+                    )}
+                  </div>
                 </td>
                 <td className="p-4">
                   <div className="flex flex-col gap-1">

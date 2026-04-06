@@ -15,6 +15,7 @@ import { LegacyManager } from '@/components/admin/LegacyManager';
 import { CollectionManager } from '@/components/admin/CollectionManager';
 import { ImpactManager } from '@/components/admin/ImpactManager';
 import { InfoModal } from '@/components/ui/InfoModal';
+import { AuditLogManager } from '@/components/admin/AuditLogManager';
 import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
 
 // Services
@@ -214,7 +215,13 @@ export default function AdminDashboard() {
         onLogout={logout} 
         onHome={() => router.push('/')}
       >
-        {dashboardView === 'overview' && <DashboardOverview products={products} user={effectiveUser} />}
+        {dashboardView === 'overview' && (
+           <DashboardOverview 
+             products={products} 
+             user={effectiveUser} 
+             setView={setDashboardView}
+           />
+        )}
         {dashboardView === 'products' && (
           <ProductManager 
             products={products} 
@@ -261,6 +268,9 @@ export default function AdminDashboard() {
         )}
         {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
            <ImpactManager setFeedback={setFeedback} />
+        )}
+        {dashboardView === 'audit' && effectiveUser.role === 'superadmin' && (
+           <AuditLogManager />
         )}
       </DashboardLayout>
 
