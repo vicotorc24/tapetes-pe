@@ -11,7 +11,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { logAction } from './audit';
+import { logAction, getDetailedAction } from './audit';
 
 const COLLECTION_NAME = 'products';
 
@@ -64,14 +64,28 @@ export const addProduct = async (productData, user) => {
 export const updateProduct = async (productId, productData, user) => {
   try {
     const productRef = doc(db, COLLECTION_NAME, productId);
+    
+    // 1. Obtener estado previo para el log detallado
+    let oldData = null;
+    try {
+      const snap = await getDoc(productRef);
+      if (snap.exists()) oldData = snap.data();
+    } catch (e) {}
+
+    // 2. Actualizar documento
     await updateDoc(productRef, {
       ...productData,
       updatedAt: new Date().toISOString()
     });
     
-    // Log the action
+    // 3. Log detallado del cambio
     if (user) {
-      logAction(user, `Actualizó el producto "${productData.title || productId}"`, 'Catálogo', 'info', { productId });
+      const detail = getDetailedAction(oldData, productData, 'product');
+      const actionMessage = detail 
+        ? `${detail} de "${productData.title || (oldData && oldData.title) || productId}"`
+        : `Actualizó el producto "${productData.title || (oldData && oldData.title) || productId}"`;
+        
+      logAction(user, actionMessage, 'Catálogo', 'info', { productId });
     }
   } catch (error) {
     console.error("Error updating product: ", error);

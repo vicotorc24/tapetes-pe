@@ -3,6 +3,7 @@ import {
   addDoc, 
   getDocs, 
   doc, 
+  getDoc,
   setDoc,
   updateDoc, 
   deleteDoc, 
@@ -11,7 +12,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { logAction } from './audit';
+import { logAction, getDetailedAction } from './audit';
 
 const COLLECTION_NAME = 'users';
 
@@ -69,13 +70,28 @@ export const addUser = async (userData, adminUser) => {
 export const updateUser = async (userId, userData, adminUser) => {
   try {
     const userRef = doc(db, COLLECTION_NAME, userId);
+    
+    // 1. Obtener estado previo para el log detallado
+    let oldData = null;
+    try {
+      const snap = await getDoc(userRef);
+      if (snap.exists()) oldData = snap.data();
+    } catch (e) {}
+
+    // 2. Actualizar documento
     await updateDoc(userRef, {
       ...userData,
       updatedAt: new Date().toISOString()
     });
 
+    // 3. Log detallado del cambio
     if (adminUser) {
-      logAction(adminUser, `Actualizó datos del usuario "${userData.name || userId}"`, 'Usuarios', 'info', { userId });
+      const detail = getDetailedAction(oldData, userData, 'user');
+      const actionMessage = detail 
+        ? `${detail} para "${userData.name || (oldData && oldData.name) || userId}"`
+        : `Actualizó datos del usuario "${userData.name || (oldData && oldData.name) || userId}"`;
+
+      logAction(adminUser, actionMessage, 'Usuarios', 'info', { userId });
     }
   } catch (error) {
     console.error("Error updating user: ", error);

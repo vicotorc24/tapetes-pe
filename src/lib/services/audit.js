@@ -13,6 +13,40 @@ import { db } from '../firebase';
 const COLLECTION_NAME = 'audit_logs';
 
 /**
+ * Detects specific changes in sensitive fields and returns a descriptive message.
+ * @param {Object} oldData - Snapshot before update
+ * @param {Object} newData - Data being applied
+ * @param {string} type - 'product' | 'user'
+ * @returns {string|null} - Descriptive string of the change
+ */
+export const getDetailedAction = (oldData, newData, type) => {
+  if (!oldData) return null;
+  
+  if (type === 'product') {
+    if (newData.price && oldData.price !== newData.price) {
+      return `Actualizó el precio de S/ ${oldData.price} a S/ ${newData.price}`;
+    }
+    if (newData.stock !== undefined && oldData.stock !== newData.stock) {
+      return `Cambió el stock de ${oldData.stock} a ${newData.stock}`;
+    }
+    if (newData.isPromoted !== undefined && oldData.isPromoted !== newData.isPromoted) {
+      return `${newData.isPromoted ? 'Destacó' : 'Quitó destaque de'} el producto`;
+    }
+  }
+
+  if (type === 'user') {
+    if (newData.role && oldData.role !== newData.role) {
+      return `Cambió el rol de "${oldData.role}" a "${newData.role}"`;
+    }
+    if (newData.status && oldData.status !== newData.status) {
+      return `Cambió el estado de "${oldData.status}" a "${newData.status}"`;
+    }
+  }
+
+  return null;
+};
+
+/**
  * Logs an administrative action to Firestore.
  * @param {Object} user - The user performing the action {uid, name, role}
  * @param {string} action - Description of the action (e.g., 'Actualizó precio de Tapete Mirador')
