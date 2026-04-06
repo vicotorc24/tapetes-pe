@@ -11,6 +11,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { logAction } from './audit';
 
 const COLLECTION_NAME = 'users';
 
@@ -36,7 +37,7 @@ export const getUsers = async (statusFilter = null) => {
   }
 };
 
-export const addUser = async (userData) => {
+export const addUser = async (userData, adminUser) => {
   try {
     const { uid, ...data } = userData;
     const finalData = {
@@ -46,38 +47,57 @@ export const addUser = async (userData) => {
       photo: data.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${data.name || 'weaver'}`
     };
 
+    let resultId;
     if (uid) {
-      // Si ya tiene UID (creado en Auth por Admin), usamos setDoc
       await setDoc(doc(db, COLLECTION_NAME, uid), finalData);
-      return uid;
+      resultId = uid;
     } else {
-      // Creación genérica
       const docRef = await addDoc(collection(db, COLLECTION_NAME), finalData);
-      return docRef.id;
+      resultId = docRef.id;
     }
+
+    if (adminUser) {
+      logAction(adminUser, `Registró al usuario "${userData.name}"`, 'Usuarios', 'success', { userId: resultId });
+    }
+    return resultId;
   } catch (error) {
     console.error("Error adding user: ", error);
     throw error;
   }
 };
 
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userId, userData, adminUser) => {
   try {
     const userRef = doc(db, COLLECTION_NAME, userId);
     await updateDoc(userRef, {
       ...userData,
       updatedAt: new Date().toISOString()
     });
+
+    if (adminUser) {
+      logAction(adminUser, `Actualizó datos del usuario "${userData.name || userId}"`, 'Usuarios', 'info', { userId });
+    }
   } catch (error) {
     console.error("Error updating user: ", error);
     throw error;
   }
 };
 
-export const deleteUser = async (userId) => {
+export const deleteUser = async (userId, adminUser) => {
   try {
     const userRef = doc(db, COLLECTION_NAME, userId);
+    
+    let userName = userId;
+    try {
+      const snap = await getDoc(userRef);
+      if (snap.exists()) userName = snap.data().name;
+    } catch (e) {}
+
     await deleteDoc(userRef);
+
+    if (adminUser) {
+      logAction(adminUser, `Eliminó al usuario "${userName}"`, 'Usuarios', 'warning', { userId });
+    }
   } catch (error) {
     console.error("Error deleting user: ", error);
     throw error;

@@ -11,6 +11,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { logAction } from './audit';
 
 const COLLECTION_NAME = 'products';
 
@@ -41,12 +42,18 @@ export const getProducts = async (user = null) => {
   }
 };
 
-export const addProduct = async (productData) => {
+export const addProduct = async (productData, user) => {
   try {
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       ...productData,
       createdAt: new Date().toISOString()
     });
+    
+    // Log the action
+    if (user) {
+      logAction(user, `Creó el producto "${productData.title}"`, 'Catálogo', 'success', { productId: docRef.id });
+    }
+    
     return docRef.id;
   } catch (error) {
     console.error("Error adding product: ", error);
@@ -54,23 +61,41 @@ export const addProduct = async (productData) => {
   }
 };
 
-export const updateProduct = async (productId, productData) => {
+export const updateProduct = async (productId, productData, user) => {
   try {
     const productRef = doc(db, COLLECTION_NAME, productId);
     await updateDoc(productRef, {
       ...productData,
       updatedAt: new Date().toISOString()
     });
+    
+    // Log the action
+    if (user) {
+      logAction(user, `Actualizó el producto "${productData.title || productId}"`, 'Catálogo', 'info', { productId });
+    }
   } catch (error) {
     console.error("Error updating product: ", error);
     throw error;
   }
 };
 
-export const deleteProduct = async (productId) => {
+export const deleteProduct = async (productId, user) => {
   try {
     const productRef = doc(db, COLLECTION_NAME, productId);
+    
+    // Optional: Fetch product name before delete for better logging
+    let productName = productId;
+    try {
+      const snap = await getDoc(productRef);
+      if (snap.exists()) productName = snap.data().title;
+    } catch (e) {}
+
     await deleteDoc(productRef);
+    
+    // Log the action
+    if (user) {
+      logAction(user, `Eliminó el producto "${productName}"`, 'Catálogo', 'warning', { productId });
+    }
   } catch (error) {
     console.error("Error deleting product: ", error);
     throw error;

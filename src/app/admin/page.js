@@ -28,6 +28,7 @@ import { initialUsersData } from '@/lib/data';
 // Firestore Direct (for quick updates)
 import { db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { logAction } from '@/lib/services/audit';
 
 export default function AdminDashboard() {
   const { user, effectiveUser, impersonatedUser, loading, logout, register, startImpersonating } = useAuth();
@@ -96,6 +97,7 @@ export default function AdminDashboard() {
       const data = await getCategories();
       setCategoriesData(data);
       setInfoMessage('Categoría agregada con éxito.');
+      logAction(effectiveUser, `Creó la categoría "${name}"`, 'Catálogo', 'success');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -107,6 +109,7 @@ export default function AdminDashboard() {
       const updated = await getCategories();
       setCategoriesData(updated);
       setInfoMessage('La categoría ha sido actualizada.');
+      logAction(effectiveUser, `Actualizó la categoría "${data.name || id}"`, 'Catálogo', 'info');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -119,6 +122,7 @@ export default function AdminDashboard() {
       const data = await getCategories();
       setCategoriesData(data);
       setInfoMessage('Categoría eliminada con éxito.');
+      logAction(effectiveUser, `Eliminó la categoría ID: ${id}`, 'Catálogo', 'warning');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -169,6 +173,7 @@ export default function AdminDashboard() {
       
       const updated = await getUsers();
       setUsersList(updated);
+      // El logAction ya ocurre dentro de addUser/register si implementamos bien los servicios
       setInfoModal('success');
     } catch (e) { 
       setInfoModal('error'); 
@@ -179,7 +184,7 @@ export default function AdminDashboard() {
   const handleEditUser = async (userData) => {
     setInfoModal('loading');
     try {
-      await updateUser(userData.id, userData);
+      await updateUser(userData.id, userData, effectiveUser);
       const updated = await getUsers();
       setUsersList(updated);
       setInfoMessage('Usuario actualizado con éxito.');
@@ -193,7 +198,7 @@ export default function AdminDashboard() {
   const handleDeleteUser = async (id) => {
     setInfoModal('loading');
     try {
-      await deleteUser(id);
+      await deleteUser(id, effectiveUser);
       const updated = await getUsers();
       setUsersList(updated);
       setInfoMessage('Usuario eliminado del sistema.');
@@ -219,6 +224,7 @@ export default function AdminDashboard() {
            <DashboardOverview 
              products={products} 
              user={effectiveUser} 
+             users={usersList}
              setView={setDashboardView}
            />
         )}

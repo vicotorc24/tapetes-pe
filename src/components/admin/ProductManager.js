@@ -106,9 +106,9 @@ export function ProductManager({ products, setProducts, categories, collections,
       };
 
       if (editingProduct) { 
-        await updateProduct(editingProduct.id, productPayload);
+        await updateProduct(editingProduct.id, productPayload, user);
       } else { 
-        await addProduct(productPayload);
+        await addProduct(productPayload, user);
       } 
       
       await refreshProducts();
@@ -151,7 +151,7 @@ export function ProductManager({ products, setProducts, categories, collections,
       onConfirm: async () => {
         setFeedback({ type: 'loading', message: 'Eliminando producto...' });
         try {
-          await deleteProduct(id);
+          await deleteProduct(id, user);
           await refreshProducts();
           setFeedback({ type: 'success', message: 'Producto eliminado del catálogo.' });
         } catch (error) {

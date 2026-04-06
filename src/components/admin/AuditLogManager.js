@@ -1,46 +1,68 @@
-"use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LucideShield, LucideHistory, LucideFilter, LucideSearch, LucideDownload, LucideAlertTriangle, LucideCheckCircle, LucideUser, LucidePackage } from 'lucide-react';
+import { getFilteredLogs } from '../../lib/services/audit';
 
 export function AuditLogManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('Todas');
   const [levelFilter, setLevelFilter] = useState('Todos');
+  const [timeRange, setTimeRange] = useState('all'); 
   const [showFilters, setShowFilters] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  const logs = [
-    { id: '101', user: 'Victoria Plasencia', action: 'Actualizó stock de producto "Tapete Mirador"', category: 'Catálogo', level: 'info', timestamp: '2026-04-06 12:45:12' },
-    { id: '102', user: 'Admin Municipal', action: 'Aprobó registro de artesana: María Fernández', category: 'Usuarios', level: 'success', timestamp: '2026-04-06 11:30:05' },
-    { id: '103', user: 'Sistema (Middleware)', action: 'Validación de integridad de datos completada', category: 'Seguridad', level: 'info', timestamp: '2026-04-06 10:15:00' },
-    { id: '104', user: 'Rosa Lopez', action: 'Eliminó producto "Camino Real" del catálogo', category: 'Catálogo', level: 'warning', timestamp: '2026-04-06 09:20:44' },
-    { id: '105', user: 'Firebase API', action: 'Sincronización de base de datos exitosa', category: 'Sistema', level: 'success', timestamp: '2026-04-06 08:00:10' },
-    { id: '106', user: 'Admin Municipal', action: 'Cambió rol de Victoria a "Redactor"', category: 'Seguridad', level: 'warning', timestamp: '2026-04-05 17:12:00' },
-    { id: '107', user: 'Sistema', action: 'Backup diario de Firestore ejecutado', category: 'Infraestructura', level: 'success', timestamp: '2026-04-05 03:00:01' },
-  ];
+  useEffect(() => {
+    setLoading(true);
+    // Usamos el servicio de filtrado en tiempo real
+    const unsubscribe = getFilteredLogs(
+      (data) => {
+        setLogs(data);
+        setLoading(false);
+      }, 
+      { category: categoryFilter, level: levelFilter }
+    );
 
-  const categories = ['Todas', ...new Set(logs.map(l => l.category))];
+    return () => unsubscribe();
+  }, [categoryFilter, levelFilter]);
+
+  const categories = ['Todas', 'Catálogo', 'Usuarios', 'Seguridad', 'Sistema', 'Infraestructura'];
   const levels = ['Todos', 'success', 'warning', 'info'];
 
   const filteredLogs = logs.filter(l => {
-    const matchesSearch = l.user.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         l.action.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'Todas' || l.category === categoryFilter;
-    const matchesLevel = levelFilter === 'Todos' || l.level === levelFilter;
-    return matchesSearch && matchesCategory && matchesLevel;
+    // Filtro de Búsqueda
+    const matchesSearch = 
+      (l.userName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 
+      (l.action?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    
+    // Filtro de Tiempo (Local)
+    if (!matchesSearch) return false;
+    
+    if (timeRange === 'all') return true;
+    
+    const logDate = new Date(l.timestamp);
+    const now = new Date();
+    const diffTime = Math.abs(now - logDate);
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    if (timeRange === 'today' && diffDays > 1) return false;
+    if (timeRange === 'week' && diffDays > 7) return false;
+    if (timeRange === 'month' && diffDays > 30) return false;
+
+    return true;
   });
 
   const handleExportCSV = () => {
     // Agregamos BOM (\uFEFF) para UTF-8 y usamos punto y coma (;) para Excel Latino
     const headers = ["\uFEFF" + 'ID;Estampa de Tiempo;Usuario;Accion;Categoria;Nivel\n'];
     const rows = filteredLogs.map(l => 
-      `${l.id};${l.timestamp};${l.user};"${l.action.replace(/"/g, '""')}";${l.category};${l.level}`
+      `${l.id};${l.timestamp};${l.userName || l.user};"${(l.action || '').replace(/"/g, '""')}";${l.category};${l.level}`
     );
     const csvContent = headers.concat(rows.join('\n')).join('');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `Bitacora_Tapetes_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Bitacora_Tapetes_Real_${new Date().toISOString().split('T')[0]}.csv`);
     link.click();
   };
 
@@ -55,6 +77,26 @@ export function AuditLogManager() {
           <p className="text-stone-500 text-sm italic">Registro inmutable de actividades administrativas y técnicas</p>
         </div>
         <div className="flex gap-2">
+          <div className="flex bg-stone-100 p-1 rounded-xl mr-2">
+            {[
+              { id: 'today', label: 'Hoy' },
+              { id: 'week', label: '7D' },
+              { id: 'month', label: '30D' },
+              { id: 'all', label: 'Todo' }
+            ].map((range) => (
+              <button
+                key={range.id}
+                onClick={() => setTimeRange(range.id)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${
+                  timeRange === range.id 
+                    ? 'bg-white text-stone-900 shadow-sm' 
+                    : 'text-stone-400 hover:text-stone-600'
+                }`}
+              >
+                {range.label}
+              </button>
+            ))}
+          </div>
           <button 
             onClick={() => setShowFilters(!showFilters)}
             className={`bg-white border px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${showFilters ? 'border-stone-900 text-stone-900 bg-stone-50' : 'border-stone-200 text-stone-600 hover:bg-stone-50'}`}
@@ -145,7 +187,16 @@ export function AuditLogManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-50">
-              {filteredLogs.map((log) => (
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="p-20 text-center text-stone-400">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin"></div>
+                      <span className="text-xs font-bold uppercase tracking-widest">Sincronizando Bitácora Real...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredLogs.map((log) => (
                 <tr key={log.id} className="hover:bg-stone-50/80 transition-colors group">
                   <td className="p-6 font-mono text-[11px] text-stone-400">{log.timestamp}</td>
                   <td className="p-6">
@@ -153,7 +204,7 @@ export function AuditLogManager() {
                       <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-900">
                         <LucideUser size={14} />
                       </div>
-                      <span className="font-bold text-stone-800">{log.user}</span>
+                      <span className="font-bold text-stone-800">{log.userName || log.user}</span>
                     </div>
                   </td>
                   <td className="p-6">
@@ -188,8 +239,8 @@ export function AuditLogManager() {
               ))}
             </tbody>
           </table>
-          {filteredLogs.length === 0 && (
-            <div className="p-20 text-center text-stone-400 italic">No se encontraron registros para tu búsqueda.</div>
+          {!loading && filteredLogs.length === 0 && (
+            <div className="p-20 text-center text-stone-400 italic">No hay registros reales en este momento.</div>
           )}
         </div>
       </div>
