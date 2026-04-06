@@ -126,15 +126,14 @@ export default function ProductPage({ params }) {
     if (!artisan?.whatsapp && !artisan?.phone) return '#';
     const number = artisan?.whatsapp || artisan?.phone || '51999999999';
     const productUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const imageUrl = typeof images[0] === 'string' ? images[0] : images[0]?.url;
     
     const message = encodeURIComponent(
-      `Hola ${artisan?.name || 'Artesana'}, vengo de Tapetes.pe y me interesa esta pieza:\n\n` +
-      `📦 *${product?.title}*\n` +
-      `💰 *Precio:* S/ ${product?.price}\n` +
-      `🆔 *Cod. Producto:* ${product?.id?.substring(0, 8).toUpperCase()}\n` +
-      `🔗 *Link:* ${productUrl}\n` +
-      `🖼️ *Foto:* ${imageUrl}\n\n` +
+      `Hola ${artisan?.name || 'Artesana'}, me interesa este producto de Tapetes.pe:\n\n` +
+      `*${product?.title}*\n` +
+      `----------------------------------\n` +
+      `» *Precio:* S/ ${product?.price}\n` +
+      `» *Cod. Producto:* ${product?.id?.substring(0, 8).toUpperCase()}\n` +
+      `» *Ver detalle:* ${productUrl}\n\n` +
       `¿Está disponible?`
     );
     
