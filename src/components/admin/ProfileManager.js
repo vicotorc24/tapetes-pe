@@ -9,7 +9,8 @@ import {
   LucideAward, 
   LucideFileText,
   LucideSave,
-  LucideRefreshCcw
+  LucideRefreshCcw,
+  LucideMail
 } from 'lucide-react';
 import { updateUser } from '../../lib/services/users';
 import { uploadFile } from '../../lib/services/storage';
@@ -19,8 +20,26 @@ export function ProfileManager({ user, setFeedback }) {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
   
+  // Lógica de migración: Si no tiene firstName, intentamos partir el 'name' antiguo
+  const getInitialNames = () => {
+    if (user.firstName) return { firstName: user.firstName, lastName: user.lastName || '' };
+    
+    // Fallback: partir por el último espacio (estilo común en apellidos peruanos)
+    const full = user.name || '';
+    const lastSpace = full.lastIndexOf(' ');
+    if (lastSpace === -1) return { firstName: full, lastName: '' };
+    
+    return {
+      firstName: full.substring(0, lastSpace).trim(),
+      lastName: full.substring(lastSpace).trim()
+    };
+  };
+
+  const initialNames = getInitialNames();
+
   const [formData, setFormData] = useState({
-    name: user.name || '',
+    firstName: initialNames.firstName,
+    lastName: initialNames.lastName,
     phone: user.phone || '',
     bio: user.bio || '',
     specialty: user.specialty || '',
@@ -102,7 +121,7 @@ export function ProfileManager({ user, setFeedback }) {
             />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-2xl font-bold text-stone-900 mb-1">{formData.name}</h3>
+            <h3 className="text-2xl font-bold text-stone-900 mb-1">{formData.firstName} {formData.lastName}</h3>
             <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
               <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
                 {user.role === 'superadmin' ? 'Super Admin' : (user.role === 'redactor' ? 'Redactor Cultura' : 'Artesana Maestra')}
@@ -121,15 +140,39 @@ export function ProfileManager({ user, setFeedback }) {
             </div>
             
             <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Nombre Público</label>
+                <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Nombres</label>
                 <input 
                   required
-                  value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  value={formData.firstName} 
+                  onChange={e => setFormData({...formData, firstName: e.target.value})}
                   className="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-200 outline-none transition-all font-medium"
                 />
               </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Apellidos</label>
+                <input 
+                  required
+                  value={formData.lastName} 
+                  onChange={e => setFormData({...formData, lastName: e.target.value})}
+                  className="w-full p-3.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-200 outline-none transition-all font-medium"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Correo Electrónico (Solo Lectura)</label>
+              <div className="relative">
+                <LucideMail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300" />
+                <input 
+                  readOnly
+                  value={user.email} 
+                  className="w-full p-3.5 pl-11 bg-stone-100 border border-stone-200 rounded-xl text-stone-500 cursor-not-allowed font-medium select-none"
+                />
+              </div>
+            </div>
               
               <div>
                 <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">WhatsApp de Contacto</label>

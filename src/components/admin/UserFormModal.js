@@ -4,8 +4,22 @@ import { LucideX } from 'lucide-react';
 import { ImageUpload } from '../ui/ImageUpload';
 
 export function UserFormModal({ user, onClose, onSave }) {
+  const getInitialNames = () => {
+    if (user?.firstName) return { firstName: user.firstName, lastName: user.lastName || '' };
+    const full = user?.name || '';
+    const lastSpace = full.lastIndexOf(' ');
+    if (lastSpace === -1) return { firstName: full, lastName: '' };
+    return {
+      firstName: full.substring(0, lastSpace).trim(),
+      lastName: full.substring(lastSpace).trim()
+    };
+  };
+
+  const initialNames = getInitialNames();
+
   const [formData, setFormData] = useState({ 
-    name: user?.name || '', 
+    firstName: initialNames.firstName,
+    lastName: initialNames.lastName,
     email: user?.email || '', 
     dni: user?.dni || '',
     phone: user?.phone || '',
@@ -45,7 +59,10 @@ export function UserFormModal({ user, onClose, onSave }) {
                 />
               </div>
             </div>
-            <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Nombre</label><input required className="w-full p-3 border rounded-lg" value={formData.name} onChange={e=>setFormData({...formData, name:e.target.value})}/></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Nombres</label><input required className="w-full p-3 border rounded-lg" value={formData.firstName} onChange={e=>setFormData({...formData, firstName:e.target.value})}/></div>
+              <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Apellidos</label><input required className="w-full p-3 border rounded-lg" value={formData.lastName} onChange={e=>setFormData({...formData, lastName:e.target.value})}/></div>
+            </div>
            <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Email</label><input required type="email" className="w-full p-3 border rounded-lg" value={formData.email} onChange={e=>setFormData({...formData, email:e.target.value})}/></div>
             
             {!user && (

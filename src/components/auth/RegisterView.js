@@ -13,7 +13,8 @@ export function RegisterView() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -68,7 +69,7 @@ export function RegisterView() {
             </div>
             <h2 className="text-3xl font-serif font-bold text-stone-900 mb-4">{t('unete.success_title')}</h2>
             <p className="text-stone-600 leading-relaxed mb-8">
-              {t('unete.success_desc').replace('{name}', formData.name)}
+              {t('unete.success_desc').replace('{name}', formData.firstName)}
             </p>
             <button 
               onClick={() => window.location.href = '/'}
@@ -126,17 +127,30 @@ export function RegisterView() {
               )}
 
               <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="relative">
                   <LucideUser className="absolute left-4 top-4 text-stone-500" size={18} />
                   <input 
                     required 
                     type="text" 
-                    placeholder={t('unete.name_placeholder')}
-                    className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
-                    value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    placeholder={t('unete.firstName_placeholder')}
+                    className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all font-medium"
+                    value={formData.firstName}
+                    onChange={e => setFormData({...formData, firstName: e.target.value})}
                   />
                 </div>
+                <div className="relative">
+                  <LucideUser className="absolute left-4 top-4 text-stone-500" size={18} />
+                  <input 
+                    required 
+                    type="text" 
+                    placeholder={t('unete.lastName_placeholder')}
+                    className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all font-medium"
+                    value={formData.lastName}
+                    onChange={e => setFormData({...formData, lastName: e.target.value})}
+                  />
+                </div>
+              </div>
 
                 <div className="relative">
                   <LucideMail className="absolute left-4 top-4 text-stone-500" size={18} />

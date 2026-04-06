@@ -17,16 +17,18 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
 
   const usersToShow = activeTab === 'active' ? activeUsersList : pendingUsers;
 
-  const filteredUsers = usersToShow.filter(u => 
-    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = usersToShow.filter(u => {
+    const fullName = u.firstName ? `${u.firstName} ${u.lastName}` : (u.name || '');
+    return fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+           u.email?.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   const handleApprove = (u) => {
     if (setFeedback) {
+      const uName = u.firstName ? `${u.firstName} ${u.lastName}` : (u.name || '');
       setFeedback({
         type: 'confirm',
-        message: `¿Deseas dar de alta a ${u.name}? Una vez activa, podrá acceder a su taller y subir productos.`,
+        message: `¿Deseas dar de alta a ${uName}? Una vez activa, podrá acceder a su taller y subir productos.`,
         onConfirm: () => onEdit({ ...u, status: 'active' }),
         confirmText: 'Dar de Alta',
         confirmColor: 'green'
@@ -37,7 +39,8 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
   const getWhatsAppLink = (u) => {
     if (!u.phone) return '#';
     const number = u.phone.replace(/\D/g, '');
-    const message = encodeURIComponent(`Hola ${u.name}, te escribo de la Municipalidad respecto a tu solicitud en Tapetes.pe. ¿Podemos coordinar la validación de tu taller?`);
+    const uName = u.firstName || u.name || 'Artesana';
+    const message = encodeURIComponent(`Hola ${uName}, te escribo de la Municipalidad respecto a tu solicitud en Tapetes.pe. ¿Podemos coordinar la validación de tu taller?`);
     return `https://wa.me/${number}?text=${message}`;
   };
 
@@ -79,11 +82,15 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
               <tr key={u.id} className="hover:bg-stone-50 transition">
                 <td className="p-4 flex items-center gap-3">
                   <div className="relative">
-                    <img src={u.photo} className="w-10 h-10 rounded-full border border-stone-200" alt=""/>
+                    <img 
+                      src={u.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${u.firstName || u.name || (u.id?.slice(0,5))}`} 
+                      className="w-10 h-10 rounded-full border border-stone-200 object-cover bg-stone-50" 
+                      alt=""
+                    />
                     <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${u.status === 'active' ? 'bg-green-500' : u.status === 'pending' ? 'bg-orange-400 animate-pulse' : 'bg-red-400'}`}></div>
                   </div>
                   <div>
-                    <p className="font-bold text-stone-900">{u.name}</p>
+                    <p className="font-bold text-stone-900">{u.firstName ? `${u.firstName} ${u.lastName}` : (u.name || 'Sin nombre')}</p>
                     <p className="text-[11px] text-stone-500">{u.email}</p>
                     {u.status === 'pending' && u.specialty && (
                       <p className="text-[10px] text-purple-600 font-medium italic mt-0.5">Especialidad: {u.specialty}</p>
@@ -139,9 +146,10 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
                         <button 
                           onClick={() => {
                             if (setFeedback) {
+                              const uName = u.firstName ? `${u.firstName} ${u.lastName}` : (u.name || '');
                               setFeedback({
                                 type: 'confirm',
-                                message: `¿Deseas rechazar la solicitud de ${u.name}? Esta acción eliminará su registro.`,
+                                message: `¿Deseas rechazar la solicitud de ${uName}? Esta acción eliminará su registro.`,
                                 onConfirm: () => onDelete(u.id),
                                 confirmText: 'Rechazar Solicitud',
                                 confirmColor: 'red'

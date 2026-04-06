@@ -17,6 +17,7 @@ import { ImpactManager } from '@/components/admin/ImpactManager';
 import { InfoModal } from '@/components/ui/InfoModal';
 import { AuditLogManager } from '@/components/admin/AuditLogManager';
 import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
+import { PendingApprovalView } from '@/components/admin/PendingApprovalView';
 
 // Services
 import { getProducts } from '@/lib/services/products';
@@ -42,9 +43,26 @@ export default function AdminDashboard() {
   const [dashboardView, setDashboardView] = useState('overview');
   const [infoModal, setInfoModal] = useState(null);
   const [infoMessage, setInfoMessage] = useState('');
-   const [onConfirmAction, setOnConfirmAction] = useState(null);
+  const [onConfirmAction, setOnConfirmAction] = useState(null);
   const [confirmText, setConfirmText] = useState('');
   const [confirmColor, setConfirmColor] = useState('');
+
+  // Centralized feedback handler for all managers
+  const handleFeedback = (data) => {
+    if (!data) {
+      setInfoModal(null);
+      return;
+    }
+    if (typeof data === 'string') {
+      setInfoModal(data);
+    } else {
+      setInfoModal(data.type);
+      setInfoMessage(data.message || '');
+      if (data.onConfirm) setOnConfirmAction(() => data.onConfirm);
+      if (data.confirmText) setConfirmText(data.confirmText);
+      if (data.confirmColor) setConfirmColor(data.confirmColor);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -213,72 +231,83 @@ export default function AdminDashboard() {
   return (
     <div className={`bg-stone-50 min-h-screen animate-in fade-in ${impersonatedUser ? 'pt-14' : ''}`}>
       <ImpersonationBanner />
-      <DashboardLayout 
-        user={effectiveUser} 
-        currentView={dashboardView} 
-        setView={setDashboardView} 
-        onLogout={logout} 
-        onHome={() => router.push('/')}
-      >
-        {dashboardView === 'overview' && (
-           <DashboardOverview 
-             products={products} 
-             user={effectiveUser} 
-             users={usersList}
-             setView={setDashboardView}
-           />
-        )}
-        {dashboardView === 'products' && (
-          <ProductManager 
-            products={products} 
-            setProducts={setProducts} 
-            categories={categoriesData} 
-            collections={collectionsData} 
-            user={effectiveUser} 
-            users={usersList}
-            setFeedback={setFeedback} 
-          />
-        )}
-        {dashboardView === 'categories' && (
-          <CategoryManager 
-            categories={categoriesData} 
-            onAdd={handleAddCategory} 
-            onUpdate={handleUpdateCategory}
-            onDelete={handleDeleteCategory} 
-            onReorder={handleReorderCategories}
-            setFeedback={setFeedback}
-          />
-        )}
-        {dashboardView === 'collections' && (
-          <CollectionManager 
-            collections={collectionsData} 
-            onAdd={addCollection} 
-            onEdit={updateCollection} 
-            onDelete={deleteCollection} 
-            setFeedback={setFeedback} 
-          />
-        )}
-        {dashboardView === 'profile' && <ProfileManager user={effectiveUser} setFeedback={setFeedback} />}
-        {dashboardView === 'legacy' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
-           <LegacyManager setFeedback={setFeedback} />
-        )}
-        {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (
-           <UserManager 
-              users={usersList} 
-              onAdd={handleAddUser} 
-              onEdit={handleEditUser} 
-              onDelete={handleDeleteUser} 
-              onImpersonate={startImpersonating}
-              setFeedback={setFeedback}
-           />
-        )}
-        {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
-           <ImpactManager setFeedback={setFeedback} />
-        )}
-        {dashboardView === 'audit' && effectiveUser.role === 'superadmin' && (
-           <AuditLogManager />
-        )}
-      </DashboardLayout>
+      
+      {/* Bloqueo de Seguridad Institucional */}
+      {effectiveUser.status !== 'active' && effectiveUser.role !== 'superadmin' ? (
+        <PendingApprovalView 
+          user={effectiveUser} 
+          onLogout={logout} 
+        />
+      ) : (
+        <DashboardLayout 
+          user={effectiveUser} 
+          currentView={dashboardView} 
+          setView={setDashboardView} 
+          onLogout={logout} 
+          onHome={() => router.push('/')}
+        >
+          {dashboardView === 'overview' && (
+             <DashboardOverview 
+               products={products} 
+               user={effectiveUser} 
+               users={usersList}
+               setView={setDashboardView}
+             />
+          )}
+          {dashboardView === 'products' && (
+             <ProductManager 
+               products={products} 
+               setProducts={setProducts} 
+               categories={categoriesData} 
+               collections={collectionsData}
+               user={effectiveUser} 
+               users={usersList}
+               setFeedback={setInfoModal}
+             />
+          )}
+          {dashboardView === 'categories' && (
+             <CategoryManager 
+               categories={categoriesData} 
+               onAdd={handleAddCategory} 
+               onDelete={handleDeleteCategory}
+             />
+          )}
+          {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (
+             <UserManager 
+                users={usersList} 
+                onAdd={handleAddUser}
+                onEdit={handleEditUser}
+                onDelete={handleDeleteUser}
+                onImpersonate={startImpersonating}
+                setFeedback={handleFeedback}
+                adminUser={effectiveUser}
+             />
+          )}
+          {dashboardView === 'collections' && (
+             <CollectionManager 
+                collections={collectionsData}
+                onAdd={addCollection}
+                onUpdate={updateCollection}
+                onDelete={deleteCollection}
+                setFeedback={handleFeedback}
+                user={effectiveUser}
+             />
+          )}
+          {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
+             <ImpactManager setFeedback={setInfoModal} />
+          )}
+          {dashboardView === 'audit' && effectiveUser.role === 'superadmin' && (
+             <AuditLogManager />
+          )}
+          {dashboardView === 'profile' && (
+             <ProfileManager 
+                user={effectiveUser} 
+                onUpdate={handleEditUser} 
+                setFeedback={handleFeedback}
+             />
+          )}
+        </DashboardLayout>
+      )}
 
       {infoModal && (
         <InfoModal 

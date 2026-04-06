@@ -96,6 +96,10 @@ export const AuthProvider = ({ children }) => {
         ...userData,
         email,
         uid,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        // Mantenemos name para compatibilidad con código antiguo hasta terminar migración
+        name: userData.name || `${userData.firstName} ${userData.lastName}`.trim(),
         status: userData.status || 'pending',
         role: userData.role || 'seller',
         createdAt: new Date().toISOString()

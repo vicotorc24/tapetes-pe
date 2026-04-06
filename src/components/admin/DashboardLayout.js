@@ -129,7 +129,9 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
              </button>
              <div>
                 <h4 className="text-stone-400 text-[10px] md:text-xs font-medium font-serif italic mb-0.5">Bienvenido de vuelta,</h4>
-                <p className="text-stone-900 font-bold text-sm tracking-tight">{user.name}</p>
+                <p className="text-stone-900 font-bold text-sm tracking-tight">
+                  {user.firstName ? `${user.firstName} ${user.lastName}` : (user.name || 'Usuario')}
+                </p>
              </div>
           </div>
           

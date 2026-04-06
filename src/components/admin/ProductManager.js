@@ -468,7 +468,13 @@ export function ProductManager({ products, setProducts, categories, collections,
               <tr key={p.id} className="hover:bg-stone-50 transition">
                 <td className="p-4">
                   <div className="flex items-center gap-4">
-                    <img src={p.image} className="w-12 h-12 rounded-lg object-cover bg-stone-200" alt=""/>
+                    <div className="w-12 h-12 rounded-lg bg-stone-100 border border-stone-200 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm transition-transform hover:scale-110">
+                      {p.image ? (
+                        <img src={p.image} className="w-full h-full object-cover" alt=""/>
+                      ) : (
+                        <LucidePackage className="text-stone-300" size={18} />
+                      )}
+                    </div>
                     <div>
                       <p className="font-bold text-stone-900 flex items-center gap-2">
                         {p.title} {p.isPromoted && <LucideCrown size={14} className="text-amber-500 fill-amber-500"/>}

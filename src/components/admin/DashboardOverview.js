@@ -343,7 +343,13 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-[10px] font-black text-stone-400 w-4">#{i + 1}</span>
-                      <img src={p.image} className="w-10 h-10 rounded-lg object-cover shadow-sm group-hover:scale-110 transition-transform" alt="" />
+                      <div className="w-10 h-10 rounded-lg bg-stone-100 overflow-hidden shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                        {p.image ? (
+                          <img src={p.image} className="w-full h-full object-cover" alt="" />
+                        ) : (
+                          <LucidePackage className="text-stone-300" size={16} />
+                        )}
+                      </div>
                       <div className="flex flex-col">
                         <div className="text-[11px] font-bold text-stone-800 max-w-[120px] truncate leading-none mb-1">{p.title}</div>
                         <div className="text-[9px] text-stone-400 font-medium">{p.stats?.views || 0} vistas • {p.stats?.whatsappClicks || 0} clics</div>
