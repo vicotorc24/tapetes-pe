@@ -262,7 +262,7 @@ export default function AdminDashboard() {
                collections={collectionsData}
                user={effectiveUser} 
                users={usersList}
-               setFeedback={setInfoModal}
+               setFeedback={handleFeedback}
              />
           )}
           {dashboardView === 'categories' && (
@@ -294,7 +294,7 @@ export default function AdminDashboard() {
              />
           )}
           {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
-             <ImpactManager setFeedback={setInfoModal} />
+             <ImpactManager setFeedback={handleFeedback} />
           )}
           {dashboardView === 'audit' && effectiveUser.role === 'superadmin' && (
              <AuditLogManager />
