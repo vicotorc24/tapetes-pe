@@ -27,9 +27,18 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
       setFeedback({
         type: 'confirm',
         message: `¿Deseas dar de alta a ${u.name}? Una vez activa, podrá acceder a su taller y subir productos.`,
-        onConfirm: () => onEdit({ ...u, status: 'active' })
+        onConfirm: () => onEdit({ ...u, status: 'active' }),
+        confirmText: 'Dar de Alta',
+        confirmColor: 'green'
       });
     }
+  };
+
+  const getWhatsAppLink = (u) => {
+    if (!u.phone) return '#';
+    const number = u.phone.replace(/\D/g, '');
+    const message = encodeURIComponent(`Hola ${u.name}, te escribo de la Municipalidad respecto a tu solicitud en Tapetes.pe. ¿Podemos coordinar la validación de tu taller?`);
+    return `https://wa.me/${number}?text=${message}`;
   };
 
   return (
@@ -73,7 +82,14 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
                     <img src={u.photo} className="w-10 h-10 rounded-full border border-stone-200" alt=""/>
                     <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${u.status === 'active' ? 'bg-green-500' : u.status === 'pending' ? 'bg-orange-400 animate-pulse' : 'bg-red-400'}`}></div>
                   </div>
-                  <div><p className="font-bold text-stone-900">{u.name}</p><p className="text-[11px] text-stone-500">{u.email}</p>{u.dni && <p className="text-[10px] bg-stone-100 text-stone-600 px-1 inline-block mt-0.5 rounded">DNI: {u.dni}</p>}</div>
+                  <div>
+                    <p className="font-bold text-stone-900">{u.name}</p>
+                    <p className="text-[11px] text-stone-500">{u.email}</p>
+                    {u.status === 'pending' && u.specialty && (
+                      <p className="text-[10px] text-purple-600 font-medium italic mt-0.5">Especialidad: {u.specialty}</p>
+                    )}
+                    {u.dni && <p className="text-[10px] bg-stone-100 text-stone-600 px-1 inline-block mt-0.5 rounded">DNI: {u.dni}</p>}
+                  </div>
                 </td>
                 <td className="p-4">
                   <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
@@ -85,13 +101,44 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
                   </span>
                 </td>
                 <td className="p-4">
-                  <p className="text-xs font-bold text-stone-800">{u.phone || '-'}</p>
-                  <p className="text-[10px] text-stone-400 truncate max-w-[120px]">{u.location || 'Contumazá'}</p>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs font-bold text-stone-800">{u.phone || '-'}</p>
+                    <p className="text-[10px] text-stone-400 truncate max-w-[120px]">{u.location || 'Contumazá'}</p>
+                    {u.status === 'pending' && u.phone && (
+                      <a 
+                        href={getWhatsAppLink(u)} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-[10px] text-green-600 font-bold hover:underline flex items-center gap-1 mt-1"
+                      >
+                         <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.519.905-6.16 2.547-3.33 3.33-3.33 8.771 0 12.101 1.632 1.632 3.84 2.533 6.16 2.533 2.321 0 4.519-.901 6.161-2.533 3.331-3.33 3.331-8.771 0-12.101-1.632-1.632-3.84-2.533-6.161-2.547zm0 15.653c-1.954 0-3.818-.761-5.228-2.171-2.883-2.883-2.883-7.574 0-10.457 1.412-1.411 3.276-2.172 5.228-2.172 1.953 0 3.818.761 5.229 2.172 2.883 2.883 2.883 7.574 0 10.457-1.411 1.41-3.276 2.171-5.229 2.171z"/></svg> 
+                         Validar por WhatsApp
+                      </a>
+                    )}
+                  </div>
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
                     {u.status === 'pending' ? (
-                       <button onClick={() => handleApprove(u)} className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 flex items-center gap-2 transition shadow-sm"><LucideCheckCircle size={14}/> Dar de Alta</button>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleApprove(u)} className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-700 flex items-center gap-2 transition shadow-sm animate-pulse-gentle"><LucideCheckCircle size={14}/> Dar de Alta</button>
+                        <button 
+                          onClick={() => {
+                            if (setFeedback) {
+                              setFeedback({
+                                type: 'confirm',
+                                message: `¿Deseas rechazar la solicitud de ${u.name}? Esta acción eliminará su registro.`,
+                                onConfirm: () => onDelete(u.id),
+                                confirmText: 'Rechazar Solicitud',
+                                confirmColor: 'red'
+                              });
+                            }
+                          }}
+                          className="text-stone-400 bg-stone-100 hover:bg-red-50 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition"
+                        >
+                          Rechazar
+                        </button>
+                      </div>
                     ) : (
                        u.role !== 'superadmin' && <button onClick={() => onImpersonate(u)} className="text-purple-700 bg-purple-50 border border-purple-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-purple-100 flex items-center gap-2 transition"><LucideEye size={14}/> Ver Como</button>
                     )}
@@ -103,7 +150,9 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
                             setFeedback({
                               type: 'confirm',
                               message: `¿Estás seguro de que deseas eliminar a ${u.name}? Esta acción no se puede deshacer.`,
-                              onConfirm: () => onDelete(u.id)
+                              onConfirm: () => onDelete(u.id),
+                              confirmText: 'Eliminar Usuario',
+                              confirmColor: 'red'
                             });
                           } else {
                             if(confirm('¿Eliminar usuario?')) onDelete(u.id);

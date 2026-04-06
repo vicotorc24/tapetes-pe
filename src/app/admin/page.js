@@ -40,7 +40,9 @@ export default function AdminDashboard() {
   const [dashboardView, setDashboardView] = useState('overview');
   const [infoModal, setInfoModal] = useState(null);
   const [infoMessage, setInfoMessage] = useState('');
-  const [onConfirmAction, setOnConfirmAction] = useState(null);
+   const [onConfirmAction, setOnConfirmAction] = useState(null);
+  const [confirmText, setConfirmText] = useState('');
+  const [confirmColor, setConfirmColor] = useState('');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -137,10 +139,12 @@ export default function AdminDashboard() {
     }
   };
 
-  const setFeedback = ({type, message, onConfirm}) => {
+  const setFeedback = ({type, message, onConfirm, confirmText, confirmColor}) => {
     setInfoModal(type);
     setInfoMessage(message);
     setOnConfirmAction(() => onConfirm);
+    setConfirmText(confirmText || '');
+    setConfirmColor(confirmColor || '');
   };
 
   const handleAddUser = async (userData) => {
@@ -266,6 +270,8 @@ export default function AdminDashboard() {
           message={infoMessage} 
           onClose={() => setInfoModal(null)} 
           onConfirm={onConfirmAction} 
+          confirmText={confirmText}
+          confirmColor={confirmColor}
         />
       )}
     </div>

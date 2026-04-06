@@ -148,6 +148,8 @@ export const translations = {
       name_placeholder: "Nombre Completo",
       email_placeholder: "Correo Electrónico",
       pass_placeholder: "Crear Contraseña",
+      pass_confirm_placeholder: "Confirmar Contraseña",
+      pass_mismatch: "Las contraseñas no coinciden.",
       phone_placeholder: "Teléfono",
       location_placeholder: "Ubicación",
       specialty_placeholder: "Cuéntanos sobre tu especialidad (ej: Tapetes circulares, crochet...)",
@@ -155,7 +157,7 @@ export const translations = {
       loading_btn: "Enviando...",
       privacy: "Al enviar tus datos, aceptas que Tapetes.pe guarde tu información para el proceso de selección artesanal.",
       success_title: "¡Solicitud Enviada!",
-      success_desc: "Gracias {name}, tu solicitud para unirte como artesana ha sido recibida correctamente. Nuestro administrador evaluará tu perfil y te contactará pronto vía email o WhatsApp.",
+      success_desc: "Gracias {name}, tu solicitud para unirte como artesana ha sido recibida correctamente. El personal encargado de la Municipalidad validará tu taller y se pondrá en contacto pronto vía WhatsApp para darte de alta.",
       back_btn: "Volver al inicio"
     },
     footer: { purpose: "Conectando el talento ancestral de las madres de Contumazá con hogares que valoran la autenticidad.", explore: "Explorar", help: "Ayuda", contact: "Contacto", slogan: "Artesanía de Contumazá", impact: "Impacto Social", shipping: "Envíos", care: "Cuidado", faq: "FAQ", legacy: "Legado Ancestral", backed_by: "Respaldado por la", municipality: "Municipalidad Provincial de Contumazá" }
@@ -309,6 +311,8 @@ export const translations = {
       name_placeholder: "Full Name",
       email_placeholder: "Email Address",
       pass_placeholder: "Create Password",
+      pass_confirm_placeholder: "Confirm Password",
+      pass_mismatch: "Passwords do not match.",
       phone_placeholder: "Phone",
       location_placeholder: "Location",
       specialty_placeholder: "Tell us about your specialty (e.g., circular rugs, crochet...)",
@@ -316,7 +320,7 @@ export const translations = {
       loading_btn: "Sending...",
       privacy: "By submitting your data, you agree that Tapetes.pe will store your information for the artisan selection process.",
       success_title: "Application Submitted!",
-      success_desc: "Thank you {name}, your application to join as an artisan has been successfully received. Our administrator will evaluate your profile and contact you soon via email or WhatsApp.",
+      success_desc: "Thank you {name}, your application to join as an artisan has been successfully received. The Municipality staff will validate your workshop and contact you soon via WhatsApp to activate your account.",
       back_btn: "Back to Home"
     },
     footer: { purpose: "Connecting the ancestral talent of Contumazá mothers with homes that value authenticity.", explore: "Explore", help: "Help", contact: "Contact", slogan: "Crafts of Contumazá", impact: "Social Impact", shipping: "Shipping", care: "Care", faq: "FAQ", legacy: "Ancestral Legacy", backed_by: "Supported by the", municipality: "Provincial Municipality of Contumazá" }

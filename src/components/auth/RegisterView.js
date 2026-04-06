@@ -16,6 +16,7 @@ export function RegisterView() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     location: 'Contumazá, Cajamarca',
     specialty: '',
@@ -33,8 +34,15 @@ export function RegisterView() {
     setLoading(true);
     setError('');
 
+    if (formData.password !== formData.confirmPassword) {
+      setError(t('unete.pass_mismatch'));
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await register(formData.email, formData.password, formData);
+      const { confirmPassword, ...dataToSave } = formData;
+      const result = await register(formData.email, formData.password, dataToSave);
       if (result.success) {
         AnalyticsEvents.JOIN_INTERACTION('form_success');
         setIsSubmitted(true);
@@ -151,6 +159,22 @@ export function RegisterView() {
                     className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all"
                     value={formData.password}
                     onChange={e => setFormData({...formData, password: e.target.value})}
+                  />
+                </div>
+
+                <div className="relative">
+                  <LucideLock className="absolute left-4 top-4 text-stone-500" size={18} />
+                  <input 
+                    required 
+                    type="password" 
+                    placeholder={t('unete.pass_confirm_placeholder')}
+                    className={`w-full bg-stone-800/50 border rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 transition-all ${
+                      formData.confirmPassword && formData.password !== formData.confirmPassword 
+                        ? 'border-red-500/50 focus:ring-red-500' 
+                        : 'border-stone-700/50 focus:ring-terracotta-500'
+                    }`}
+                    value={formData.confirmPassword}
+                    onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
                   />
                 </div>
 

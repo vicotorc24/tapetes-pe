@@ -1,7 +1,7 @@
 import React from 'react';
 import { LucideX, LucideCheckCircle2, LucideAlertCircle, LucideLoader2 } from 'lucide-react';
 
-export function InfoModal({ type, message, onClose, onConfirm }) { 
+export function InfoModal({ type, message, onClose, onConfirm, confirmText, confirmColor }) { 
   const isFeedback = ['loading', 'success', 'error', 'confirm'].includes(type);
 
   return (
@@ -53,14 +53,23 @@ export function InfoModal({ type, message, onClose, onConfirm }) {
 
           {type === 'confirm' && (
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
-                <LucideAlertCircle className="text-red-600" size={40} />
+              <div className={`w-20 h-20 ${confirmColor === 'green' ? 'bg-green-50' : confirmColor === 'stone' ? 'bg-stone-50' : 'bg-red-50'} rounded-full flex items-center justify-center mb-6`}>
+                <LucideAlertCircle className={confirmColor === 'green' ? 'text-green-600' : confirmColor === 'stone' ? 'text-stone-600' : 'text-red-600'} size={40} />
               </div>
               <h3 className="text-xl font-bold text-stone-900 mb-2">¿Confirmar Acción?</h3>
               <p className="text-stone-500 leading-relaxed">{message || 'Esta acción no se puede deshacer.'}</p>
               <div className="flex gap-3 w-full mt-8">
                 <button onClick={onClose} className="flex-1 py-4 bg-stone-100 text-stone-600 rounded-2xl font-bold hover:bg-stone-200 transition">Cancelar</button>
-                <button onClick={() => { onConfirm(); }} className="flex-1 py-4 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition shadow-lg">Eliminar</button>
+                <button 
+                  onClick={() => { onConfirm(); onClose?.(); }} 
+                  className={`flex-1 py-4 text-white rounded-2xl font-bold transition shadow-lg ${
+                    confirmColor === 'green' ? 'bg-green-600 hover:bg-green-700' : 
+                    confirmColor === 'stone' ? 'bg-stone-900 hover:bg-stone-800' : 
+                    'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  {confirmText || 'Confirmar'}
+                </button>
               </div>
             </div>
           )}

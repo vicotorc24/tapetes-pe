@@ -27,7 +27,10 @@ export function CartDrawer() {
   const handleCheckout = () => {
     AnalyticsEvents.BEGIN_CHECKOUT(cartTotal, paymentMethod);
     if (paymentMethod === 'whatsapp') {
-      const text = `Hola, deseo adquirir: ${cart.map(i => i.title).join(', ')}. Total: S/${cartTotal}`;
+      const text = `Hola, deseo adquirir los siguientes tesoros de Tapetes.pe:\n\n` +
+        cart.map(i => `🧶 *${i.title}* (S/${i.price})\n   🆔 Cod. Producto: ${i.id?.substring(0, 8).toUpperCase()}\n   📷 Imagen: ${i.image}`).join('\n\n') +
+        ` \n\n💰 *Total: S/${cartTotal.toFixed(2)}*\n\n¿Por favor, confírmenme la disponibilidad y los pasos para el envío?`;
+        
       const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '51908513551';
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`);
     } else {
