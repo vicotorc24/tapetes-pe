@@ -29,7 +29,10 @@ export function CollectionManager({ collections, products = [], onAdd, onEdit, o
     setFeedback({
       type: 'confirm',
       message: `¿Estás seguro de que deseas eliminar la colección "${c.name}"? Los productos asociados dejarán de mostrarla.`,
-      onConfirm: () => onDelete(c.id)
+      onConfirm: () => {
+        setFeedback({ type: 'loading', message: 'Eliminando colección...' });
+        onDelete(c.id);
+      }
     });
   };
 

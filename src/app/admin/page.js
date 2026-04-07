@@ -209,6 +209,39 @@ export default function AdminDashboard() {
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
 
+  const handleAddCollection = async (data) => {
+    setInfoModal('loading');
+    try {
+      await addCollection(data);
+      const updated = await getCollections();
+      setCollectionsData(updated);
+      setInfoMessage(`Colección "${data.name}" creada.`);
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleUpdateCollection = async (data) => {
+    setInfoModal('loading');
+    try {
+      await updateCollection(data.id, data);
+      const updated = await getCollections();
+      setCollectionsData(updated);
+      setInfoMessage('Colección actualizada.');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleDeleteCollection = async (id) => {
+    setInfoModal('loading');
+    try {
+      await deleteCollection(id);
+      const updated = await getCollections();
+      setCollectionsData(updated);
+      setInfoMessage('Colección eliminada.');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
   const handleReorderCategories = async (newOrder) => {
     // Actualizamos localmente primero para UX instantánea
     setCategoriesData(newOrder);
@@ -299,12 +332,12 @@ export default function AdminDashboard() {
       {/* Bloqueo de Seguridad Institucional */}
       {effectiveUser.status !== 'active' && effectiveUser.role !== 'superadmin' ? (
         <PendingApprovalView 
-          user={effectiveUser} 
+          user={effectiveUser} sectors={sectorsData} 
           onLogout={logout} 
         />
       ) : (
         <DashboardLayout 
-          user={effectiveUser} 
+          user={effectiveUser} sectors={sectorsData} 
           currentView={dashboardView} 
           setView={setDashboardView} 
           onLogout={logout} 
@@ -313,7 +346,7 @@ export default function AdminDashboard() {
           {dashboardView === 'overview' && (
              <DashboardOverview 
                products={products} 
-               user={effectiveUser} 
+               user={effectiveUser} sectors={sectorsData} 
                users={usersList}
                setView={setDashboardView}
                refreshData={refreshData}
@@ -327,7 +360,7 @@ export default function AdminDashboard() {
                categories={categoriesData} 
                collections={collectionsData}
                sectors={sectorsData}
-               user={effectiveUser} 
+               user={effectiveUser} sectors={sectorsData} 
                users={usersList}
                setFeedback={handleFeedback}
              />
@@ -360,19 +393,20 @@ export default function AdminDashboard() {
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
                 onImpersonate={startImpersonating}
+                sectors={sectorsData}
                 setFeedback={handleFeedback}
-                adminUser={effectiveUser}
+                adminuser={effectiveUser} sectors={sectorsData}
              />
           )}
           {dashboardView === 'collections' && (
              <CollectionManager 
                 collections={collectionsData}
                 products={products}
-                onAdd={addCollection}
-                onUpdate={updateCollection}
-                onDelete={deleteCollection}
+                onAdd={handleAddCollection}
+                onEdit={handleUpdateCollection}
+                onDelete={handleDeleteCollection}
                 setFeedback={handleFeedback}
-                user={effectiveUser}
+                user={effectiveUser} sectors={sectorsData}
              />
           )}
           {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
@@ -386,7 +420,7 @@ export default function AdminDashboard() {
           )}
           {dashboardView === 'profile' && (
              <ProfileManager 
-                user={effectiveUser} 
+                user={effectiveUser} sectors={sectorsData} 
                 onUpdate={handleEditUser} 
                 setFeedback={handleFeedback}
              />

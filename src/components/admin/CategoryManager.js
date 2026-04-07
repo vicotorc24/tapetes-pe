@@ -72,7 +72,10 @@ export function CategoryManager({ categories, sectors = [], products = [], onAdd
     setFeedback({
       type: 'confirm',
       message: `¿Estás seguro de que deseas eliminar permanentemente la categoría "${cat.name}"? Los productos asociados podrían quedar sin categoría.`,
-      onConfirm: () => onDelete(cat.id)
+      onConfirm: () => {
+        setFeedback({ type: 'loading', message: 'Eliminando categoría...' });
+        onDelete(cat.id);
+      }
     });
   };
 

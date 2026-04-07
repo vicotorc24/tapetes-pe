@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LucideX } from 'lucide-react';
 import { ImageUpload } from '../ui/ImageUpload';
 
-export function UserFormModal({ user, onClose, onSave }) {
+export function UserFormModal({ user, sectors = [], onClose, onSave }) {
   const getInitialNames = () => {
     if (user?.firstName) return { firstName: user.firstName, lastName: user.lastName || '' };
     const full = user?.name || '';
@@ -29,6 +29,7 @@ export function UserFormModal({ user, onClose, onSave }) {
     gender: user?.gender || 'female',
     role: user?.role || 'seller', 
     status: user?.status || 'active',
+    sectors: Array.isArray(user?.sectors) ? user?.sectors : (user?.sector ? [user.sector] : []), // Handle both array and legacy string
     photo: user?.photo || '',
     bio: user?.bio || '',
     brandName: user?.brandName || '',
@@ -92,21 +93,82 @@ export function UserFormModal({ user, onClose, onSave }) {
 
             {formData.role === 'seller' && (
               <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1 font-serif italic text-orange-900">Nombre de Marca / Emprendimiento</label><input className="w-full p-3 border rounded-lg border-orange-200 bg-orange-50/20" value={formData.brandName} onChange={e=>setFormData({...formData, brandName:e.target.value})} placeholder="Ej: Alva's - Miel Pura"/></div>
-                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Especialidad (Rubro)</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.specialty} onChange={e=>setFormData({...formData, specialty:e.target.value})} placeholder="Ej: Apicultura, Tejidos a crochet..."/></div>
-                </div>
-                <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Biografía Breve (Aparece en los productos)</label>
-                  <textarea 
-                    className="w-full p-3 border rounded-lg resize-none h-24 text-sm" 
-                    placeholder="Cuéntanos un poco sobre tu historia o inspiración..."
-                    value={formData.bio}
-                    onChange={e=>setFormData({...formData, bio:e.target.value})}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Instagram</label><input className="w-full p-3 border rounded-lg" value={formData.instagram} onChange={e=>setFormData({...formData, instagram:e.target.value})} placeholder="@usuario"/></div>
-                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Facebook</label><input className="w-full p-3 border rounded-lg" value={formData.facebook} onChange={e=>setFormData({...formData, facebook:e.target.value})} placeholder="Nombre en FB"/></div>
+                <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100/50 space-y-4">
+                  <h4 className="text-[10px] font-black text-orange-900/50 uppercase tracking-widest px-1">Información de Marca & Rubro</h4>
+                  
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="text-xs font-bold text-stone-500 uppercase block mb-3">Rubros Productivos Asociados</label>
+                      <div className="flex flex-wrap gap-2 p-3 bg-stone-50 border-2 border-stone-100 rounded-2xl min-h-[52px] items-center">
+                        {/* Tags selected */}
+                        {(formData.sectors || []).map(sId => {
+                          const s = sectors.find(x => x.id === sId);
+                          if (!s) return null;
+                          return (
+                            <span 
+                              key={s.id} 
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-600 text-white rounded-xl text-[11px] font-black shadow-sm animate-in zoom-in-95"
+                            >
+                              <span>{s.icon}</span>
+                              <span>{s.name}</span>
+                              <button 
+                                type="button" 
+                                onClick={() => {
+                                  setFormData({...formData, sectors: formData.sectors.filter(id => id !== sId)});
+                                }}
+                                className="ml-1 hover:bg-orange-500 rounded-full p-0.5 transition-colors"
+                              >
+                                <LucideX size={12} />
+                              </button>
+                            </span>
+                          );
+                        })}
+                        
+                        {/* Add more selector */}
+                        <div className="relative flex-1 min-w-[120px]">
+                          <select 
+                            className="w-full bg-transparent text-xs font-bold text-stone-400 outline-none cursor-pointer hover:text-orange-600 transition-colors py-1 pl-1"
+                            value=""
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val && !formData.sectors.includes(val)) {
+                                setFormData({...formData, sectors: [...(formData.sectors || []), val]});
+                              }
+                            }}
+                          >
+                            <option value="" disabled>+ Añadir rubro...</option>
+                            {sectors.filter(s => !(formData.sectors || []).includes(s.id)).map(s => (
+                              <option key={s.id} value={s.id}>{s.icon} {s.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      {formData.sectors?.length === 0 && (
+                        <p className="text-[10px] text-orange-600/70 mt-2 italic px-1 font-bold">
+                          * Es obligatorio seleccionar al menos un rubro para productores.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Nombre de Marca</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.brandName} onChange={e=>setFormData({...formData, brandName:e.target.value})} placeholder="Ej: Alva's"/></div>
+                    <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Especialidad Técnica</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.specialty} onChange={e=>setFormData({...formData, specialty:e.target.value})} placeholder="Ej: Apicultura, Tejidos a crochet..."/></div>
+                  </div>
+
+                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Biografía Breve (Narrativa)</label>
+                    <textarea 
+                      className="w-full p-3 border rounded-lg resize-none h-24 text-sm border-orange-200" 
+                      placeholder="Cuéntanos un poco sobre tu historia o inspiración..."
+                      value={formData.bio}
+                      onChange={e=>setFormData({...formData, bio:e.target.value})}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Instagram</label><input className="w-full p-3 border rounded-lg border-orange-100" value={formData.instagram} onChange={e=>setFormData({...formData, instagram:e.target.value})} placeholder="@usuario"/></div>
+                    <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Facebook</label><input className="w-full p-3 border rounded-lg border-orange-100" value={formData.facebook} onChange={e=>setFormData({...formData, facebook:e.target.value})} placeholder="Nombre en FB"/></div>
+                  </div>
                 </div>
               </>
             )}

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LucideSearch, LucidePlus, LucideCheckCircle, LucideXCircle, LucideEye, LucideEdit, LucideTrash2 } from 'lucide-react';
 import { UserFormModal } from './UserFormModal';
 
-export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, setFeedback }) {
+export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, sectors = [], setFeedback }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -193,7 +193,14 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
         </table>
         {filteredUsers.length === 0 && <div className="p-8 text-center text-stone-400">No se encontraron usuarios.</div>}
       </div>
-      {isModalOpen && <UserFormModal user={editingUser} onClose={() => setIsModalOpen(false)} onSave={(u) => { editingUser ? onEdit(u) : onAdd(u); setIsModalOpen(false); }} />}
+      {isModalOpen && (
+        <UserFormModal 
+          user={editingUser} 
+          sectors={sectors}
+          onClose={() => setIsModalOpen(false)} 
+          onSave={(u) => { editingUser ? onEdit(u) : onAdd(u); setIsModalOpen(false); }} 
+        />
+      )}
     </div>
   );
 }
