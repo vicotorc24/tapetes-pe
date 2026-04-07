@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { LucideUser, LucideMail, LucideLock, LucidePhone, LucideMapPin, LucideSend, LucideCheckCircle } from 'lucide-react';
+import { LucideUser, LucideMail, LucideLock, LucidePhone, LucideMapPin, LucideSend, LucideCheckCircle, LucideTag } from 'lucide-react';
 import { useTranslation } from '@/context/LanguageContext';
 import { Navbar } from '../layout/Navbar';
 import { AnalyticsEvents } from '@/lib/analytics';
@@ -21,6 +21,7 @@ export function RegisterView() {
     phone: '',
     location: 'Contumazá, Cajamarca',
     specialty: '',
+    brandName: '',
     role: 'seller',
     status: 'pending' // Estado crucial para la evaluación del admin
   });
@@ -150,6 +151,17 @@ export function RegisterView() {
                     onChange={e => setFormData({...formData, lastName: e.target.value})}
                   />
                 </div>
+              </div>
+
+              <div className="relative">
+                <LucideTag className="absolute left-4 top-4 text-stone-500" size={18} />
+                <input 
+                  type="text" 
+                  placeholder={t('unete.brandName_placeholder')}
+                  className="w-full bg-stone-800/50 border border-stone-700/50 rounded-2xl py-4 pl-12 pr-6 text-white text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 transition-all font-bold text-orange-400 placeholder:font-normal"
+                  value={formData.brandName}
+                  onChange={e => setFormData({...formData, brandName: e.target.value})}
+                />
               </div>
 
                 <div className="relative">

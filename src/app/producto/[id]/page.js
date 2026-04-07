@@ -16,7 +16,9 @@ import {
   LucideTags,
   LucideMessageCircle,
   LucideMaximize2,
-  LucideX
+  LucideX,
+  LucideShield,
+  LucideApple
 } from 'lucide-react';
 import Link from 'next/link';
 import { getProductById } from '@/lib/services/products';
@@ -271,8 +273,12 @@ export default function ProductPage({ params }) {
                 </div>
                 <div>
                   <span className="text-[9px] font-black text-andeansky-600 uppercase tracking-[0.2em] mb-1 block">Tu Maestra Artesana</span>
-                  <h4 className="text-xl font-serif font-black text-stone-900 leading-none">{artisan?.name || 'Artesana de Contumazá'}</h4>
-                  <p className="text-[10px] text-stone-400 mt-1 font-bold">{artisan?.location || 'Contumazá, Cajamarca'}</p>
+                  <h4 className="text-xl font-serif font-black text-stone-900 leading-none">
+                    {artisan?.brandName ? artisan.brandName : (artisan?.name || 'Artesana de Contumazá')}
+                  </h4>
+                  <p className="text-[10px] text-stone-400 mt-1 font-bold">
+                    {artisan?.brandName ? `Por ${artisan.name} • ` : ''}{artisan?.location || 'Contumazá, Cajamarca'}
+                  </p>
                 </div>
               </div>
 
@@ -302,7 +308,12 @@ export default function ProductPage({ params }) {
         
         {/* COLUMNA DERECHA: Datos + Compra + Ficha */}
         <div className="lg:col-span-5 flex flex-col pt-2">
-          <div className="mb-2">
+          <div className="mb-2 flex items-center gap-3">
+            {artisan?.brandName && (
+              <span className="bg-orange-100 text-orange-700 font-black text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-md border border-orange-200">
+                Marca: {artisan.brandName}
+              </span>
+            )}
             <span className="text-andeansky-600 font-black text-[10px] uppercase tracking-[0.2em]">
                Colección: {product.collection || 'Artesanía Local'}
             </span>
@@ -348,39 +359,86 @@ export default function ProductPage({ params }) {
           </div>
 
           {/* FICHA TÉCNICA (Regresada a la Derecha) */}
-          <div className="bg-stone-50/50 p-8 rounded-[2.5rem] space-y-7 border border-stone-100/50 shadow-sm relative overflow-hidden">
+          <div className="bg-white p-8 rounded-[2.5rem] space-y-7 border border-stone-100 shadow-sm relative overflow-hidden">
             <h3 className="text-stone-900 font-black text-[10px] uppercase tracking-[0.25em] flex items-center gap-3 border-b border-stone-200/50 pb-4">
-              <LucideTags size={14} className="text-andeansky-500"/> Especificaciones Técnicas
+              <LucideTags size={14} className="text-andeansky-500"/> 
+              {product.sector === 'textile' ? 'Ficha Técnica Textil' : 'Especificaciones del Producto'}
             </h3>
           
             <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucidePalette size={16} /></div>
-                <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Técnica</p><p className="text-sm font-bold text-stone-700">{product.technique || 'Crochet'}</p></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideLayers size={16} /></div>
-                <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Punto</p><p className="text-sm font-bold text-stone-700">{Array.isArray(product.stitchType) ? product.stitchType.join(', ') : (product.stitchType || 'Artesanal')}</p></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideBox size={16} /></div>
-                <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Material</p><p className="text-sm font-bold text-stone-700">{product.materials || 'Fibras'}</p></div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideRuler size={16} /></div>
-                <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Tamaño</p><p className="text-sm font-bold text-stone-700">{product.dimensions || 'Estándar'}</p></div>
-              </div>
+              {/* 1. Atributos Dinámicos (Prioridad) */}
+              {product.attributes && Object.entries(product.attributes).map(([label, value]) => (
+                value && (
+                  <div key={label} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0">
+                      <LucideBox size={16} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">{label}</p>
+                      <p className="text-sm font-bold text-stone-700">
+                        {typeof value === 'boolean' ? (value ? 'Sí' : 'No') : value}
+                      </p>
+                    </div>
+                  </div>
+                )
+              ))}
+
+              {/* 2. Atributos Legacy (Solo si no están en attributes) */}
+              {product.technique && !product.attributes?.Técnica && (
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucidePalette size={16} /></div>
+                  <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Técnica</p><p className="text-sm font-bold text-stone-700">{product.technique}</p></div>
+                </div>
+              )}
+              {product.materials && !product.attributes?.Material && (
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideBox size={16} /></div>
+                  <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Material</p><p className="text-sm font-bold text-stone-700">{product.materials}</p></div>
+                </div>
+              )}
+              {product.dimensions && !product.attributes?.Tamaño && (
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideRuler size={16} /></div>
+                  <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Tamaño</p><p className="text-sm font-bold text-stone-700">{product.dimensions}</p></div>
+                </div>
+              )}
+              {product.weight && !product.attributes?.['Contenido / Peso'] && (
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-stone-50 flex items-center justify-center text-stone-400 shrink-0"><LucideBox size={16} /></div>
+                  <div><p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Peso/Contenido</p><p className="text-sm font-bold text-stone-700">{product.weight}</p></div>
+                </div>
+              )}
+              {product.ingredients && (
+                <div className="col-span-2 flex items-start gap-3 bg-stone-50/50 p-4 rounded-2xl border border-stone-100">
+                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-orange-600 shrink-0 shadow-sm"><LucideApple size={16} /></div>
+                  <div>
+                    <p className="text-[10px] font-black text-stone-400 uppercase tracking-wider mb-0.5">Ingredientes / Insumos</p>
+                    <p className="text-sm font-medium text-stone-700 leading-relaxed">{product.ingredients}</p>
+                  </div>
+                </div>
+              )}
+              {product.registroSanitario && (
+                <div className="col-span-2 flex items-center gap-3 bg-blue-50/30 p-3 rounded-xl border border-blue-100/50">
+                  <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shrink-0"><LucideShield size={14} /></div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[9px] font-black text-blue-900/40 uppercase tracking-widest leading-none">Registro Sanitario:</p>
+                    <p className="text-xs font-black text-blue-900 leading-none">{product.registroSanitario}</p>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="bg-orange-50/50 p-6 rounded-3xl border border-orange-100 mt-4 relative overflow-hidden group">
-              <div className="relative z-10 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0"><LucideClock size={20} /></div>
-                <div>
-                  <p className="text-[8px] font-black text-orange-900/50 uppercase tracking-widest leading-none mb-1">Días de labor</p>
-                  <p className="text-sm font-serif font-bold text-orange-900">{product.laborDays || 'X'} días de trabajo manual</p>
+            {product.laborDays && (
+              <div className="bg-orange-50/50 p-6 rounded-3xl border border-orange-100 mt-4 relative overflow-hidden group">
+                <div className="relative z-10 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0"><LucideClock size={20} /></div>
+                  <div>
+                    <p className="text-[8px] font-black text-orange-900/50 uppercase tracking-widest leading-none mb-1">Días de labor</p>
+                    <p className="text-sm font-serif font-bold text-orange-900">{product.laborDays} días de trabajo manual</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

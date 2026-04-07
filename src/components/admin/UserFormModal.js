@@ -31,6 +31,7 @@ export function UserFormModal({ user, onClose, onSave }) {
     status: user?.status || 'active',
     photo: user?.photo || '',
     bio: user?.bio || '',
+    brandName: user?.brandName || '',
     instagram: user?.instagram || '',
     facebook: user?.facebook || '',
     password: ''
@@ -42,7 +43,7 @@ export function UserFormModal({ user, onClose, onSave }) {
   };
   
   return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-stone-900/50 backdrop-blur-md p-4 animate-in fade-in duration-300">
       <div className="bg-white w-full max-w-xl p-8 rounded-[2rem] shadow-2xl animate-in zoom-in-95 overflow-y-auto max-h-[95vh]">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-bold text-stone-900 border-b pb-4 w-full">{user ? 'Editar Perfil Local' : 'Nuevo Productor/a de Contumazá'}</h3>
@@ -91,7 +92,10 @@ export function UserFormModal({ user, onClose, onSave }) {
 
             {formData.role === 'seller' && (
               <>
-                <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Especialidad (Rubro)</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.specialty} onChange={e=>setFormData({...formData, specialty:e.target.value})} placeholder="Ej: Apicultura, Tejidos a crochet, Café..."/></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1 font-serif italic text-orange-900">Nombre de Marca / Emprendimiento</label><input className="w-full p-3 border rounded-lg border-orange-200 bg-orange-50/20" value={formData.brandName} onChange={e=>setFormData({...formData, brandName:e.target.value})} placeholder="Ej: Alva's - Miel Pura"/></div>
+                  <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Especialidad (Rubro)</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.specialty} onChange={e=>setFormData({...formData, specialty:e.target.value})} placeholder="Ej: Apicultura, Tejidos a crochet..."/></div>
+                </div>
                 <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Biografía Breve (Aparece en los productos)</label>
                   <textarea 
                     className="w-full p-3 border rounded-lg resize-none h-24 text-sm" 

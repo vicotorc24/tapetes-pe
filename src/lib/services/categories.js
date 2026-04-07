@@ -24,6 +24,14 @@ export const addCategory = async (data) => {
   });
 };
 
+export const updateCategory = async (id, data) => {
+  const docRef = doc(db, COLLECTION_NAME, id);
+  return await updateDoc(docRef, {
+    ...data,
+    updatedAt: new Date().toISOString()
+  });
+};
+
 export const deleteCategory = async (id) => {
   const docRef = doc(db, COLLECTION_NAME, id);
   return await deleteDoc(docRef);

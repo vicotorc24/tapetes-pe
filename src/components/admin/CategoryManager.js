@@ -2,41 +2,41 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { LucideTrash2, LucidePlusCircle, LucideTag, LucideEdit, LucideX, LucideCheck, LucideGripVertical, LucideTrendingUp, LucideEye, LucidePackage } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { CategoryFormModal } from './CategoryFormModal';
 import { CONFIG } from '@/lib/config';
 
 export function CategoryManager({ categories, sectors = [], products = [], onAdd, onUpdate, onDelete, onReorder, setFeedback }) {
-  const [newCat, setNewCat] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedSector, setSelectedSector] = useState(sectors[0]?.id || 'textile');
-  const [editingId, setEditingId] = useState(null);
-  const [editFormData, setEditFormData] = useState({ name: '', description: '', sector: sectors[0]?.id || 'textile' });
+  const [filterSector, setFilterSector] = useState('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentCategory, setCurrentCategory] = useState(null);
   
   // Refs para scroll y foco
   const editFormRef = useRef(null);
   const nameInputRef = useRef(null);
 
-  const handleAdd = () => {
-    if (newCat) {
-      onAdd({ name: newCat, description, sector: selectedSector });
-      setNewCat('');
-      setDescription('');
-    }
+  const handleOpenCreate = () => {
+    setCurrentCategory(null);
+    setIsModalOpen(true);
   };
+
+  const handleSave = (data) => {
+    if (currentCategory) {
+      onUpdate(currentCategory.id, data);
+    } else {
+      onAdd(data);
+    }
+    setIsModalOpen(false);
+    setCurrentCategory(null);
+  };
+
+  const filteredCategories = useMemo(() => {
+    if (filterSector === 'all') return categories;
+    return categories.filter(cat => cat.sector === filterSector);
+  }, [categories, filterSector]);
 
   const startEditing = (cat) => {
-    setEditingId(cat.id);
-    setEditFormData({ name: cat.name, description: cat.description || '', sector: cat.sector || sectors[0]?.id || 'textile' });
-    
-    // El scroll ocurre después de que React renderice el formulario
-    setTimeout(() => {
-      editFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      nameInputRef.current?.focus();
-    }, 100);
-  };
-
-  const handleSaveEdit = () => {
-    onUpdate(editingId, editFormData);
-    setEditingId(null);
+    setCurrentCategory(cat);
+    setIsModalOpen(true);
   };
 
   const confirmDelete = (cat) => {
@@ -52,8 +52,25 @@ export function CategoryManager({ categories, sectors = [], products = [], onAdd
     if (!result.destination) return;
     
     const items = Array.from(categories);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    
+    if (filterSector === 'all') {
+      const [reorderedItem] = items.splice(result.source.index, 1);
+      items.splice(result.destination.index, 0, reorderedItem);
+    } else {
+      // Reordenamiento dentro de un filtro
+      const filtered = Array.from(filteredCategories);
+      const [movedItem] = filtered.splice(result.source.index, 1);
+      filtered.splice(result.destination.index, 0, movedItem);
+      
+      // Mapear los cambios de vuelta a la lista global
+      let filteredIdx = 0;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].sector === filterSector) {
+          items[i] = filtered[filteredIdx];
+          filteredIdx++;
+        }
+      }
+    }
     
     onReorder(items);
   };
@@ -80,134 +97,47 @@ export function CategoryManager({ categories, sectors = [], products = [], onAdd
 
   return (
     <div className="animate-in fade-in pb-20">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-stone-900 font-serif">Gestión de Categorías</h2>
-        <p className="text-stone-500 text-sm">Define el orden y las guías para tu catálogo.</p>
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h2 className="text-2xl font-bold text-stone-900 font-serif">Gestión de Categorías</h2>
+          <p className="text-stone-500 text-sm">Define el orden y las guías para tu catálogo.</p>
+        </div>
+        <button 
+          onClick={handleOpenCreate}
+          className="bg-stone-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-stone-800 transition shadow-lg shadow-stone-100"
+        >
+          <LucidePlusCircle size={18} /> Nueva Categoría
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2">
-          <div ref={editFormRef}>
-            {!editingId ? (
-              <div className="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm mb-10 transition-all duration-500">
-                <h3 className="text-sm font-bold text-stone-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-                  <LucidePlusCircle size={16} /> Nueva Categoría
-                </h3>
-                <div className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="text-[10px] font-bold text-stone-500 uppercase block mb-3 font-sans">Sector Vinculado</label>
-                        <div className="flex gap-2">
-                          {sectors.map(sec => (
-                            <button
-                              key={sec.id}
-                              type="button"
-                              onClick={() => setSelectedSector(sec.id)}
-                              className={`flex-1 p-3 rounded-xl border text-xs font-bold transition-all ${
-                                selectedSector === sec.id 
-                                  ? 'bg-stone-900 text-white border-stone-900 shadow-lg' 
-                                  : 'bg-stone-50 text-stone-400 border-stone-100 hover:bg-stone-100'
-                              }`}
-                            >
-                              {sec.icon} {sec.name}
-                            </button>
-                          ))}
-                        </div>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Nombre</label>
-                      <input 
-                        className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-100 transition-all font-medium bg-stone-50/30" 
-                        placeholder="Ej: Manteles Litúrgicos" 
-                        value={newCat} 
-                        onChange={e => setNewCat(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Descripción / Guía</label>
-                    <textarea 
-                      className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-100 transition-all h-[100px] text-sm resize-none bg-stone-50/30 font-sans" 
-                      placeholder="Explica qué tipo de productos van aquí..." 
-                      value={description} 
-                      onChange={e => setDescription(e.target.value)}
-                    />
-                  </div>
-                  <button 
-                    onClick={handleAdd} 
-                    disabled={!newCat}
-                    className="w-full bg-stone-900 text-white py-4 rounded-xl font-bold hover:bg-stone-800 transition shadow-lg shadow-stone-100 disabled:opacity-50 disabled:shadow-none"
-                  >
-                    Agregar Categoría
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* ... (Edit structure remains similar but within col-span-2) ... */
-              <div className="bg-orange-50/50 p-8 rounded-2xl border border-orange-200 shadow-xl mb-10 animate-in zoom-in-95 duration-300">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-sm font-bold text-orange-900 uppercase tracking-widest flex items-center gap-2">
-                    <LucideEdit size={16} /> Editando: {editFormData.name}
-                  </h3>
-                  <button onClick={() => setEditingId(null)} className="text-stone-400 hover:text-stone-600">
-                    <LucideX size={20} />
-                  </button>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Nombre</label>
-                      <input 
-                        ref={nameInputRef}
-                        className="w-full p-3 border border-orange-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-300 transition-all font-medium bg-white" 
-                        value={editFormData.name} 
-                        onChange={e => setEditFormData({...editFormData, name: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-bold text-stone-500 uppercase block mb-3 font-sans">Cambiar Sector</label>
-                        <div className="flex gap-2">
-                          {sectors.map(sec => (
-                            <button
-                              key={sec.id}
-                              type="button"
-                              onClick={() => setEditFormData({...editFormData, sector: sec.id})}
-                              className={`flex-1 p-3 rounded-xl border text-[10px] font-bold transition-all ${
-                                editFormData.sector === sec.id 
-                                  ? 'bg-orange-800 text-white border-orange-800 shadow-md' 
-                                  : 'bg-white text-orange-400 border-orange-100 hover:bg-orange-50'
-                              }`}
-                            >
-                              {sec.icon} {sec.name}
-                            </button>
-                          ))}
-                        </div>
-                    </div>
-                    <button 
-                      onClick={handleSaveEdit}
-                      className="w-full bg-orange-700 text-white py-3.5 rounded-xl font-bold hover:bg-orange-800 transition shadow-lg shadow-orange-100 flex items-center justify-center gap-2"
-                    >
-                      <LucideCheck size={18} /> Guardar Cambios
-                    </button>
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Descripción / Guía</label>
-                    <textarea 
-                      className="w-full p-3 border border-orange-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-300 transition-all h-[180px] text-sm resize-none bg-white" 
-                      value={editFormData.description} 
-                      onChange={e => setEditFormData({...editFormData, description: e.target.value})}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
           <div className="space-y-4">
-            <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest px-4 mb-2 font-sans flex justify-between items-center">
-              Categorías Registradas 
-              <span className="text-[9px] font-normal lowercase italic">Arrastra para reordenar</span>
-            </h3>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-4 mb-2">
+              <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-widest font-sans flex items-center gap-2">
+                Categorías Registradas 
+                <span className="text-[9px] font-normal lowercase italic">Arrastra para reordenar</span>
+              </h3>
+              
+              <div className="flex gap-1.5 p-1 bg-stone-100 rounded-xl">
+                <button 
+                  onClick={() => setFilterSector('all')}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all ${filterSector === 'all' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-400 hover:text-stone-600'}`}
+                >
+                  Todos
+                </button>
+                {sectors.map(sec => (
+                  <button 
+                    key={sec.id}
+                    onClick={() => setFilterSector(sec.id)}
+                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1.5 ${filterSector === sec.id ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-400 hover:text-stone-600'}`}
+                  >
+                    <span>{sec.icon}</span>
+                    <span className="hidden sm:inline">{sec.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
             
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable droppableId="categories-list">
@@ -217,7 +147,7 @@ export function CategoryManager({ categories, sectors = [], products = [], onAdd
                     ref={provided.innerRef}
                     className="grid gap-3"
                   >
-                    {categories.map((cat, index) => (
+                    {filteredCategories.map((cat, index) => (
                       <Draggable key={cat.id} draggableId={cat.id} index={index}>
                         {(provided, snapshot) => (
                           <div 
@@ -246,7 +176,20 @@ export function CategoryManager({ categories, sectors = [], products = [], onAdd
                                     <span className="font-bold text-stone-900 font-serif">{cat.name}</span>
                                     {cat.sector && (
                                       <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md ${
-                                        cat.sector === 'food' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'
+                                        (() => {
+                                          const sector = sectors.find(s => s.id === cat.sector);
+                                          const color = sector?.color || 'purple';
+                                          const colorMap = {
+                                            orange: 'bg-orange-100 text-orange-700 border-orange-200',
+                                            blue: 'bg-blue-100 text-blue-700 border-blue-200',
+                                            emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                            purple: 'bg-purple-100 text-purple-700 border-purple-200',
+                                            amber: 'bg-amber-100 text-amber-700 border-amber-200',
+                                            rose: 'bg-rose-100 text-rose-700 border-rose-200',
+                                            stone: 'bg-stone-100 text-stone-700 border-stone-200'
+                                          };
+                                          return colorMap[color] || colorMap.purple;
+                                        })()
                                       }`}>
                                         {sectors.find(s => s.id === cat.sector)?.name || cat.sector}
                                       </span>
@@ -316,6 +259,15 @@ export function CategoryManager({ categories, sectors = [], products = [], onAdd
            </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <CategoryFormModal 
+          category={currentCategory}
+          sectors={sectors}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }

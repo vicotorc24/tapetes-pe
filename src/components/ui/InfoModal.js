@@ -7,7 +7,7 @@ export function InfoModal({ type, message, onClose, onConfirm, confirmText, conf
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={type !== 'loading' ? onClose : undefined}></div>
+      <div className="absolute inset-0 bg-stone-900/50 backdrop-blur-md animate-in fade-in duration-300" onClick={type !== 'loading' ? onClose : undefined}></div>
       
       {/* Modal Card */}
       <div className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">

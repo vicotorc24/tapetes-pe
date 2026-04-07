@@ -140,10 +140,10 @@ export default function AdminDashboard() {
   }
 
   // Handlers (Migrated from old page.js)
-  const handleAddCategory = async ({ name, description }) => {
+  const handleAddCategory = async (data) => {
     setInfoModal('loading');
     try {
-      await addCategory({ name, description });
+      await addCategory(data);
       const data = await getCategories();
       setCategoriesData(data);
       setInfoMessage('Categoría agregada con éxito.');

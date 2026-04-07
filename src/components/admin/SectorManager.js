@@ -14,7 +14,7 @@ import {
 export function SectorManager({ sectors, onAdd, onUpdate, onDelete, setFeedback }) {
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({ name: '', icon: '📦', color: 'stone', description: '' });
+  const [formData, setFormData] = useState({ name: '', icon: '📦', color: 'stone', description: '', fields: [] });
   
   const COLORS = [
     { id: 'stone', bg: 'bg-stone-100', text: 'text-stone-700', border: 'border-stone-200' },
@@ -27,7 +27,7 @@ export function SectorManager({ sectors, onAdd, onUpdate, onDelete, setFeedback 
 
   const handleStartCreate = () => {
     setEditingId(null);
-    setFormData({ name: '', icon: '📦', color: 'stone', description: '' });
+    setFormData({ name: '', icon: '📦', color: 'stone', description: '', fields: [] });
     setIsCreating(true);
   };
 
@@ -37,7 +37,8 @@ export function SectorManager({ sectors, onAdd, onUpdate, onDelete, setFeedback 
       name: sector.name, 
       icon: sector.icon || '📦', 
       color: sector.color || 'stone',
-      description: sector.description || ''
+      description: sector.description || '',
+      fields: sector.fields || []
     });
     setIsCreating(true);
   };
@@ -133,7 +134,6 @@ export function SectorManager({ sectors, onAdd, onUpdate, onDelete, setFeedback 
                     ))}
                   </div>
                 </div>
-
                 <div>
                   <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2 font-sans">Color de Marca</label>
                   <div className="flex gap-3">
@@ -150,6 +150,72 @@ export function SectorManager({ sectors, onAdd, onUpdate, onDelete, setFeedback 
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Constructor de Campos Dinámicos */}
+            <div className="pt-8 border-t border-stone-100">
+              <div className="flex justify-between items-center mb-6">
+                 <div>
+                   <h4 className="text-sm font-bold text-stone-900 font-serif italic">Configuración de Campos Propios</h4>
+                   <p className="text-[10px] text-stone-400 font-medium tracking-wide">Define qué información se pedirá al registrar productos en este sector.</p>
+                 </div>
+                 <button 
+                  type="button" 
+                  onClick={() => setFormData({ ...formData, fields: [...formData.fields, { id: Date.now(), label: '', type: 'text' }] })}
+                  className="px-4 py-2 bg-stone-100 text-stone-700 rounded-xl text-xs font-bold hover:bg-stone-200 transition-all flex items-center gap-2"
+                 >
+                   <LucidePlusCircle size={14} /> Añadir Campo
+                 </button>
+              </div>
+
+              {formData.fields.length === 0 ? (
+                <div className="py-8 bg-stone-50/50 rounded-2xl border-2 border-dashed border-stone-100 text-center">
+                   <p className="text-[10px] text-stone-400 font-medium italic">Sin campos adicionales (usará los campos base: Nombre, Precio, Stock...)</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                   {formData.fields.map((f, idx) => (
+                     <div key={f.id} className="flex gap-4 items-center bg-stone-50/30 p-3 rounded-2xl border border-stone-100 animate-in slide-in-from-left-2 duration-300">
+                        <div className="flex-1">
+                          <input 
+                            className="w-full p-2.5 text-xs border border-transparent focus:border-stone-200 bg-white rounded-lg outline-none font-bold text-stone-700" 
+                            placeholder="Nombre del campo (ej: Aforo, Litraje, Fecha de Inicio...)"
+                            value={f.label}
+                            onChange={(e) => {
+                              const next = [...formData.fields];
+                              next[idx].label = e.target.value;
+                              setFormData({ ...formData, fields: next });
+                            }}
+                          />
+                        </div>
+                        <div className="w-1/4">
+                          <select 
+                            className="w-full p-2.5 text-xs border-none bg-stone-100/50 rounded-lg outline-none font-medium text-stone-600"
+                            value={f.type}
+                            onChange={(e) => {
+                              const next = [...formData.fields];
+                              next[idx].type = e.target.value;
+                              setFormData({ ...formData, fields: next });
+                            }}
+                          >
+                            <option value="text">Texto Corto</option>
+                            <option value="number">Número</option>
+                            <option value="date">Fecha</option>
+                            <option value="textarea">Texto Largo</option>
+                            <option value="checkbox">Selección (Si/No)</option>
+                          </select>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => setFormData({ ...formData, fields: formData.fields.filter((_, i) => i !== idx) })}
+                          className="p-2.5 text-stone-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        >
+                          <LucideTrash2 size={16} />
+                        </button>
+                     </div>
+                   ))}
+                </div>
+              )}
             </div>
 
             <div className="pt-6 border-t border-stone-100 flex justify-end">

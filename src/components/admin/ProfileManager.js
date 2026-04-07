@@ -43,6 +43,7 @@ export function ProfileManager({ user, setFeedback }) {
     phone: user.phone || '',
     bio: user.bio || '',
     specialty: user.specialty || '',
+    brandName: user.brandName || '',
     instagram: user.instagram || '',
     facebook: user.facebook || '',
     photo: user.photo || ''
@@ -187,16 +188,30 @@ export function ProfileManager({ user, setFeedback }) {
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Especialidad / Técnica</label>
-                <div className="relative">
-                  <LucideAward size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                  <input 
-                    placeholder="Ej: Crochet, Telar de Cintura..."
-                    value={formData.specialty} 
-                    onChange={e => setFormData({...formData, specialty: e.target.value})}
-                    className="w-full p-3.5 pl-11 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-200 outline-none transition-all font-medium"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Nombre de Marca / Emprendimiento (Opcional)</label>
+                  <div className="relative">
+                    <LucideAward size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-700" />
+                    <input 
+                      placeholder="Ej: Alva's"
+                      value={formData.brandName} 
+                      onChange={e => setFormData({...formData, brandName: e.target.value})}
+                      className="w-full p-3.5 pl-11 bg-stone-50 border border-orange-100 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-200 outline-none transition-all font-bold text-orange-950"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-stone-400 uppercase mb-1.5 block tracking-wider">Especialidad / Técnica</label>
+                  <div className="relative">
+                    <LucideAward size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                    <input 
+                      placeholder="Ej: Crochet, Telar de Cintura..."
+                      value={formData.specialty} 
+                      onChange={e => setFormData({...formData, specialty: e.target.value})}
+                      className="w-full p-3.5 pl-11 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-200 outline-none transition-all font-medium"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
