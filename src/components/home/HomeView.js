@@ -2,10 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../context/LanguageContext';
 import { AnalyticsEvents } from '@/lib/analytics';
-import { LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideSearch, LucideX, LucidePlus, LucideCrown } from 'lucide-react';
+import { LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideSearch, LucideX, LucidePlus, LucideCrown, LucidePalette, LucideSprout, LucideMountain } from 'lucide-react';
 import { getImpactData } from '@/lib/services/impact';
+import { IconTurismo, IconAlimentos, IconArtesania, IconTodos } from './TerritoryIcons';
 
-export function HomeView({ products, categories = [], activeCategory, collections = [], activeCollection, onSelectCollection, onSelectCategory, onViewProduct, onAddToCart, onExplore, onCustomOrder, searchTerm = '', onSearch }) {
+export function HomeView({ 
+  products, 
+  categories = [], 
+  activeCategory, 
+  sectors = [], 
+  brands = [], 
+  activeSector, 
+  onSelectSector, 
+  onSelectCategory, 
+  onViewProduct, 
+  onAddToCart, 
+  onExplore, 
+  onCustomOrder, 
+  searchTerm = '', 
+  onSearch 
+}) {
   const { t } = useTranslation();
   const [impactData, setImpactData] = useState(null);
   
@@ -16,20 +32,35 @@ export function HomeView({ products, categories = [], activeCategory, collection
   // Lógica de Filtrado Optimizada con Búsqueda
   let filteredProducts = products;
   
-  // 1. Filtrar por Colección (Nombre o ID)
-  const activeCol = collections.find(c => 
-    c.id === activeCollection || 
-    c.name.toLowerCase() === activeCollection?.toString().toLowerCase()
-  );
+  // 1. Filtrar por Sector (Omni-Filtro Resiliente)
+  if (activeSector) {
+    const activeSectorObj = sectors.find(s => s.id === activeSector);
+    const activeName = activeSectorObj?.name?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || '';
+    
+    filteredProducts = filteredProducts.filter(p => {
+      // Detección de formato del sector en el producto (String, ID o Objeto)
+      const pSector = p.sector;
+      const pSectorId = typeof pSector === 'object' ? pSector.id : pSector;
+      const pSectorName = typeof pSector === 'object' ? pSector.name : pSector?.toString();
+      
+      const pSectorStrNormalized = pSectorName?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || '';
+      
+      // 1. Coincidencia por ID técnico
+      if (pSectorId === activeSector) return true;
+      
+      // 2. Coincidencia por Nombre Normalizado
+      if (pSectorStrNormalized === activeName) return true;
+      
+      // 3. Soporte Legacy Especial
+      if (activeName.includes('artesania') && (pSectorStrNormalized === 'textile' || pSectorId === 'textile')) return true;
+      if ((activeName.includes('alimento') || activeName.includes('agro')) && (pSectorStrNormalized === 'food' || pSectorId === 'food')) return true;
+      
+      return false;
+    });
+  }
 
-  if (activeCol) {
-    filteredProducts = filteredProducts.filter(p => 
-      p.collectionId === activeCol.id || 
-      p.collection === activeCol.name ||
-      p.collection === activeCol.id
-    );
-  } else if (activeCategory && activeCategory !== 'Todos') {
-    // 2. Filtrar por Categoría (Robusto: ignora mayúsculas y espacios)
+  // 2. Filtrar por Categoría (Robusto)
+  if (activeCategory && activeCategory !== 'Todos') {
     filteredProducts = filteredProducts.filter(p => 
       p.category?.toString().trim().toLowerCase() === activeCategory.toString().trim().toLowerCase()
     );
@@ -96,39 +127,8 @@ export function HomeView({ products, categories = [], activeCategory, collection
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-terracotta-50/40 rounded-full blur-[100px] pointer-events-none"></div>
       </div>
 
-      {/* Banner de Campaña: Semana Santa (Restaurado por preferencia del usuario) */}
-      {!activeCollection && (
-        <div className="bg-textilemagenta-900 text-white overflow-hidden relative border-y-8 border-terracotta-500 group">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-stretch justify-between">
-            <div className="p-12 md:p-20 flex-1 text-center md:text-left z-10 flex flex-col justify-center">
-              <span className="text-wheat-500 font-bold tracking-[0.4em] text-[10px] uppercase mb-4 block animate-in fade-in slide-in-from-left-4 duration-500">{t('catalog.heritage_tag')}</span>
-              <h2 className="text-5xl md:text-7xl font-serif font-bold mb-6 text-white leading-tight drop-shadow-md">{t('catalog.heritage_title')}</h2>
-              <p className="text-textilemagenta-100 text-lg mb-10 max-w-xl font-light leading-relaxed">
-                {t('catalog.heritage_desc')}
-              </p>
-              <div>
-                <button 
-                  onClick={() => onSelectCollection?.('Semana Santa')} 
-                  className="bg-wheat-500 text-textilemagenta-900 px-12 py-5 rounded-full font-bold hover:bg-white transition-all transform hover:-translate-y-1 shadow-2xl"
-                >
-                  {t('catalog.heritage_cta')}
-                </button>
-              </div>
-            </div>
-            <div className="md:w-1/2 w-full h-[400px] md:h-auto relative overflow-hidden">
-              <img 
-                src="/images/semanasanta.webp" 
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100" 
-                alt="Semana Santa Contumazá Real"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent via-textilemagenta-900/60 to-textilemagenta-900"></div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Banner de Campaña Secundaria: Herencia Viva */}
-      {!activeCollection && (
+      {!activeCategory && (
         <div className="bg-stone-900 text-white overflow-hidden relative border-b-8 border-stone-800 group">
           <div className="max-w-7xl mx-auto px-8 py-20 flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="max-w-2xl">
@@ -150,51 +150,8 @@ export function HomeView({ products, categories = [], activeCategory, collection
         </div>
       )}
 
-      {/* Colecciones Showcase */}
-      {!activeCollection && collections && collections.length > 0 && (
-        <div className="bg-stone-50 py-16 border-b border-stone-100">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="mb-8 flex justify-between items-end">
-              <div>
-                <span className="text-terracotta-600 font-bold text-xs uppercase tracking-widest block mb-2">{t('catalog.collections_subtitle')}</span>
-                <h2 className="text-3xl font-serif font-bold text-stone-900">{t('catalog.collections_title')}</h2>
-              </div>
-            </div>
-            <div className="flex overflow-x-auto gap-6 pb-8 snap-x hide-scrollbar">
-              {collections.map(col => (
-                <div 
-                  key={col.id} 
-                  onClick={() => onSelectCollection?.(col.name)}
-                  className="min-w-[280px] md:min-w-[320px] bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer snap-start group border border-stone-100"
-                >
-                  <div className="aspect-[4/3] bg-stone-100 relative overflow-hidden">
-                    {col.image || col.coverImage || col.name.includes('Renacimiento') ? (
-                      <img 
-                        src={col.image || col.coverImage || (col.name.includes('Renacimiento') ? '/images/renacimiento_authentic.png' : '')} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-700" 
-                        alt={col.name}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-stone-300 font-serif text-4xl bg-stone-50">T.pe</div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <h3 className="font-bold text-lg leading-tight mb-1">{col.name}</h3>
-                    </div>
-                  </div>
-                  <div className="p-4 flex justify-between items-center text-sm">
-                    <span className="text-stone-500 line-clamp-1 flex-1 pr-4">{col.description || t('catalog.collection_default_desc')}</span>
-                    <LucideArrowRight size={16} className="text-terracotta-500 group-hover:translate-x-1 transition"/>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Reubicando Sección Impacto Social: Mayor Visibilidad antes del Catálogo */}
-      {!activeCollection && impactData && (
+      {impactData && (
         <div className="bg-ANDEANGREEN border-y-8 border-terracotta-500 text-stone-800 bg-andeangreen-50 py-24 px-4 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-andeangreen-200/20 blur-[100px] -z-0"></div>
           <div className="max-w-6xl mx-auto relative z-10">
@@ -227,7 +184,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
       )}
 
       {/* Nueva Sección: Gran Banner Herencia de Contumazá (Cinemático & Refinado) */}
-      {!activeCollection && (
+      { (
         <div className="relative h-[700px] md:h-[900px] w-full overflow-hidden flex items-center group bg-stone-900">
           {/* Fondo con Parallax y Gradiente Inteligente */}
           <div className="absolute inset-0 z-0">
@@ -306,8 +263,125 @@ export function HomeView({ products, categories = [], activeCategory, collection
         </div>
       )}
 
+      {/* NUEVA SECCIÓN: Marcador de Marcas con Propósito */}
+      {brands && brands.length > 0 && (
+        <div className="bg-stone-50 py-20 overflow-hidden border-b border-stone-100">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <span className="text-terracotta-600 font-bold text-[10px] uppercase tracking-[0.3em] mb-2 block">{t('catalog.brands_title')}</span>
+                <h2 className="text-3xl md:text-4xl font-serif font-black text-stone-900 leading-none">Identidades locales</h2>
+              </div>
+            </div>
+            
+            <div className="flex gap-8 overflow-x-auto pb-10 no-scrollbar snap-x">
+              {brands.map((brand, idx) => (
+                <div key={brand.id || idx} className="min-w-[280px] bg-white p-8 rounded-[2.5rem] border border-stone-100 shadow-sm hover:shadow-xl transition-all group snap-start cursor-pointer" onClick={() => onSearch?.(brand.brandName)}>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-stone-50 border-2 border-white shadow-md">
+                      <img 
+                        src={brand.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${brand.brandName}`} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        alt={brand.brandName}
+                      />
+                    </div>
+                    <div>
+                      <h4 className="font-serif font-black text-xl text-stone-900 leading-none mb-1">{brand.brandName}</h4>
+                      <p className="text-[10px] text-stone-400 font-bold uppercase tracking-widest">{brand.location || 'Contumazá'}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-stone-500 italic line-clamp-2 mb-6">
+                    {brand.bio || "Productor destacado de la región de Contumazá."}
+                  </p>
+                  <button className="text-andeansky-700 font-black text-[10px] uppercase tracking-widest border-b border-andeansky-100 group-hover:border-andeansky-700 transition-all pb-1">
+                    Ver Catálogo de Marca →
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div id="catalog-section" className="max-w-6xl mx-auto px-4 py-8 md:py-24 animate-in fade-in duration-700">
         
+          {/* NUEVO: Sector Explorer Bar (Navegación Territorial) */}
+          <div className="mb-20">
+            <div className="flex items-center gap-4 mb-10">
+              <span className="h-[1px] w-12 bg-stone-200"></span>
+              <span className="text-stone-400 font-bold text-[10px] uppercase tracking-[0.4em]">{t('catalog.explore_sectors')}</span>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Opción Todos */}
+              <button 
+                onClick={() => { onSelectSector?.(null); onSelectCategory?.('Todos'); onSearch?.(''); }}
+                className={`group p-8 rounded-[2.5rem] border-2 transition-all duration-500 flex flex-col items-center text-center relative overflow-hidden ${!activeSector ? 'bg-stone-900 border-stone-900 shadow-2xl scale-105' : 'bg-white border-stone-50 hover:border-stone-200 shadow-sm'}`}
+              >
+                {!activeSector && <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -mr-12 -mt-12 animate-pulse" />}
+                <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-5 transition-all duration-500 ${!activeSector ? 'bg-white/10 text-white shadow-inner' : 'bg-stone-50 text-stone-300 group-hover:text-stone-900 group-hover:bg-stone-100'}`}>
+                  <IconTodos className="w-10 h-10" color={!activeSector ? '#FFF' : '#A8A29E'} />
+                </div>
+                <span className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${!activeSector ? 'text-white' : 'text-stone-400 group-hover:text-stone-900'}`}>{t('catalog.cat_all')}</span>
+              </button>
+              
+              {sectors.map(sec => {
+                const isActive = activeSector?.toLowerCase() === sec.id?.toLowerCase() || activeSector === sec.name;
+                
+                // Mapeo serio de Colores (Sincronizado con Admin SectorManager)
+                const getSectorHex = (colorName) => {
+                  const map = {
+                    'stone': '#57534e',   // Stone-600
+                    'orange': '#ea580c',  // Orange-600
+                    'purple': '#9333ea',  // Purple-600
+                    'emerald': '#059669', // Emerald-600
+                    'blue': '#2563eb',    // Blue-600
+                    'rose': '#e11d48',    // Rose-600
+                    'terracotta': '#a32a18' // Especial: Color de Marca Base
+                  };
+                  // Si el color ya es un Hexadecimal (empieza con #), lo usamos directamente
+                  if (colorName?.startsWith('#')) return colorName;
+                  return map[colorName?.toLowerCase()] || '#8b5e3c';
+                };
+
+                const currentHex = getSectorHex(sec.color);
+
+                // Mapeo serio de Iconos Territoriales (Súper Robusto)
+                const getTerritorialIcon = (secName) => {
+                  const normalizedName = (secName || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                  const iconColor = isActive ? currentHex : '#A8A29E';
+                  
+                  if (normalizedName.includes('artesania') || normalizedName.includes('tejido')) 
+                    return <IconArtesania className="w-10 h-10" color={iconColor} />;
+                  if (normalizedName.includes('alimento') || normalizedName.includes('agro') || normalizedName.includes('dulce') || normalizedName.includes('miel')) 
+                    return <IconAlimentos className="w-10 h-10" color={iconColor} />;
+                  if (normalizedName.includes('turismo') || normalizedName.includes('hotel') || normalizedName.includes('viaje')) 
+                    return <IconTurismo className="w-10 h-10" color={iconColor} />;
+                    
+                  return sec.icon || '📦';
+                };
+
+                return (
+                  <button 
+                    key={sec.id}
+                    onClick={() => { onSelectSector?.(sec.id); onSelectCategory?.('Todos'); onSearch?.(''); }}
+                    className={`group p-8 rounded-[2.5rem] border-2 transition-all duration-500 flex flex-col items-center text-center relative overflow-hidden ${isActive ? 'bg-white shadow-2xl scale-105 ring-4 ring-stone-900/5' : 'bg-white border-stone-50 hover:border-stone-200 shadow-sm'}`}
+                    style={{ borderColor: isActive ? currentHex : '' }}
+                  >
+                    {isActive && <div className="absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 opacity-5" style={{ backgroundColor: currentHex }} />}
+                    <div 
+                      className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-5 transition-all duration-500 ${isActive ? 'shadow-lg scale-110' : 'bg-stone-50 text-stone-300 group-hover:text-stone-900'}`}
+                      style={{ backgroundColor: isActive ? `${currentHex}20` : '' }}
+                    >
+                      {getTerritorialIcon(sec.name)}
+                    </div>
+                    <span className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${isActive ? 'text-stone-900' : 'text-stone-400 group-hover:text-stone-900'}`}>{sec.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
         {/* Barra de Búsqueda y Navegación de Catálogo */}
         <div className="mb-12 border-b border-stone-100 pb-8">
            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -332,17 +406,17 @@ export function HomeView({ products, categories = [], activeCategory, collection
               <div className="flex items-center gap-2 overflow-x-auto pb-2 w-full md:w-auto scrollbar-hide">
                  <span className="text-[10px] text-stone-400 font-bold uppercase tracking-widest mr-2 whitespace-nowrap">{t('catalog.categories_label')}</span>
                  <button 
-                    onClick={() => { onSearch?.(''); onSelectCategory?.('Todos'); onSelectCollection?.(null); }} 
-                    className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${activeCategory === 'Todos' && !activeCollection ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
+                    onClick={() => { onSearch?.(''); onSelectCategory?.('Todos'); }} 
+                    className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${activeCategory === 'Todos' ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
                  >
                     {t('catalog.cat_all')}
                  </button>
-                 {categories.map(cat => {
-                   const isActive = cat.name?.toString().trim().toLowerCase() === activeCategory?.toString().trim().toLowerCase() && !activeCollection;
+                 {categories.filter(cat => !activeSector || cat.sector === activeSector || cat.sector?.toLowerCase() === activeSector.toLowerCase()).map(cat => {
+                   const isActive = cat.name?.toString().trim().toLowerCase() === activeCategory?.toString().trim().toLowerCase();
                    return (
                      <button 
                        key={cat.id} 
-                       onClick={() => { onSearch?.(''); onSelectCategory?.(cat.name); onSelectCollection?.(null); }} 
+                       onClick={() => { onSearch?.(''); onSelectCategory?.(cat.name); }} 
                        className={`px-5 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap ${isActive ? 'bg-stone-900 text-white shadow-lg' : 'bg-white text-stone-500 border border-stone-100 hover:border-stone-900 hover:text-stone-900'}`}
                      >
                        {cat.name}
@@ -354,7 +428,7 @@ export function HomeView({ products, categories = [], activeCategory, collection
         </div>
         
         {/* Indicadores de Filtros Aplicados (Pills) */}
-        {(activeCategory !== 'Todos' || activeCol || searchTerm) && (
+        {(activeCategory !== 'Todos' || searchTerm) && (
           <div className="flex flex-wrap items-center gap-3 mb-8 animate-in slide-in-from-left duration-500">
             <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mr-2">{t('catalog.filters_label')}</span>
             
@@ -362,15 +436,6 @@ export function HomeView({ products, categories = [], activeCategory, collection
               <div className="flex items-center gap-2 bg-stone-100 text-stone-800 px-4 py-2 rounded-full text-xs font-bold border border-stone-200">
                 <span className="text-stone-400 uppercase text-[9px] mr-1 font-black">{t('catalog.filter_category')}</span> {activeCategory}
                 <button onClick={() => onSelectCategory?.('Todos')} className="hover:text-terracotta-600 transition-colors ml-1">
-                  <LucideX size={14} />
-                </button>
-              </div>
-            )}
-            
-            {activeCol && (
-              <div className="flex items-center gap-2 bg-andeansky-50 text-andeansky-900 px-4 py-2 rounded-full text-xs font-bold border border-andeansky-100">
-                <span className="text-andeansky-400 uppercase text-[9px] mr-1 font-black">{t('catalog.filter_collection')}</span> {activeCol.name}
-                <button onClick={() => onSelectCollection?.(null)} className="hover:text-terracotta-600 transition-colors ml-1">
                   <LucideX size={14} />
                 </button>
               </div>
@@ -385,9 +450,9 @@ export function HomeView({ products, categories = [], activeCategory, collection
               </div>
             )}
             
-            {(activeCategory !== 'Todos' || activeCol || searchTerm) && (
+            {(activeCategory !== 'Todos' || searchTerm) && (
               <button 
-                onClick={() => { onSelectCategory?.('Todos'); onSelectCollection?.(null); onSearch?.(''); }}
+                onClick={() => { onSelectCategory?.('Todos'); onSearch?.(''); }}
                 className="text-[10px] font-bold text-terracotta-600 uppercase tracking-widest hover:underline ml-2"
               >
                 {t('catalog.clear_all')}
@@ -398,22 +463,21 @@ export function HomeView({ products, categories = [], activeCategory, collection
 
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-8">
           <div>
-            {activeCol || searchTerm ? (
+            {searchTerm ? (
               <div className="space-y-4">
                 <nav className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-stone-400">
-                  <button onClick={() => { onSelectCollection?.(null); onSearch?.(''); }} className="hover:text-terracotta-600 transition-colors">Catálogo</button>
+                  <button onClick={() => { onSearch?.(''); }} className="hover:text-terracotta-600 transition-colors">Catálogo</button>
                   <LucideArrowRight size={10} className="rotate-0" />
                   <span className="text-stone-900">
-                    {searchTerm ? `Resultados para: "${searchTerm}"` : `Colección: ${activeCol?.name}`}
+                    Resultados para: "{searchTerm}"
                   </span>
                 </nav>
                 <div className="flex items-baseline gap-4">
                    <h2 className="text-4xl md:text-5xl font-serif font-black text-stone-900 tracking-tight">
-                     {searchTerm ? 'Búsqueda' : activeCol?.name}
+                     Búsqueda
                    </h2>
                    <span className="text-sm font-bold text-stone-400 italic">({filteredProducts.length} {filteredProducts.length === 1 ? 'piezaúnica' : 'piezas'})</span>
                 </div>
-                {activeCol && <p className="text-stone-500 max-w-2xl font-light italic text-lg leading-relaxed">{activeCol.description || 'Una selección de piezas exclusivas tejidas con alma por nuestras maestras artesanas.'}</p>}
               </div>
             ) : (
               <>
@@ -426,9 +490,9 @@ export function HomeView({ products, categories = [], activeCategory, collection
             )}
           </div>
           
-          {(activeCol || searchTerm) && (
+          {searchTerm && (
             <button 
-               onClick={() => { onSelectCollection?.(null); onSearch?.(''); }}
+               onClick={() => { onSearch?.(''); }}
                className="bg-stone-900 text-white px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-terracotta-600 transition-all shadow-xl shadow-stone-900/10 transform active:scale-95 group"
             >
                <LucideX size={18} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -460,6 +524,8 @@ export function HomeView({ products, categories = [], activeCategory, collection
                     <p className="text-[10px] text-stone-400 font-bold uppercase tracking-[0.2em] flex items-center gap-2">
                        <span className="w-1.5 h-1.5 bg-terracotta-500 rounded-full"></span>
                        {p.sellerName || t('catalog.artisan_default')}
+                       {p.brandName && <span className="text-stone-300 mx-1">/</span>}
+                       {p.brandName && <span className="text-stone-600 font-black">{p.brandName}</span>}
                        <span className="ml-auto flex items-center gap-1 text-[8px] text-andeangreen-600 font-black px-2 py-0.5 bg-andeangreen-50 rounded-full border border-andeangreen-100">
                           <LucideHeart size={8} className="fill-andeangreen-600"/> {t('impact.fair_trade_badge') || 'JUSTO'}
                        </span>
@@ -479,23 +545,33 @@ export function HomeView({ products, categories = [], activeCategory, collection
           </div>
         ) : (
           <div className="py-32 flex flex-col items-center text-center animate-in fade-in zoom-in duration-700">
-            <div className="w-24 h-24 bg-stone-100 rounded-[2rem] flex items-center justify-center text-stone-300 mb-8 transform -rotate-6">
-               <LucidePlus size={48} className="rotate-45" />
+            <div className="w-32 h-32 bg-stone-50 rounded-[3rem] flex items-center justify-center mb-8 transform -rotate-6 shadow-inner border border-stone-100">
+               <div className="text-stone-400 opacity-20">
+                 {(() => {
+                   const sec = sectors.find(s => s.id === activeSector || s.name === activeSector);
+                   const normalizedName = (sec?.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                   const colorFallback = '#A8A29E';
+                   if (normalizedName.includes('artesania')) return <IconArtesania className="w-24 h-24" color={colorFallback} />;
+                   if (normalizedName.includes('alimento') || normalizedName.includes('agro')) return <IconAlimentos className="w-24 h-24" color={colorFallback} />;
+                   if (normalizedName.includes('turismo') || normalizedName.includes('hotel')) return <IconTurismo className="w-24 h-24" color={colorFallback} />;
+                   return <LucidePlus size={64} strokeWidth={1} />;
+                 })()}
+               </div>
             </div>
-            <h3 className="text-3xl font-serif font-black text-stone-900 mb-4 italic">
-              {searchTerm ? `${t('catalog.no_search')} "${searchTerm}"` : t('catalog.future')}
+            <h3 className="text-4xl font-serif font-black text-stone-900 mb-4 tracking-tighter">
+              {searchTerm ? `${t('catalog.no_search')} "${searchTerm}"` : t('catalog.coming_soon')}
             </h3>
-            <p className="text-stone-500 max-w-md mb-10 font-light text-lg">
+            <p className="text-stone-400 max-w-sm mb-12 font-light text-xl leading-relaxed italic">
               {searchTerm 
-                ? 'Intenta con términos más generales como "mantel", "mesa" o busca el nombre de una artesana.' 
-                : 'Estamos tejiendo nuevas piezas para esta colección especial. Mientras tanto, te invitamos a explorar nuestra curaduría completa.'}
+                ? 'Intenta con términos más generales como "miel", "mermelada" o busca el nombre de una marca.' 
+                : t('catalog.coming_soon_desc')}
             </p>
             <button 
-              onClick={() => { onSelectCollection?.(null); onSearch?.(''); }}
-              className="bg-stone-900 text-white px-12 py-5 rounded-full font-bold hover:bg-terracotta-600 transition-all shadow-2xl flex items-center gap-4 group"
+              onClick={() => { onSelectSector?.(null); onSelectCollection?.(null); onSearch?.(''); }}
+              className="bg-stone-900 text-white px-14 py-6 rounded-full font-bold hover:bg-terracotta-600 transition-all shadow-2xl flex items-center gap-4 group text-lg"
             >
-              {searchTerm ? 'Limpiar Búsqueda' : 'Ver Todo el Catálogo'}
-              <LucideArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+              {searchTerm ? 'Limpiar Búsqueda' : 'Ver otros tesoros'}
+              <LucideArrowRight size={24} className="group-hover:translate-x-3 transition-transform" />
             </button>
           </div>
         )}

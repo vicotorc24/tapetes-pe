@@ -111,8 +111,8 @@ export default function AdminDashboard() {
       const currentSectors = await getSectors();
       if (currentSectors.length === 0) {
         const defaults = [
-          { id: 'textile', name: 'Artesanía', icon: '🧶', color: 'purple', description: 'Artesanía local y tejidos tradicionales.' },
-          { id: 'food', name: 'Alimentos / Agro', icon: '🐝', color: 'orange', description: 'Miel, granos y productos del campo.' }
+          { name: 'Artesanía', icon: '🧶', color: 'purple', description: 'Artesanía local y tejidos tradicionales.', fields: [] },
+          { name: 'Alimentos / Agro', icon: '🐝', color: 'orange', description: 'Miel, granos y productos del campo.', fields: [] }
         ];
         for (const s of defaults) {
           await addSector(s, effectiveUser);
@@ -144,10 +144,10 @@ export default function AdminDashboard() {
     setInfoModal('loading');
     try {
       await addCategory(data);
-      const data = await getCategories();
-      setCategoriesData(data);
+      const updated = await getCategories();
+      setCategoriesData(updated);
       setInfoMessage('Categoría agregada con éxito.');
-      logAction(effectiveUser, `Creó la categoría "${name}"`, 'Catálogo', 'success');
+      logAction(effectiveUser, `Creó la categoría "${data.name}"`, 'Catálogo', 'success');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -341,7 +341,7 @@ export default function AdminDashboard() {
                onUpdate={handleUpdateCategory}
                onDelete={handleDeleteCategory}
                onReorder={handleReorderCategories}
-               setFeedback={setFeedback}
+               setFeedback={handleFeedback}
              />
           )}
           {dashboardView === 'sectors' && effectiveUser.role === 'superadmin' && (
@@ -350,7 +350,7 @@ export default function AdminDashboard() {
                 onAdd={handleAddSector}
                 onUpdate={handleUpdateSector}
                 onDelete={handleDeleteSector}
-                setFeedback={setFeedback}
+                setFeedback={handleFeedback}
              />
           )}
           {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (

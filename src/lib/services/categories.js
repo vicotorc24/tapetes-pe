@@ -7,8 +7,8 @@ export const getCategories = async () => {
   const q = query(collection(db, COLLECTION_NAME));
   const snapshot = await getDocs(q);
   const data = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+    ...doc.data(),
+    id: doc.id
   }));
   
   // Ordenar en memoria para no excluir documentos sin el campo 'order'

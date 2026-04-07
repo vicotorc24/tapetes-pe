@@ -36,9 +36,15 @@ export function ProductManager({ products, setProducts, categories, collections,
     ingredients: '',
     registroSanitario: '',
     sellerEmail: '',
-    sellerName: '',
     attributes: {} // For dynamic sector fields
   });
+
+  // Ayudante para encontrar el sector de forma robusta (soporta IDs antiguos y nuevos)
+  const currentSector = useMemo(() => {
+    if (!formData.sector) return null;
+    return sectors.find(s => s.id === formData.sector) || 
+           sectors.find(s => (s.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(formData.sector.toLowerCase()));
+  }, [formData.sector, sectors]);
   
   const STITCH_OPTIONS = [
     { id: 'jersey', name: 'Punto Jersey', desc: 'Clásico del tejido a dos agujas.' },
@@ -265,14 +271,7 @@ export function ProductManager({ products, setProducts, categories, collections,
                 <input required type="number" className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Colección Oficial</label>
-              <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none appearance-none" value={formData.collection} onChange={e => setFormData({...formData, collection: e.target.value})}>
-                <option value="">(Ninguna)</option>
-                {collections.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-              </select>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Dimensiones / Medidas</label>
               <input className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.dimensions} onChange={e => setFormData({...formData, dimensions: e.target.value})} placeholder="Ej: 40cm x 40cm" />
@@ -281,12 +280,101 @@ export function ProductManager({ products, setProducts, categories, collections,
 
           <div className="bg-stone-50/50 p-6 rounded-3xl border border-stone-100 space-y-6">
             <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-4">
-              {sectors.find(s => s.id === formData.sector)?.name || 'Detalles de Producción'}
+              {currentSector?.name || 'Detalles de Producción'}
             </h4>
-            
-            {/* 1. Campos de Schema Dinámicos */}
+
+            {/* 1. Campos Legacy (Base) - Siempre visibles en sus respectivos rubros */}
+            {(currentSector?.name?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes('artesania') || formData.sector === 'textile') ? (
+              <>
+                <div className="grid grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Materiales</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.materials} onChange={e => setFormData({...formData, materials: e.target.value})} placeholder="Ej: Lana de ovino" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Técnica</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.technique} onChange={e => setFormData({...formData, technique: e.target.value})} placeholder="Ej: Telar de cintura" />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-stone-100">
+                  <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {STITCH_OPTIONS.map(opt => {
+                      const isSelected = (formData.stitchType || []).includes(opt.name);
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
+                            const next = isSelected 
+                              ? current.filter(s => s !== opt.name)
+                              : [...current, opt.name];
+                            setFormData({ ...formData, stitchType: next });
+                          }}
+                          className={`p-2 rounded-lg border text-left transition-all text-[10px] font-bold ${
+                            isSelected ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-white border-stone-100 text-stone-600 hover:border-stone-200'
+                          }`}
+                        >
+                          {opt.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (currentSector?.name?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes('alimento') || currentSector?.name?.toLowerCase().includes('agro') || formData.sector === 'food') ? (
+              <>
+                <div className="grid grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Contenido / Peso</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none font-medium" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} placeholder="Ej: 500g, 1 Litro" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Fecha de Cosecha / Prod.</label>
+                    <input type="date" className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none text-sm font-medium" value={formData.harvestDate} onChange={e => setFormData({...formData, harvestDate: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Fecha de Vencimiento (Aprox)</label>
+                    <input type="date" className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none text-sm font-medium" value={formData.expirationDate} onChange={e => setFormData({...formData, expirationDate: e.target.value})} />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-stone-100 mt-4">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div>
+                      <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2 font-sans">Ingredientes / Insumos</label>
+                      <textarea 
+                        className="w-full p-4 bg-white border border-stone-200 rounded-2xl outline-none focus:ring-4 focus:ring-orange-50 focus:border-orange-200 transition-all text-sm resize-none h-24 font-sans leading-relaxed" 
+                        value={formData.ingredients} 
+                        onChange={e => setFormData({...formData, ingredients: e.target.value})} 
+                        placeholder="Ej: Miel de abeja 100% pura, extractos naturales de flores..." 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1 font-sans">Registro Sanitario (Si aplica)</label>
+                      <input 
+                        className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none text-xs font-bold text-stone-600 focus:border-orange-200 transition-all" 
+                        value={formData.registroSanitario} 
+                        onChange={e => setFormData({...formData, registroSanitario: e.target.value})} 
+                        placeholder="Ej: RSA-0000-X-XXXX" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
+
+            {/* Separador visual opcional si hay campos dinámicos */}
+            {currentSector?.fields?.length > 0 && (
+              <div className="pt-8 border-t border-stone-100 mt-8">
+                <h5 className="text-[9px] font-black text-stone-300 uppercase tracking-[0.3em] mb-6">Detalles Complementarios</h5>
+              </div>
+            )}
+
+            {/* 2. Campos de Schema Dinámicos (Accesorios) */}
             {(() => {
-              const currentSector = sectors.find(s => s.id === formData.sector);
               if (!currentSector || !currentSector.fields || currentSector.fields.length === 0) return null;
               
               return (
@@ -336,91 +424,6 @@ export function ProductManager({ products, setProducts, categories, collections,
                 </div>
               );
             })()}
-
-            {/* 2. Campos Legacy (Textile/Food) solo si no hay schema definido */}
-            {(!sectors.find(s => s.id === formData.sector)?.fields || sectors.find(s => s.id === formData.sector)?.fields.length === 0) && (
-              formData.sector === 'textile' ? (
-              <>
-                <div className="grid grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
-                  <div>
-                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Materiales</label>
-                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.materials} onChange={e => setFormData({...formData, materials: e.target.value})} placeholder="Ej: Lana de ovino" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Técnica</label>
-                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.technique} onChange={e => setFormData({...formData, technique: e.target.value})} placeholder="Ej: Telar de cintura" />
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-stone-100">
-                  <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {STITCH_OPTIONS.map(opt => {
-                      const isSelected = (formData.stitchType || []).includes(opt.name);
-                      return (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => {
-                            const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
-                            const next = isSelected 
-                              ? current.filter(s => s !== opt.name)
-                              : [...current, opt.name];
-                            setFormData({ ...formData, stitchType: next });
-                          }}
-                          className={`p-2 rounded-lg border text-left transition-all text-[10px] font-bold ${
-                            isSelected ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-white border-stone-100 text-stone-600 hover:border-stone-200'
-                          }`}
-                        >
-                          {opt.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
-                  <div>
-                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Contenido / Peso</label>
-                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none font-medium" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} placeholder="Ej: 500g, 1 Litro" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Fecha de Cosecha / Prod.</label>
-                    <input type="date" className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none text-sm font-medium" value={formData.harvestDate} onChange={e => setFormData({...formData, harvestDate: e.target.value})} />
-                  </div>
-                  <div>
-                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Fecha de Vencimiento (Aprox)</label>
-                    <input type="date" className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none text-sm font-medium" value={formData.expirationDate} onChange={e => setFormData({...formData, expirationDate: e.target.value})} />
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-stone-100 mt-4">
-                  <div className="grid grid-cols-1 gap-6">
-                    <div>
-                      <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-2 font-sans">Ingredientes / Insumos</label>
-                      <textarea 
-                        className="w-full p-4 bg-white border border-stone-200 rounded-2xl outline-none focus:ring-4 focus:ring-orange-50 focus:border-orange-200 transition-all text-sm resize-none h-24 font-sans leading-relaxed" 
-                        value={formData.ingredients} 
-                        onChange={e => setFormData({...formData, ingredients: e.target.value})} 
-                        placeholder="Ej: Miel de abeja 100% pura, extractos naturales de flores..." 
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest block mb-1 font-sans">Registro Sanitario (Si aplica)</label>
-                      <input 
-                        className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none text-xs font-bold text-stone-600 focus:border-orange-200 transition-all" 
-                        value={formData.registroSanitario} 
-                        onChange={e => setFormData({...formData, registroSanitario: e.target.value})} 
-                        placeholder="Ej: RSA-0000-X-XXXX" 
-                      />
-                    </div>
-                  </div>
-                </div>
-              </>
-              )
-            )}
           </div>
 
           <div className="space-y-4">

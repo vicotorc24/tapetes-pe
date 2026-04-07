@@ -33,8 +33,8 @@ export const getProducts = async (user = null) => {
     
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
+      ...doc.data(),
+      id: doc.id
     }));
   } catch (error) {
     console.error("Error getting products: ", error);
