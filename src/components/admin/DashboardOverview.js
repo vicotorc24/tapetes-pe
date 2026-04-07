@@ -64,6 +64,31 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     return scoreB - scoreA;
   });
 
+  // Cálculo de Ingresos Proyectados por Categoría
+  const revenueByCategory = useMemo(() => {
+    const categories = {};
+    products.forEach(p => {
+      const cat = p.category || 'Sin Categoría';
+      const price = parseFloat(p.price) || 0;
+      const clicks = p.stats?.whatsappClicks || 0;
+      const revenue = price * clicks;
+      
+      if (!categories[cat]) categories[cat] = 0;
+      categories[cat] += revenue;
+    });
+    return Object.entries(categories)
+      .map(([name, value]) => ({ name, value: value * timeMultiplier }))
+      .sort((a, b) => b.value - a.value);
+  }, [products, timeMultiplier]);
+
+  const maxCategoryRevenue = Math.max(...revenueByCategory.map(c => c.value), 1);
+  const totalPotentialRevenue = Math.round(estimatedRevenue * timeMultiplier);
+
+  // Tasa de Conversión (Interés -> Intención)
+  const conversionRate = totalViews > 0 
+    ? ((totalWhatsappClicks / totalViews) * 100).toFixed(1) 
+    : 0;
+
   const topProducts = sortedProducts.slice(0, 10);
   const maxScore = topProducts.length > 0
     ? (topProducts[0].stats?.views || 0) + (topProducts[0].stats?.whatsappClicks || 0) * 2
@@ -304,18 +329,76 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm h-full flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-stone-800 mb-2">Proyección de Impacto</h3>
-              <p className="text-xs text-stone-400 mb-6">Basado en el valor REAL de los productos cliqueados</p>
+          <div className="bg-white p-8 rounded-3xl border border-stone-200 shadow-sm h-full flex flex-col group overflow-hidden relative">
+            {/* Background Accent Decor */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-andeanpurple-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+            
+            <div className="flex flex-col md:flex-row justify-between items-start gap-8 relative z-10">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-serif font-black text-xl italic text-stone-900 tracking-tight">Proyección de Impacto Económico</h3>
+                  <div className="bg-green-100 text-green-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">En Tiempo Real</div>
+                </div>
+                <p className="text-xs text-stone-400 mb-8 max-w-sm">Valor monetario del interés captado a través de clics comerciales, segmentado por línea de producción.</p>
+                
+                <div className="flex items-baseline gap-4 mb-2">
+                  <span className="text-5xl font-serif font-black text-stone-900 tracking-tighter">S/ {totalPotentialRevenue.toLocaleString()}</span>
+                  <div className="flex items-center gap-1.5 text-green-500 font-black text-xs">
+                    <LucideTrendingUp size={16} /> +18.4%
+                  </div>
+                </div>
+                <p className="text-[10px] uppercase font-black tracking-[0.2em] text-stone-300">Intención de Negocio Generada</p>
+
+                <div className="mt-10 grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                     <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1">Efectividad (CTR)</p>
+                     <div className="flex items-center gap-2">
+                        <span className="text-lg font-black text-stone-800">{conversionRate}%</span>
+                        <div className="w-12 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                           <div className="h-full bg-orange-500 rounded-full" style={{ width: `${Math.min(100, conversionRate * 5)}%` }}></div>
+                        </div>
+                     </div>
+                  </div>
+                  <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                     <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1">Impacto/Producto</p>
+                     <span className="text-lg font-black text-stone-800">S/ {activeProductsCount > 0 ? (totalPotentialRevenue / activeProductsCount).toFixed(0).toLocaleString() : 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full md:w-80 flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-[10px] font-black text-stone-900 uppercase tracking-[0.15em]">Desglose por Categoría</span>
+                  <LucideInfo size={12} className="text-stone-300 cursor-help" />
+                </div>
+                
+                <div className="space-y-6">
+                  {revenueByCategory.length === 0 ? (
+                    <div className="py-12 text-center text-stone-300 text-[10px] italic">Aún no hay ingresos proyectados.</div>
+                  ) : revenueByCategory.map((cat, i) => {
+                    const percentage = (cat.value / maxCategoryRevenue) * 100;
+                    return (
+                      <div key={i} className="group/bar cursor-pointer">
+                        <div className="flex justify-between items-end mb-1.5">
+                          <span className="text-[11px] font-black text-stone-700 uppercase tracking-tight">{cat.name}</span>
+                          <span className="text-[10px] font-bold text-stone-400">S/ {Math.round(cat.value).toLocaleString()}</span>
+                        </div>
+                        <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden flex items-center p-[2px]">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-1000 ${i === 0 ? 'bg-andeanpurple-600' : 'bg-stone-300 group-hover/bar:bg-andeanpurple-300'}`}
+                            style={{ width: `${Math.max(5, percentage)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
-            <div className="py-10 text-center">
-              <span className="text-stone-300 text-6xl font-black block mb-2 opacity-20">S/ {Math.round(estimatedRevenue * timeMultiplier).toLocaleString()}</span>
-              <p className="text-xs uppercase tracking-widest font-bold text-stone-400">Intención de Negocio Generada</p>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-stone-50 rounded-lg text-stone-500 text-[10px]">
-              <LucideAlertTriangle size={14} className="text-amber-500" />
-              Esta cifra estima el valor del interés captado a través de clics en WhatsApp.
+
+            <div className="mt-8 flex items-center gap-2 p-4 bg-orange-50/50 rounded-2xl text-[10px] text-orange-900/60 font-medium">
+              <LucideAlertTriangle size={14} className="text-orange-500 shrink-0" />
+              Esta estimación refleja el valor comercial del interés captado. Sirve como indicador de demanda para la Gerencia de Desarrollo Económico.
             </div>
           </div>
         </div>

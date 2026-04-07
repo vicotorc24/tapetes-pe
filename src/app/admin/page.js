@@ -281,8 +281,11 @@ export default function AdminDashboard() {
           {dashboardView === 'categories' && (
              <CategoryManager 
                categories={categoriesData} 
+               products={products}
                onAdd={handleAddCategory} 
                onDelete={handleDeleteCategory}
+               onReorder={handleReorderCategories}
+               setFeedback={setFeedback}
              />
           )}
           {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (
@@ -299,6 +302,7 @@ export default function AdminDashboard() {
           {dashboardView === 'collections' && (
              <CollectionManager 
                 collections={collectionsData}
+                products={products}
                 onAdd={addCollection}
                 onUpdate={updateCollection}
                 onDelete={deleteCollection}
