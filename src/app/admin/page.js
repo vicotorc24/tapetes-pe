@@ -296,6 +296,9 @@ export default function AdminDashboard() {
           {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
              <ImpactManager setFeedback={handleFeedback} />
           )}
+          {dashboardView === 'legacy' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
+             <LegacyManager setFeedback={handleFeedback} />
+          )}
           {dashboardView === 'audit' && effectiveUser.role === 'superadmin' && (
              <AuditLogManager />
           )}
