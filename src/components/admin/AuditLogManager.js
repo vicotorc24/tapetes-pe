@@ -146,17 +146,17 @@ export function AuditLogManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl">
           <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Total Actividad</p>
-          <p className="text-3xl font-black text-blue-900 leading-none mb-2">1,284</p>
-          <p className="text-xs text-blue-600 font-medium">Últimos 30 días</p>
+          <p className="text-3xl font-black text-blue-900 leading-none mb-2">{logs.length}</p>
+          <p className="text-xs text-blue-600 font-medium">Registros en esta vista</p>
         </div>
         <div className="bg-amber-50 border border-amber-100 p-6 rounded-2xl">
           <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-1">Alertas Generadas</p>
-          <p className="text-3xl font-black text-amber-900 leading-none mb-2">12</p>
+          <p className="text-3xl font-black text-amber-900 leading-none mb-2">{logs.filter(l => l.level === 'warning').length}</p>
           <p className="text-xs text-amber-600 font-medium italic">Acciones Críticas Registradas</p>
         </div>
         <div className="bg-green-50 border border-green-100 p-6 rounded-2xl">
           <p className="text-[10px] font-black text-green-400 uppercase tracking-widest mb-1">Integridad</p>
-          <p className="text-3xl font-black text-green-900 leading-none mb-2">100%</p>
+          <p className="text-3xl font-black text-green-900 leading-none mb-2">{loading ? '...' : '100%'}</p>
           <p className="text-xs text-green-600 font-medium uppercase tracking-tighter">🔒 Inmutabilidad Activa</p>
         </div>
       </div>

@@ -22,7 +22,7 @@ import Link from 'next/link';
 import { getProductById } from '@/lib/services/products';
 import { getUserByEmail } from '@/lib/services/users';
 import { AnalyticsEvents } from '@/lib/analytics';
-import { recordProfileView, recordWhatsappClick } from '@/lib/services/interactions';
+import { recordWhatsappClick } from '@/lib/services/interactions';
 
 export default function ProductPage({ params }) {
   const { addToCart } = useCart();
@@ -79,7 +79,6 @@ export default function ProductPage({ params }) {
   // Registro de Visita de Perfil de Artesana
   useEffect(() => {
     if (artisan?.id) {
-      recordProfileView(artisan.id);
       AnalyticsEvents.PROFILE_VIEW(artisan);
     }
   }, [artisan?.id]);
