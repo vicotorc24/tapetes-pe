@@ -22,7 +22,6 @@ import Link from 'next/link';
 import { getProductById } from '@/lib/services/products';
 import { getUserByEmail } from '@/lib/services/users';
 import { AnalyticsEvents } from '@/lib/analytics';
-import { recordWhatsappClick } from '@/lib/services/interactions';
 
 export default function ProductPage({ params }) {
   const { addToCart } = useCart();
@@ -86,7 +85,6 @@ export default function ProductPage({ params }) {
   const handleWhatsappAction = () => {
     if (product && artisan) {
       AnalyticsEvents.WHATSAPP_CLICK(product, artisan);
-      if (artisan.id) recordWhatsappClick(artisan.id);
     }
   };
 
