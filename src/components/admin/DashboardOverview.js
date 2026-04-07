@@ -5,6 +5,7 @@ import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTri
 import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { subscribeToLogs } from '../../lib/services/audit';
+import { CONFIG } from '@/lib/config';
 
 export function DashboardOverview({ products: allProducts, user, users = [], setView, refreshData, isRefreshing }) {
   const [logs, setLogs] = useState([]);
@@ -15,20 +16,28 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     return () => unsubscribe();
   }, []);
 
-  // Métricas de Impacto Social & Legado Cultural
+  // 1. Filtramos los productos según el rol del usuario para que el dashboard sea personal
+  // Definido al inicio para evitar ReferenceError en los hooks subsiguientes
+  const products = user.role === 'superadmin'
+    ? allProducts
+    : allProducts.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
+
+  // Métricas de Impacto Social & Desarrollo Económico
   const impactMetrics = useMemo(() => {
-    const sellers = users.filter(u => u.role === 'seller');
+    const sellers = users.filter(u => u.role === 'seller' || u.role === 'artisan');
+    const foodProducers = products.filter(p => p.sector === 'food' && p.sellerEmail).length;
     const stitches = [...new Set(allProducts.flatMap(p => p.stitchType || []))];
     const totalLaborDays = allProducts.reduce((acc, p) => acc + (parseInt(p.laborDays) || 0), 0);
     const locations = [...new Set(sellers.map(u => u.location).filter(Boolean))];
 
     return {
       familias: sellers.length,
-      tecnicas: stitches.length || 3, // Fallback a 3 técnicas base para la demo si el catálogo está vacío
+      productoresAgro: foodProducers,
+      tecnicas: stitches.length || 3,
       laborDays: totalLaborDays,
-      comunidades: locations.length || 5 // Fallback a 5 barrios para la demo
+      comunidades: locations.length || 5
     };
-  }, [allProducts, users]);
+  }, [allProducts, products, users]);
 
   // Multiplicadores simulados para la demo (reaccionando al tiempo)
   const timeMultiplier = useMemo(() => {
@@ -37,11 +46,6 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     if (timeRange === 'month') return 0.65;
     return 1;
   }, [timeRange]);
-
-  // Filtramos los productos según el rol del usuario para que el dashboard sea personal
-  const products = user.role === 'superadmin'
-    ? allProducts
-    : allProducts.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
 
   // Cálculos reales basados en el catálogo filtrado (el del propio artesano)
   const activeProductsCount = products.length;
@@ -64,7 +68,28 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     return scoreB - scoreA;
   });
 
-  // Cálculo de Ingresos Proyectados por Categoría
+  // Cálculo de Ingresos Proyectados por Sector (Rebranding Multi-sector)
+  const revenueBySector = useMemo(() => {
+    const sectors = { 
+      textile: { name: 'Artesanía (Tejidos)', value: 0 },
+      food: { name: 'Alimentos y Agro', value: 0 }
+    };
+    
+    products.forEach(p => {
+      const sectorKey = p.sector || 'textile';
+      const price = parseFloat(p.price) || 0;
+      const clicks = p.stats?.whatsappClicks || 0;
+      const revenue = price * clicks;
+      
+      if (!sectors[sectorKey]) sectors[sectorKey] = { name: sectorKey === 'textile' ? 'Artesanía' : 'Alimentos', value: 0 };
+      sectors[sectorKey].value += revenue;
+    });
+
+    return Object.values(sectors)
+      .map(s => ({ ...s, value: s.value * timeMultiplier }))
+      .sort((a, b) => b.value - a.value);
+  }, [products, timeMultiplier]);
+
   const revenueByCategory = useMemo(() => {
     const categories = {};
     products.forEach(p => {
@@ -160,9 +185,9 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     <div className="animate-in fade-in duration-500 print:bg-white">
       <div className="flex justify-between items-center mb-8 print:mb-4">
         <div>
-          <h2 className="text-3xl font-bold text-stone-900 tracking-tight font-serif italic">Centro de Control Municipal 🏛️</h2>
+          <h2 className="text-3xl font-bold text-stone-900 tracking-tight font-serif italic">{CONFIG.BRAND.NAME} 🏛️</h2>
           <p className="text-sm text-stone-500 print:hidden">
-            Métricas estratégicas para la Gerencia de Sistemas y Desarrollo Económico
+            Centro de Control Territorial • Municipalidad de Contumazá
           </p>
           <p className="hidden print:block text-xs text-stone-400 mt-1">Generado el {new Date().toLocaleString()}</p>
         </div>
@@ -290,36 +315,36 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
             <StatCard 
               title="Familias Protegidas" 
               value={`+${impactMetrics.familias}`} 
-              label="Artesanas en Red" 
+              label="Productores en Red" 
               icon={<LucideHeart className="text-pink-500" size={20} />} 
               trend="Impacto Directo" 
               color="stone" 
               trendUp={true}
             />
             <StatCard 
-              title="Herencia Viva" 
-              value={impactMetrics.tecnicas} 
-              label="Técnicas Preservadas" 
-              icon={<LucideAward className="text-amber-500" size={20} />} 
-              trend="Legado Seguro" 
+              title="Agroindustria" 
+              value={impactMetrics.productoresAgro || 4} // Fallback para demo
+              label="Unidades Productivas" 
+              icon={<LucideShoppingBag className="text-amber-600" size={20} />} 
+              trend="Nuevos Sectores" 
               color="stone" 
               trendUp={true}
             />
             <StatCard 
               title="Desarrollo Local" 
               value={impactMetrics.comunidades} 
-              label="Barrios Alcanzados" 
+              label="Zonas de Origen" 
               icon={<LucideMap className="text-blue-500" size={20} />} 
               trend="Territorial" 
               color="stone" 
               trendUp={true}
             />
             <StatCard 
-              title="Labor Tradicional" 
+              title="Labor Revalorizada" 
               value={`${Math.round(impactMetrics.laborDays * timeMultiplier)}`} 
-              label="Días de Trabajo" 
+              label="Días de Producción" 
               icon={<LucideHistory className="text-purple-500" size={20} />} 
-              trend="Horas Hombre" 
+              trend="Valor Humano" 
               color="stone" 
               trendUp={true}
             />
@@ -368,30 +393,40 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
 
               <div className="w-full md:w-80 flex flex-col">
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-[10px] font-black text-stone-900 uppercase tracking-[0.15em]">Desglose por Categoría</span>
+                  <span className="text-[10px] font-black text-stone-900 uppercase tracking-[0.15em]">Desglose por Sector</span>
                   <LucideInfo size={12} className="text-stone-300 cursor-help" />
                 </div>
                 
                 <div className="space-y-6">
-                  {revenueByCategory.length === 0 ? (
-                    <div className="py-12 text-center text-stone-300 text-[10px] italic">Aún no hay ingresos proyectados.</div>
-                  ) : revenueByCategory.map((cat, i) => {
-                    const percentage = (cat.value / maxCategoryRevenue) * 100;
+                  {revenueBySector.map((sec, i) => {
+                    const percentage = (sec.value / Math.max(1, totalPotentialRevenue)) * 100;
                     return (
                       <div key={i} className="group/bar cursor-pointer">
                         <div className="flex justify-between items-end mb-1.5">
-                          <span className="text-[11px] font-black text-stone-700 uppercase tracking-tight">{cat.name}</span>
-                          <span className="text-[10px] font-bold text-stone-400">S/ {Math.round(cat.value).toLocaleString()}</span>
+                          <span className="text-[11px] font-black text-stone-700 uppercase tracking-tight">{sec.name}</span>
+                          <span className="text-[10px] font-bold text-stone-400">S/ {Math.round(sec.value).toLocaleString()}</span>
                         </div>
                         <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden flex items-center p-[2px]">
                           <div 
-                            className={`h-full rounded-full transition-all duration-1000 ${i === 0 ? 'bg-andeanpurple-600' : 'bg-stone-300 group-hover/bar:bg-andeanpurple-300'}`}
+                            className={`h-full rounded-full transition-all duration-1000 ${sec.name.includes('Artesanía') ? 'bg-andeanpurple-600' : 'bg-orange-500'}`}
                             style={{ width: `${Math.max(5, percentage)}%` }}
                           ></div>
                         </div>
                       </div>
                     )
                   })}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-stone-100">
+                  <span className="text-[10px] font-black text-stone-400 uppercase tracking-[0.15em] mb-4 block">Top Categorías</span>
+                  <div className="space-y-3">
+                    {revenueByCategory.slice(0, 3).map((cat, i) => (
+                      <div key={i} className="flex justify-between items-center text-[10px] font-bold">
+                        <span className="text-stone-500">{cat.name}</span>
+                        <span className="text-stone-900">S/ {Math.round(cat.value).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

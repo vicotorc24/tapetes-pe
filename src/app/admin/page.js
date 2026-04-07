@@ -18,12 +18,14 @@ import { InfoModal } from '@/components/ui/InfoModal';
 import { AuditLogManager } from '@/components/admin/AuditLogManager';
 import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
 import { PendingApprovalView } from '@/components/admin/PendingApprovalView';
+import { SectorManager } from '@/components/admin/SectorManager';
 
 // Services
 import { getProducts } from '@/lib/services/products';
 import { getUsers, addUser, updateUser, deleteUser } from '@/lib/services/users';
 import { getCollections, addCollection, updateCollection, deleteCollection } from '@/lib/services/collections';
 import { getCategories, addCategory, deleteCategory } from '@/lib/services/categories';
+import { getSectors, addSector, updateSector, deleteSector as deleteSectorSvc } from '@/lib/services/sectors';
 import { initialUsersData } from '@/lib/data';
 
 // Firestore Direct (for quick updates)
@@ -40,6 +42,7 @@ export default function AdminDashboard() {
   const [usersList, setUsersList] = useState([]);
   const [collectionsData, setCollectionsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([]);
+  const [sectorsData, setSectorsData] = useState([]);
   const [dashboardView, setDashboardView] = useState('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [infoModal, setInfoModal] = useState(null);
@@ -75,16 +78,18 @@ export default function AdminDashboard() {
     if (!user) return;
     if (!silent) setIsRefreshing(true);
     try {
-      const [p, u, col, cat] = await Promise.all([
+      const [p, u, col, cat, sec] = await Promise.all([
         getProducts(),
         getUsers(),
         getCollections(),
-        getCategories()
+        getCategories(),
+        getSectors()
       ]);
       setProducts(p);
       setUsersList(u.length > 0 ? u : initialUsersData);
       setCollectionsData(col);
       setCategoriesData(cat);
+      setSectorsData(sec);
       if (!silent) {
         logAction(effectiveUser, "Actualizó manualmente los datos del dashboard", "Sistema", "info");
       }
@@ -100,7 +105,23 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    refreshData(true); // Carga inicial silenciosa
+    const init = async () => {
+      await refreshData(true);
+      // Auto-initialization of legacy sectors if DB is empty
+      const currentSectors = await getSectors();
+      if (currentSectors.length === 0) {
+        const defaults = [
+          { id: 'textile', name: 'Artesanía', icon: '🧶', color: 'purple', description: 'Artesanía local y tejidos tradicionales.' },
+          { id: 'food', name: 'Alimentos / Agro', icon: '🐝', color: 'orange', description: 'Miel, granos y productos del campo.' }
+        ];
+        for (const s of defaults) {
+          await addSector(s, effectiveUser);
+        }
+        const updated = await getSectors();
+        setSectorsData(updated);
+      }
+    };
+    init();
   }, [user]);
 
   // Si empezamos a suplantar, volvemos al resumen para ver el estado del nuevo usuario
@@ -144,7 +165,6 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteCategory = async (id) => {
-    // La confirmación se manejará dentro del componente o aquí
     setInfoModal('loading');
     try {
       await deleteCategory(id);
@@ -152,6 +172,39 @@ export default function AdminDashboard() {
       setCategoriesData(data);
       setInfoMessage('Categoría eliminada con éxito.');
       logAction(effectiveUser, `Eliminó la categoría ID: ${id}`, 'Catálogo', 'warning');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleAddSector = async (data) => {
+    setInfoModal('loading');
+    try {
+      await addSector(data, effectiveUser);
+      const updated = await getSectors();
+      setSectorsData(updated);
+      setInfoMessage(`Sector "${data.name}" registrado.`);
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleUpdateSector = async (id, data) => {
+    setInfoModal('loading');
+    try {
+      await updateSector(id, data, effectiveUser);
+      const updated = await getSectors();
+      setSectorsData(updated);
+      setInfoMessage('Sector actualizado.');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleDeleteSector = async (id, name) => {
+    setInfoModal('loading');
+    try {
+      await deleteSectorSvc(id, name, effectiveUser);
+      const updated = await getSectors();
+      setSectorsData(updated);
+      setInfoMessage('Sector eliminado.');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -273,6 +326,7 @@ export default function AdminDashboard() {
                setProducts={setProducts} 
                categories={categoriesData} 
                collections={collectionsData}
+               sectors={sectorsData}
                user={effectiveUser} 
                users={usersList}
                setFeedback={handleFeedback}
@@ -281,11 +335,22 @@ export default function AdminDashboard() {
           {dashboardView === 'categories' && (
              <CategoryManager 
                categories={categoriesData} 
+               sectors={sectorsData}
                products={products}
                onAdd={handleAddCategory} 
+               onUpdate={handleUpdateCategory}
                onDelete={handleDeleteCategory}
                onReorder={handleReorderCategories}
                setFeedback={setFeedback}
+             />
+          )}
+          {dashboardView === 'sectors' && effectiveUser.role === 'superadmin' && (
+             <SectorManager 
+                sectors={sectorsData}
+                onAdd={handleAddSector}
+                onUpdate={handleUpdateSector}
+                onDelete={handleDeleteSector}
+                setFeedback={setFeedback}
              />
           )}
           {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (

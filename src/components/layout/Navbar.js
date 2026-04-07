@@ -15,6 +15,7 @@ import {
   ArrowRight as LucideArrowRight 
 } from 'lucide-react';
 import { ImpersonationBanner } from './ImpersonationBanner';
+import { CONFIG } from '@/lib/config';
 
 export function Navbar() {
   const { t, language, setLanguage } = useTranslation();
@@ -55,8 +56,8 @@ export function Navbar() {
         <div className="fixed inset-0 bg-white z-[120] lg:hidden flex flex-col overflow-y-auto pt-0">
           <div className="h-20 flex items-center justify-between px-6 border-b border-stone-100 bg-white sticky top-0 z-10">
              <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-4">
-                <div className="w-8 h-8 border border-stone-200 rounded-full flex items-center justify-center font-serif text-lg">T</div>
-                <span className="text-xl font-serif font-black tracking-tighter">Tapetes.pe</span>
+                <div className="w-8 h-8 bg-stone-900 text-white rounded-lg flex items-center justify-center font-serif text-lg font-black">C</div>
+                <span className="text-xl font-serif font-black tracking-tighter">{CONFIG.BRAND.NAME}</span>
              </Link>
              <button onClick={() => setMenuOpen(false)} className="text-stone-900 p-2 hover:bg-stone-50 rounded-full transition-all">
                 <LucideX size={32} />
@@ -111,10 +112,10 @@ export function Navbar() {
         <nav className="bg-white/95 backdrop-blur-md border-b border-stone-100 h-20 flex items-center transition-all duration-500 shadow-sm">
           <div className="max-w-7xl mx-auto px-6 w-full flex justify-between items-center text-stone-900">
             <Link href="/" className="flex items-center gap-4 group">
-              <img src="/logo.svg" className="w-11 h-11 object-contain group-hover:scale-105 transition-transform duration-500" alt="Tapetes.pe Logo" />
+              <div className="w-11 h-11 bg-stone-900 rounded-xl flex items-center justify-center text-white font-serif text-2xl font-black group-hover:rotate-6 transition-transform duration-500 shadow-xl shadow-stone-200">C</div>
               <div className="flex flex-col">
-                <span className="text-2xl font-serif font-black tracking-tighter leading-none">Tapetes<span className="text-terracotta-600">.</span>pe</span>
-                <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-bold font-sans mt-0.5 group-hover:text-terracotta-600 transition-colors">{t('nav.slogan')}</span>
+                <span className="text-2xl font-serif font-black tracking-tighter leading-none">Made In <span className="text-terracotta-600">Contumazá</span></span>
+                <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-bold font-sans mt-0.5 group-hover:text-terracotta-600 transition-colors uppercase">{CONFIG.BRAND.SLOGAN}</span>
               </div>
             </Link>
             <div className="hidden lg:flex items-center space-x-1 text-[12px] uppercase">

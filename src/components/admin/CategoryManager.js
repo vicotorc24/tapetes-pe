@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { LucideTrash2, LucidePlusCircle, LucideTag, LucideEdit, LucideX, LucideCheck, LucideGripVertical, LucideTrendingUp, LucideEye } from 'lucide-react';
+import { LucideTrash2, LucidePlusCircle, LucideTag, LucideEdit, LucideX, LucideCheck, LucideGripVertical, LucideTrendingUp, LucideEye, LucidePackage } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { CONFIG } from '@/lib/config';
 
-export function CategoryManager({ categories, products = [], onAdd, onUpdate, onDelete, onReorder, setFeedback }) {
+export function CategoryManager({ categories, sectors = [], products = [], onAdd, onUpdate, onDelete, onReorder, setFeedback }) {
   const [newCat, setNewCat] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedSector, setSelectedSector] = useState(sectors[0]?.id || 'textile');
   const [editingId, setEditingId] = useState(null);
-  const [editFormData, setEditFormData] = useState({ name: '', description: '' });
+  const [editFormData, setEditFormData] = useState({ name: '', description: '', sector: sectors[0]?.id || 'textile' });
   
   // Refs para scroll y foco
   const editFormRef = useRef(null);
@@ -15,7 +17,7 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
 
   const handleAdd = () => {
     if (newCat) {
-      onAdd({ name: newCat, description });
+      onAdd({ name: newCat, description, sector: selectedSector });
       setNewCat('');
       setDescription('');
     }
@@ -23,7 +25,7 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
 
   const startEditing = (cat) => {
     setEditingId(cat.id);
-    setEditFormData({ name: cat.name, description: cat.description || '' });
+    setEditFormData({ name: cat.name, description: cat.description || '', sector: cat.sector || sectors[0]?.id || 'textile' });
     
     // El scroll ocurre después de que React renderice el formulario
     setTimeout(() => {
@@ -91,8 +93,27 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
                 <h3 className="text-sm font-bold text-stone-400 uppercase tracking-widest mb-6 flex items-center gap-2">
                   <LucidePlusCircle size={16} /> Nueva Categoría
                 </h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="text-[10px] font-bold text-stone-500 uppercase block mb-3 font-sans">Sector Vinculado</label>
+                        <div className="flex gap-2">
+                          {sectors.map(sec => (
+                            <button
+                              key={sec.id}
+                              type="button"
+                              onClick={() => setSelectedSector(sec.id)}
+                              className={`flex-1 p-3 rounded-xl border text-xs font-bold transition-all ${
+                                selectedSector === sec.id 
+                                  ? 'bg-stone-900 text-white border-stone-900 shadow-lg' 
+                                  : 'bg-stone-50 text-stone-400 border-stone-100 hover:bg-stone-100'
+                              }`}
+                            >
+                              {sec.icon} {sec.name}
+                            </button>
+                          ))}
+                        </div>
+                    </div>
                     <div>
                       <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Nombre</label>
                       <input 
@@ -102,23 +123,23 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
                         onChange={e => setNewCat(e.target.value)}
                       />
                     </div>
-                    <button 
-                      onClick={handleAdd} 
-                      disabled={!newCat}
-                      className="w-full bg-stone-900 text-white py-3.5 rounded-xl font-bold hover:bg-stone-800 transition shadow-lg shadow-stone-100 disabled:opacity-50 disabled:shadow-none"
-                    >
-                      Agregar Categoría
-                    </button>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Descripción / Guía</label>
                     <textarea 
-                      className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-100 transition-all h-[116px] text-sm resize-none bg-stone-50/30 font-sans" 
+                      className="w-full p-3 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-100 transition-all h-[100px] text-sm resize-none bg-stone-50/30 font-sans" 
                       placeholder="Explica qué tipo de productos van aquí..." 
                       value={description} 
                       onChange={e => setDescription(e.target.value)}
                     />
                   </div>
+                  <button 
+                    onClick={handleAdd} 
+                    disabled={!newCat}
+                    className="w-full bg-stone-900 text-white py-4 rounded-xl font-bold hover:bg-stone-800 transition shadow-lg shadow-stone-100 disabled:opacity-50 disabled:shadow-none"
+                  >
+                    Agregar Categoría
+                  </button>
                 </div>
               </div>
             ) : (
@@ -143,6 +164,25 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
                         onChange={e => setEditFormData({...editFormData, name: e.target.value})}
                       />
                     </div>
+                    <div>
+                        <label className="text-[10px] font-bold text-stone-500 uppercase block mb-3 font-sans">Cambiar Sector</label>
+                        <div className="flex gap-2">
+                          {sectors.map(sec => (
+                            <button
+                              key={sec.id}
+                              type="button"
+                              onClick={() => setEditFormData({...editFormData, sector: sec.id})}
+                              className={`flex-1 p-3 rounded-xl border text-[10px] font-bold transition-all ${
+                                editFormData.sector === sec.id 
+                                  ? 'bg-orange-800 text-white border-orange-800 shadow-md' 
+                                  : 'bg-white text-orange-400 border-orange-100 hover:bg-orange-50'
+                              }`}
+                            >
+                              {sec.icon} {sec.name}
+                            </button>
+                          ))}
+                        </div>
+                    </div>
                     <button 
                       onClick={handleSaveEdit}
                       className="w-full bg-orange-700 text-white py-3.5 rounded-xl font-bold hover:bg-orange-800 transition shadow-lg shadow-orange-100 flex items-center justify-center gap-2"
@@ -153,7 +193,7 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
                   <div>
                     <label className="text-[10px] font-bold text-stone-500 uppercase block mb-1 font-sans">Descripción / Guía</label>
                     <textarea 
-                      className="w-full p-3 border border-orange-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-300 transition-all h-[116px] text-sm resize-none bg-white" 
+                      className="w-full p-3 border border-orange-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-300 transition-all h-[180px] text-sm resize-none bg-white" 
                       value={editFormData.description} 
                       onChange={e => setEditFormData({...editFormData, description: e.target.value})}
                     />
@@ -202,7 +242,16 @@ export function CategoryManager({ categories, products = [], onAdd, onUpdate, on
                                   <LucideTag size={20} />
                                 </div>
                                 <div>
-                                  <span className="font-bold text-stone-900 block mb-0.5 font-serif">{cat.name}</span>
+                                  <div className="flex items-center gap-2 mb-0.5">
+                                    <span className="font-bold text-stone-900 font-serif">{cat.name}</span>
+                                    {cat.sector && (
+                                      <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-md ${
+                                        cat.sector === 'food' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'
+                                      }`}>
+                                        {sectors.find(s => s.id === cat.sector)?.name || cat.sector}
+                                      </span>
+                                    )}
+                                  </div>
                                   <p className="text-xs text-stone-500 line-clamp-1 font-sans">{cat.description || 'Sin descripción.'}</p>
                                 </div>
                               </div>

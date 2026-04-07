@@ -6,19 +6,19 @@
 
 export const CONFIG = {
   BRAND: {
-    NAME: "Tapetes.pe",
-    SLOGAN: "Artesanía de Contumazá",
+    NAME: "Made In Contumazá",
+    SLOGAN: "Sello de Origen y Calidad",
     LOCATION: "Contumazá, Cajamarca, Perú",
     REGION_TAG: "Nido de Cóndores"
   },
   CONTACT: {
     WHATSAPP: "+51 928 293 841",
-    EMAIL: "hola@tapetes.pe",
+    EMAIL: "hola@madeincontumaza.pe",
     HOURS: "Lunes a Viernes (9am - 6pm)"
   },
   SOCIAL: {
-    INSTAGRAM: "https://instagram.com/tapetes.pe",
-    FACEBOOK: "https://facebook.com/tapetes.pe"
+    INSTAGRAM: "https://instagram.com/madeincontumaza",
+    FACEBOOK: "https://facebook.com/madeincontumaza"
   },
   EXTERNAL_LINKS: {
     MUNICIPALITY: "https://www.municontumaza.gob.pe/"

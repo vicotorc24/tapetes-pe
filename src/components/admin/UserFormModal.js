@@ -45,7 +45,7 @@ export function UserFormModal({ user, onClose, onSave }) {
     <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white w-full max-w-xl p-8 rounded-[2rem] shadow-2xl animate-in zoom-in-95 overflow-y-auto max-h-[95vh]">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-stone-900 border-b pb-4 w-full">{user ? 'Editar Perfil Peruano' : 'Nueva Artesana del Legado'}</h3>
+          <h3 className="text-2xl font-bold text-stone-900 border-b pb-4 w-full">{user ? 'Editar Perfil Local' : 'Nuevo Productor/a de Contumazá'}</h3>
           <button onClick={onClose} className="p-2 hover:bg-stone-100 rounded-full transition absolute top-8 right-8"><LucideX/></button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,12 +86,12 @@ export function UserFormModal({ user, onClose, onSave }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">RUC (Opcional)</label><input maxLength="11" className="w-full p-3 border rounded-lg bg-stone-50" value={formData.ruc} onChange={e=>setFormData({...formData, ruc:e.target.value.replace(/\D/g,'')})} placeholder="10..."/></div>
-              <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Ubicación / Taller</label><input className="w-full p-3 border rounded-lg" value={formData.location} onChange={e=>setFormData({...formData, location:e.target.value})}/></div>
+              <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Ubicación / Producción</label><input className="w-full p-3 border rounded-lg" value={formData.location} onChange={e=>setFormData({...formData, location:e.target.value})}/></div>
             </div>
 
             {formData.role === 'seller' && (
               <>
-                <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Especialidad (Artesanía)</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.specialty} onChange={e=>setFormData({...formData, specialty:e.target.value})} placeholder="Ej: Tapetes a crochet, bordados..."/></div>
+                <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Especialidad (Rubro)</label><input className="w-full p-3 border rounded-lg border-orange-200" value={formData.specialty} onChange={e=>setFormData({...formData, specialty:e.target.value})} placeholder="Ej: Apicultura, Tejidos a crochet, Café..."/></div>
                 <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Biografía Breve (Aparece en los productos)</label>
                   <textarea 
                     className="w-full p-3 border rounded-lg resize-none h-24 text-sm" 
@@ -117,7 +117,7 @@ export function UserFormModal({ user, onClose, onSave }) {
               </div>
               <div><label className="text-xs font-bold text-stone-500 uppercase block mb-1">Rol</label>
                 <select className="w-full p-3 border rounded-lg bg-white" value={formData.role} onChange={e=>setFormData({...formData, role:e.target.value})}>
-                  <option value="seller">Artesana</option>
+                  <option value="seller">Productor/a</option>
                   <option value="redactor">Redactor</option>
                   <option value="superadmin">Super Admin</option>
                 </select>

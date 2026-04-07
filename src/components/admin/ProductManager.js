@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from 'react';
-import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle, LucidePackage } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { addProduct, updateProduct, deleteProduct, getProducts } from '../../lib/services/products';
 import { ImageUpload } from '../ui/ImageUpload';
+import { CONFIG } from '@/lib/config';
 
-export function ProductManager({ products, setProducts, categories, collections, user, users, setFeedback }) {
+export function ProductManager({ products, setProducts, categories, collections, sectors = [], user, users, setFeedback }) {
   const myProducts = user.role === 'superadmin' ? products : products.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -15,17 +16,23 @@ export function ProductManager({ products, setProducts, categories, collections,
     title: '', 
     price: '', 
     category: categories[0]?.name || '', 
+    sector: 'textile', // New field: textile, food
     description: '', 
     stock: 1, 
     isPromoted: false,
     image: '',
     images: [],
     collection: '',
+    // Textile specific
     materials: '',
     technique: '',
     dimensions: '',
     laborDays: '',
     stitchType: [],
+    // Food specific
+    weight: '',
+    harvestDate: '',
+    expirationDate: '',
     sellerEmail: '',
     sellerName: ''
   });
@@ -50,6 +57,19 @@ export function ProductManager({ products, setProducts, categories, collections,
     { id: 'elastico', name: 'Punto Elástico', desc: 'Ideal para puños y cuellos.' }
   ];
   const [stitchType, setStitchType] = useState(''); // Just for context, line 31 is filter
+
+  // 1. Filtramos categorías por el sector seleccionado
+  const filteredCategories = useMemo(() => {
+    return categories.filter(c => !c.sector || c.sector === formData.sector);
+  }, [categories, formData.sector]);
+
+  // Aseguramos que la categoría seleccionada sea válida para el sector
+  useEffect(() => {
+    const isValid = filteredCategories.some(c => c.name === formData.category);
+    if (!isValid && filteredCategories.length > 0) {
+      setFormData(prev => ({ ...prev, category: filteredCategories[0].name }));
+    }
+  }, [formData.sector, filteredCategories]);
   const filteredProducts = myProducts.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const canManage = (p) => {
@@ -66,9 +86,10 @@ export function ProductManager({ products, setProducts, categories, collections,
   const handleEditClick = (product) => { 
     setEditingProduct(product); 
     setFormData({ 
-      title: product.title, 
-      price: product.price, 
-      category: product.category, 
+      title: product.title || '', 
+      price: product.price || '', 
+      category: product.category || '', 
+      sector: product.sector || 'textile',
       description: product.description || '', 
       stock: product.stock || 1, 
       isPromoted: product.isPromoted || false,
@@ -79,8 +100,10 @@ export function ProductManager({ products, setProducts, categories, collections,
       technique: product.technique || '',
       dimensions: product.dimensions || '', 
       laborDays: product.laborDays || '', 
-      laborDays: product.laborDays || '', 
       stitchType: Array.isArray(product.stitchType) ? product.stitchType : (product.stitchType ? [product.stitchType] : []),
+      weight: product.weight || '',
+      harvestDate: product.harvestDate || '',
+      expirationDate: product.expirationDate || '',
       sellerEmail: product.sellerEmail || '',
       sellerName: product.sellerName || ''
     }); 
@@ -113,7 +136,12 @@ export function ProductManager({ products, setProducts, categories, collections,
       
       await refreshProducts();
       setIsCreating(false); 
-      setFormData({ title: '', price: '', category: categories[0]?.name || '', description: '', stock: 1, isPromoted: false, image: '', images: [], collection: '', materials: '', technique: '', dimensions: '', laborDays: '', stitchType: '' }); 
+      setFormData({ 
+        title: '', price: '', category: categories[0]?.name || '', sector: 'textile',
+        description: '', stock: 1, isPromoted: false, image: '', images: [], 
+        collection: '', materials: '', technique: '', dimensions: '', 
+        laborDays: '', stitchType: [], weight: '', harvestDate: '', expirationDate: '' 
+      }); 
       setEditingProduct(null);
 
       if (setFeedback) {
@@ -184,9 +212,29 @@ export function ProductManager({ products, setProducts, categories, collections,
 
           <div className="grid grid-cols-2 gap-6">
             <div>
+                <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Sector Productivo</label>
+                <div className="flex gap-2">
+                  {sectors.map(sec => (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => setFormData({...formData, sector: sec.id})}
+                      className={`flex-1 p-3 rounded-xl border text-sm font-bold transition-all duration-300 ${
+                        formData.sector === sec.id 
+                          ? 'bg-stone-900 text-white border-stone-900 shadow-lg scale-[1.02]' 
+                          : 'bg-stone-50 text-stone-500 border-stone-100 hover:bg-stone-100'
+                      }`}
+                    >
+                      <span className="mr-2">{sec.icon}</span>
+                      {sec.name}
+                    </button>
+                  ))}
+                </div>
+            </div>
+            <div>
                 <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Categoría</label>
                 <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none font-medium text-stone-900" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                    {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    {filteredCategories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                 </select>
             </div>
             {/* Guía de Categorización */}
@@ -224,52 +272,67 @@ export function ProductManager({ products, setProducts, categories, collections,
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Materiales</label>
-              <input className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.materials} onChange={e => setFormData({...formData, materials: e.target.value})} placeholder="Ej: Lana de ovino, Algodón" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Técnica Artesanal</label>
-              <input className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.technique} onChange={e => setFormData({...formData, technique: e.target.value})} placeholder="Ej: Telar de cintura, Crochet" />
-            </div>
-          </div>
+          <div className="bg-stone-50/50 p-6 rounded-3xl border border-stone-100 space-y-6">
+            <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-4">Detalles de {formData.sector === 'textile' ? 'Artesanía' : 'Producción'}</h4>
+            
+            {formData.sector === 'textile' ? (
+              <>
+                <div className="grid grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Materiales</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.materials} onChange={e => setFormData({...formData, materials: e.target.value})} placeholder="Ej: Lana de ovino" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Técnica</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.technique} onChange={e => setFormData({...formData, technique: e.target.value})} placeholder="Ej: Telar de cintura" />
+                  </div>
+                </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Días de Labor / Dedicación</label>
-              <input type="number" className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.laborDays} onChange={e => setFormData({...formData, laborDays: e.target.value})} placeholder="Ej: 15" />
-            </div>
-            <div className="col-span-2">
-              <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {STITCH_OPTIONS.map(opt => {
-                  const isSelected = (formData.stitchType || []).includes(opt.name);
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => {
-                        const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
-                        const next = isSelected 
-                          ? current.filter(s => s !== opt.name)
-                          : [...current, opt.name];
-                        setFormData({ ...formData, stitchType: next });
-                      }}
-                      className={`flex flex-col p-3 rounded-xl border text-left transition-all duration-200 ${
-                        isSelected 
-                          ? 'bg-orange-50 border-orange-200 ring-2 ring-orange-50' 
-                          : 'bg-stone-50 border-stone-100 hover:border-stone-200'
-                      }`}
-                    >
-                      <span className={`text-xs font-bold ${isSelected ? 'text-orange-700' : 'text-stone-700'}`}>{opt.name}</span>
-                      <span className="text-[9px] text-stone-400 line-clamp-1 mt-0.5">{opt.desc}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-[10px] text-stone-400 italic mt-3">* Puedes seleccionar varios puntos para una misma pieza.</p>
-            </div>
+                <div className="pt-4 border-t border-stone-100">
+                  <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {STITCH_OPTIONS.map(opt => {
+                      const isSelected = (formData.stitchType || []).includes(opt.name);
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
+                            const next = isSelected 
+                              ? current.filter(s => s !== opt.name)
+                              : [...current, opt.name];
+                            setFormData({ ...formData, stitchType: next });
+                          }}
+                          className={`p-2 rounded-lg border text-left transition-all text-[10px] font-bold ${
+                            isSelected ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-white border-stone-100 text-stone-600 hover:border-stone-200'
+                          }`}
+                        >
+                          {opt.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Contenido / Peso</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} placeholder="Ej: 500g, 1 Litro" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Fecha de Cosecha / Prod.</label>
+                    <input type="date" className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none text-sm" value={formData.harvestDate} onChange={e => setFormData({...formData, harvestDate: e.target.value})} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Fecha de Vencimiento (Aprox)</label>
+                    <input type="date" className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none text-sm" value={formData.expirationDate} onChange={e => setFormData({...formData, expirationDate: e.target.value})} />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -372,7 +435,7 @@ export function ProductManager({ products, setProducts, categories, collections,
               </h4>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-stone-500 uppercase mb-2 block">Asignar a Artesana (Vendedor)</label>
+                  <label className="text-[10px] font-bold text-stone-500 uppercase mb-2 block">Asignar a Productor/a (Vendedor)</label>
                   <select 
                     className="w-full p-2.5 text-sm bg-stone-800 border border-stone-700 text-white rounded-lg outline-none focus:ring-1 focus:ring-purple-500 transition-all cursor-pointer"
                     value={formData.sellerEmail || ''}
@@ -394,7 +457,7 @@ export function ProductManager({ products, setProducts, categories, collections,
                       }
                     }}
                   >
-                    <option value="">Seleccionar Artesana...</option>
+                    <option value="">Seleccionar Productor/a...</option>
                     {(users || []).filter(u => u.role === 'seller' || u.role === 'artisan').map(u => (
                       <option key={u.id} value={u.email}>
                         {u.name} — {u.email}
@@ -443,8 +506,8 @@ export function ProductManager({ products, setProducts, categories, collections,
     <div className="animate-in fade-in">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-stone-900">Mis Productos</h2>
-          <p className="text-stone-500 text-sm">Gestiona tu catálogo y stock</p>
+          <h2 className="text-2xl font-bold text-stone-900 font-serif">Made In Contumazá</h2>
+          <p className="text-stone-500 text-sm">Gestiona el catálogo territorial y stock</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => { setEditingProduct(null); setFormData({ title: '', price: '', category: categories[0]?.name || '', description: '', stock: 1, isPromoted: false, image: '', images: [], collection: '', materials: '', technique: '', dimensions: '' }); setIsCreating(true); }} className="bg-orange-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-orange-800 transition"><LucidePlus size={18} /> Nuevo</button>

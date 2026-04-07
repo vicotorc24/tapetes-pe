@@ -124,7 +124,7 @@ export function ProfileManager({ user, setFeedback }) {
             <h3 className="text-2xl font-bold text-stone-900 mb-1">{formData.firstName} {formData.lastName}</h3>
             <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
               <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${user.role === 'superadmin' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
-                {user.role === 'superadmin' ? 'Super Admin' : (user.role === 'redactor' ? 'Redactor Cultura' : 'Artesana Maestra')}
+                {user.role === 'superadmin' ? 'Super Admin' : (user.role === 'redactor' ? 'Redactor Cultura' : 'Productor/a Local')}
               </span>
               <span className="text-xs text-stone-400 font-medium">Desde el 2024</span>
             </div>

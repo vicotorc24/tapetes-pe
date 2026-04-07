@@ -13,12 +13,12 @@ export function Footer({ onOpenInfo, onCategory, onAbout, onHistory, onImpact })
           {/* Logo Rediseñado - Serif & Premium (Igual al Navbar) */}
           <div className="flex items-center gap-4 mb-8 text-white group cursor-default">
             <div className="relative">
-              <div className="w-10 h-10 border border-stone-700 rounded-full flex items-center justify-center font-serif text-xl group-hover:bg-white group-hover:text-stone-900 transition-all duration-500">T</div>
+              <div className="w-10 h-10 border border-stone-700 rounded-xl flex items-center justify-center font-serif text-xl group-hover:bg-white group-hover:text-stone-900 transition-all duration-500 font-black">C</div>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-terracotta-500 rounded-full border-2 border-stone-900"></div>
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-serif font-black tracking-tighter leading-none text-white">Tapetes<span className="text-terracotta-600">.</span>pe</span>
-              <span className="text-[9px] uppercase tracking-[0.3em] text-stone-500 font-bold font-sans mt-0.5">{t('footer.slogan')}</span>
+              <span className="text-2xl font-serif font-black tracking-tighter leading-none text-white">Made In <span className="text-terracotta-600">Contumazá</span></span>
+              <span className="text-[9px] uppercase tracking-[0.3em] text-stone-500 font-bold font-sans mt-0.5">{CONFIG.BRAND.SLOGAN}</span>
             </div>
           </div>
           
@@ -79,7 +79,7 @@ export function Footer({ onOpenInfo, onCategory, onAbout, onHistory, onImpact })
       </div>
 
       <div className="border-t border-stone-800/50 pt-10 max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center text-[11px] font-bold tracking-widest uppercase opacity-40 gap-8">
-        <p>© 2024 {CONFIG.BRAND.NAME} • {t('footer.legacy')}</p>
+        <p>© 2026 {CONFIG.BRAND.NAME} • {t('footer.legacy')}</p>
         <div className="flex items-center gap-3">
            <span className="opacity-60">{t('footer.backed_by')}</span>
            <a href={CONFIG.EXTERNAL_LINKS.MUNICIPALITY} target="_blank" rel="noopener noreferrer" className="text-white hover:text-terracotta-500 transition-colors decoration-terracotta-500/30 underline underline-offset-4">

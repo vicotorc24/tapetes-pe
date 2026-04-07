@@ -14,7 +14,8 @@ import {
   LucideMenu,
   LucideX,
   LucideHeartHandshake,
-  LucideShield
+  LucideShield,
+  LucideLayoutGrid
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -37,6 +38,7 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
       title: 'Taller y Catálogo',
       items: [
         { id: 'products', label: 'Mis Productos', icon: LucidePackage, roles: ['superadmin', 'seller'] },
+        { id: 'sectors', label: 'Sectores', icon: LucideLayoutGrid, roles: ['superadmin'] },
         { id: 'categories', label: 'Categorías', icon: LucideTags, roles: ['superadmin'] },
         { id: 'collections', label: 'Colecciones', icon: LucideLayers, roles: ['superadmin'] },
       ]
@@ -144,7 +146,7 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
                 }`}>
                   {user.role === 'superadmin' ? 'Super Usuario' : 
                    user.role === 'redactor' ? 'Redactor' : 
-                   'Artesana'}
+                   'Productor/a'}
                 </span>
              </div>
              <div className="w-10 h-10 rounded-xl bg-stone-100 overflow-hidden border border-stone-200 shadow-inner">
