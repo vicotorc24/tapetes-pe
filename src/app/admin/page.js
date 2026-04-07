@@ -41,6 +41,7 @@ export default function AdminDashboard() {
   const [collectionsData, setCollectionsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([]);
   const [dashboardView, setDashboardView] = useState('overview');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [infoModal, setInfoModal] = useState(null);
   const [infoMessage, setInfoMessage] = useState('');
   const [onConfirmAction, setOnConfirmAction] = useState(null);
@@ -70,26 +71,36 @@ export default function AdminDashboard() {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
+  const refreshData = async (silent = false) => {
     if (!user) return;
-
-    const loadData = async () => {
-      try {
-        const [p, u, col, cat] = await Promise.all([
-          getProducts(),
-          getUsers(),
-          getCollections(),
-          getCategories()
-        ]);
-        setProducts(p);
-        setUsersList(u.length > 0 ? u : initialUsersData);
-        setCollectionsData(col);
-        setCategoriesData(cat);
-      } catch (error) {
-        console.error("Dashboard Load Error:", error);
+    if (!silent) setIsRefreshing(true);
+    try {
+      const [p, u, col, cat] = await Promise.all([
+        getProducts(),
+        getUsers(),
+        getCollections(),
+        getCategories()
+      ]);
+      setProducts(p);
+      setUsersList(u.length > 0 ? u : initialUsersData);
+      setCollectionsData(col);
+      setCategoriesData(cat);
+      if (!silent) {
+        logAction(effectiveUser, "Actualizó manualmente los datos del dashboard", "Sistema", "info");
       }
-    };
-    loadData();
+    } catch (error) {
+      console.error("Dashboard Load Error:", error);
+      if (!silent) {
+        setInfoModal('error');
+        setInfoMessage("No se pudo actualizar la información. Revisa tu conexión.");
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshData(true); // Carga inicial silenciosa
   }, [user]);
 
   // Si empezamos a suplantar, volvemos al resumen para ver el estado del nuevo usuario
@@ -252,6 +263,8 @@ export default function AdminDashboard() {
                user={effectiveUser} 
                users={usersList}
                setView={setDashboardView}
+               refreshData={refreshData}
+               isRefreshing={isRefreshing}
              />
           )}
           {dashboardView === 'products' && (

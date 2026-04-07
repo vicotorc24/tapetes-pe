@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { subscribeToLogs } from '../../lib/services/audit';
 
-export function DashboardOverview({ products: allProducts, user, users = [], setView }) {
+export function DashboardOverview({ products: allProducts, user, users = [], setView, refreshData, isRefreshing }) {
   const [logs, setLogs] = useState([]);
   const [timeRange, setTimeRange] = useState('all'); 
 
@@ -170,9 +170,19 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
           </button>
           <button 
             onClick={() => handleExportMetrics('Excel')}
-            className="flex items-center gap-2 bg-stone-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-stone-800 transition shadow-lg"
+            className="flex items-center gap-2 bg-stone-100 text-stone-900 border border-stone-200 px-4 py-2 rounded-xl text-xs font-bold hover:bg-stone-200 transition shadow-sm"
           >
             Descargar Excel
+          </button>
+
+          <button 
+            onClick={() => refreshData && refreshData()}
+            disabled={isRefreshing}
+            className={`flex items-center gap-2 bg-stone-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-stone-800 transition shadow-lg disabled:opacity-50`}
+            title="Actualizar datos"
+          >
+            <LucideRotateCcw size={14} className={isRefreshing ? 'animate-spin' : ''} /> 
+            {isRefreshing ? 'Actualizando...' : 'Refrescar'}
           </button>
         </div>
       </div>
