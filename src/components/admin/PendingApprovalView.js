@@ -28,7 +28,7 @@ export function PendingApprovalView({ user, onLogout }) {
           
           <div className="space-y-4 mb-10">
             <p className="text-stone-500 leading-relaxed text-sm">
-              Hola, <span className="font-bold text-stone-800">{user?.name || user?.displayName || 'Artesana'}</span>. 
+              Hola, <span className="font-bold text-stone-800">{user?.name || user?.displayName || 'Productor/a'}</span>. 
               Tu solicitud de acceso ha sido recibida y se encuentra actualmente en el **Módulo de Aprobación Municipal**.
             </p>
             <div className="p-4 bg-andeansky-50/50 rounded-2xl border border-andeansky-100 italic text-[11px] text-andeansky-700 leading-snug">

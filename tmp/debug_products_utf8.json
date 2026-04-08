@@ -1,0 +1,96 @@
+﻿{
+    "count":  15,
+    "products":  [
+                     {
+                         "title":  "DÃºo de Galas \"ViÃ±edos de ContumazÃ¡\"",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T17:00:51.214Z"
+                     },
+                     {
+                         "title":  "Casaca Artesanal \"Amanecer en el Nido\"",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Vestimenta Infantil",
+                         "createdAt":  "2026-04-03T14:36:08.904Z"
+                     },
+                     {
+                         "title":  "Mantel Imperial de ContumazÃ¡",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T21:36:56.778Z"
+                     },
+                     {
+                         "title":  "Camino de Mesa \"Esencia del Alba\"",
+                         "seller":  "admin@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T07:15:40.211Z"
+                     },
+                     {
+                         "title":  " Guardapolvo Tejido \u0027Sol de ContumazÃ¡\u0027",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Accesorios \u0026 Moda",
+                         "createdAt":  "2026-03-31T11:15:36.759Z"
+                     },
+                     {
+                         "title":  "Mandala Nocturno \"SueÃ±o de Rosas\"",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T17:05:23.278Z"
+                     },
+                     {
+                         "title":  "Mandala Ovalado \"Bruma del Alba\"",
+                         "seller":  "juana.alva@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-04-01T04:55:23.523Z"
+                     },
+                     {
+                         "title":  "Mandala \"Sol de ContumazÃ¡\"",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T16:47:32.099Z"
+                     },
+                     {
+                         "title":  "Camino de Mesa \"Espirales del Valle\"",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T17:10:43.991Z"
+                     },
+                     {
+                         "title":  "Miel de Abeja Castillo - 100% Pura",
+                         "seller":  "admin@madeincontumaza.pe",
+                         "sector":  "food",
+                         "category":  "Miel y Derivados",
+                         "createdAt":  "2026-04-07T05:14:20.690Z"
+                     },
+                     {
+                         "title":  "Camino de Mesa \"Aura de Cristal\"",
+                         "seller":  "juana.alva@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-04-02T03:26:39.188Z"
+                     },
+                     {
+                         "title":  "Chaqueta Calada \u0027Viento de la Sierra\u0027",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Accesorios \u0026 Moda",
+                         "createdAt":  "2026-03-31T11:18:55.583Z"
+                     },
+                     {
+                         "title":  "Camino/Pie de SofÃ¡ Blanco",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-31T11:11:43.163Z"
+                     },
+                     {
+                         "title":  "Camino de Mesa \"Amanecer Contumacino\"",
+                         "seller":  "admin@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T06:12:29.811Z"
+                     },
+                     {
+                         "title":  "Mandala Ovalado \"Bruma del Alba\"",
+                         "seller":  "victoria.plasencia@tapetes.pe",
+                         "category":  "Hogar \u0026 Mesa",
+                         "createdAt":  "2026-03-30T17:14:21.358Z"
+                     }
+                 ]
+}

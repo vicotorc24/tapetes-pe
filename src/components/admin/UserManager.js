@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LucideSearch, LucidePlus, LucideCheckCircle, LucideXCircle, LucideEye, LucideEdit, LucideTrash2 } from 'lucide-react';
 import { UserFormModal } from './UserFormModal';
 
-export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, setFeedback }) {
+export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, sectors = [], setFeedback }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +39,7 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
   const getWhatsAppLink = (u) => {
     if (!u.phone) return '#';
     const number = u.phone.replace(/\D/g, '');
-    const uName = u.firstName || u.name || 'Artesana';
+    const uName = u.firstName || u.name || 'Productor/a';
     const message = encodeURIComponent(`Hola ${uName}, te escribo de la Municipalidad respecto a tu solicitud en Tapetes.pe. ¿Podemos coordinar la validación de tu taller?`);
     return `https://wa.me/${number}?text=${message}`;
   };
@@ -105,7 +105,7 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
                       u.role === 'redactor' ? 'bg-blue-100 text-blue-700 border-blue-200' : 
                       'bg-orange-100 text-orange-700 border-orange-200'
                     }`}>
-                      {u.role === 'superadmin' ? 'Super Admin' : u.role === 'redactor' ? 'Redactor' : 'Artesana'}
+                      {u.role === 'superadmin' ? 'Super Admin' : u.role === 'redactor' ? 'Redactor' : 'Productor/a'}
                     </span>
                     {u.role === 'superadmin' && (
                       <>
@@ -193,7 +193,14 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, set
         </table>
         {filteredUsers.length === 0 && <div className="p-8 text-center text-stone-400">No se encontraron usuarios.</div>}
       </div>
-      {isModalOpen && <UserFormModal user={editingUser} onClose={() => setIsModalOpen(false)} onSave={(u) => { editingUser ? onEdit(u) : onAdd(u); setIsModalOpen(false); }} />}
+      {isModalOpen && (
+        <UserFormModal 
+          user={editingUser} 
+          sectors={sectors}
+          onClose={() => setIsModalOpen(false)} 
+          onSave={(u) => { editingUser ? onEdit(u) : onAdd(u); setIsModalOpen(false); }} 
+        />
+      )}
     </div>
   );
 }

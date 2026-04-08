@@ -7,10 +7,10 @@ export function InfoModal({ type, message, onClose, onConfirm, confirmText, conf
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={type !== 'loading' ? onClose : undefined}></div>
+      <div className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm animate-in fade-in duration-150" onClick={type !== 'loading' ? onClose : undefined}></div>
       
       {/* Modal Card */}
-      <div className="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
+      <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 fade-in duration-150 ease-out">
         
         {type !== 'loading' && (
           <button onClick={onClose} className="absolute top-6 right-6 text-stone-400 hover:text-stone-900 transition">
@@ -20,12 +20,21 @@ export function InfoModal({ type, message, onClose, onConfirm, confirmText, conf
 
         <div className="p-10 text-center">
           {type === 'loading' && (
-            <div className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-                <LucideLoader2 className="text-orange-600 animate-spin" size={40} />
+            <div className="flex flex-col items-center py-6 bg-gradient-to-b from-orange-50/40 to-transparent">
+              <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center mb-10 relative shadow-inner overflow-hidden border-2 border-orange-50">
+                <div className="absolute inset-0 rounded-full border-[6px] border-stone-100 border-t-orange-600 animate-spin shadow-[0_0_20px_-5px_#ea580c]"></div>
+                <div className="absolute inset-4 rounded-full bg-orange-100/40 blur-xl animate-pulse"></div>
+                <LucideLoader2 className="text-orange-600 animate-spin relative z-10 drop-shadow-[0_0_8px_rgba(234,88,12,0.5)]" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-stone-900 mb-2">Procesando</h3>
-              <p className="text-stone-500 leading-relaxed">{message || 'Estamos conectando con el servidor...'}</p>
+              <h3 className="text-2xl font-black text-stone-900 mb-2 font-serif tracking-tight drop-shadow-sm">Procesando</h3>
+              <p className="text-stone-500 text-sm max-w-[240px] mx-auto leading-relaxed italic font-medium">
+                {message || 'Sincronizando con el servidor local...'}
+              </p>
+              <div className="mt-8 flex gap-1 justify-center opacity-30">
+                 <div className="w-1.5 h-1.5 bg-orange-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                 <div className="w-1.5 h-1.5 bg-orange-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                 <div className="w-1.5 h-1.5 bg-orange-600 rounded-full animate-bounce"></div>
+              </div>
             </div>
           )}
 
@@ -61,7 +70,7 @@ export function InfoModal({ type, message, onClose, onConfirm, confirmText, conf
               <div className="flex gap-3 w-full mt-8">
                 <button onClick={onClose} className="flex-1 py-4 bg-stone-100 text-stone-600 rounded-2xl font-bold hover:bg-stone-200 transition">Cancelar</button>
                 <button 
-                  onClick={() => { onConfirm(); onClose?.(); }} 
+                  onClick={() => { onConfirm(); }} 
                   className={`flex-1 py-4 text-white rounded-2xl font-bold transition shadow-lg ${
                     confirmColor === 'green' ? 'bg-green-600 hover:bg-green-700' : 
                     confirmColor === 'stone' ? 'bg-stone-900 hover:bg-stone-800' : 

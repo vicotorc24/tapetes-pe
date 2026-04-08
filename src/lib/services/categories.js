@@ -7,8 +7,8 @@ export const getCategories = async () => {
   const q = query(collection(db, COLLECTION_NAME));
   const snapshot = await getDocs(q);
   const data = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
+    ...doc.data(),
+    id: doc.id
   }));
   
   // Ordenar en memoria para no excluir documentos sin el campo 'order'
@@ -21,6 +21,14 @@ export const addCategory = async (data) => {
     ...data,
     order: existing.length,
     createdAt: new Date().toISOString()
+  });
+};
+
+export const updateCategory = async (id, data) => {
+  const docRef = doc(db, COLLECTION_NAME, id);
+  return await updateDoc(docRef, {
+    ...data,
+    updatedAt: new Date().toISOString()
   });
 };
 

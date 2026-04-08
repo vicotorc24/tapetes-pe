@@ -18,12 +18,14 @@ import { InfoModal } from '@/components/ui/InfoModal';
 import { AuditLogManager } from '@/components/admin/AuditLogManager';
 import { ImpersonationBanner } from '@/components/layout/ImpersonationBanner';
 import { PendingApprovalView } from '@/components/admin/PendingApprovalView';
+import { SectorManager } from '@/components/admin/SectorManager';
 
 // Services
 import { getProducts } from '@/lib/services/products';
 import { getUsers, addUser, updateUser, deleteUser } from '@/lib/services/users';
 import { getCollections, addCollection, updateCollection, deleteCollection } from '@/lib/services/collections';
 import { getCategories, addCategory, deleteCategory } from '@/lib/services/categories';
+import { getSectors, addSector, updateSector, deleteSector as deleteSectorSvc } from '@/lib/services/sectors';
 import { initialUsersData } from '@/lib/data';
 
 // Firestore Direct (for quick updates)
@@ -32,7 +34,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { logAction } from '@/lib/services/audit';
 
 export default function AdminDashboard() {
-  const { user, effectiveUser, impersonatedUser, loading, logout, register, startImpersonating } = useAuth();
+  const { user, effectiveUser, impersonatedUser, loading, logout, register, startImpersonating, refreshAuthUser } = useAuth();
   const router = useRouter();
   
   // States
@@ -40,6 +42,7 @@ export default function AdminDashboard() {
   const [usersList, setUsersList] = useState([]);
   const [collectionsData, setCollectionsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([]);
+  const [sectorsData, setSectorsData] = useState([]);
   const [dashboardView, setDashboardView] = useState('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [infoModal, setInfoModal] = useState(null);
@@ -75,16 +78,18 @@ export default function AdminDashboard() {
     if (!user) return;
     if (!silent) setIsRefreshing(true);
     try {
-      const [p, u, col, cat] = await Promise.all([
+      const [p, u, col, cat, sec] = await Promise.all([
         getProducts(),
         getUsers(),
         getCollections(),
-        getCategories()
+        getCategories(),
+        getSectors()
       ]);
       setProducts(p);
       setUsersList(u.length > 0 ? u : initialUsersData);
       setCollectionsData(col);
       setCategoriesData(cat);
+      setSectorsData(sec);
       if (!silent) {
         logAction(effectiveUser, "Actualizó manualmente los datos del dashboard", "Sistema", "info");
       }
@@ -100,7 +105,23 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    refreshData(true); // Carga inicial silenciosa
+    const init = async () => {
+      await refreshData(true);
+      // Auto-initialization of legacy sectors if DB is empty
+      const currentSectors = await getSectors();
+      if (currentSectors.length === 0) {
+        const defaults = [
+          { name: 'Artesanía', icon: '🧶', color: 'purple', description: 'Artesanía local y tejidos tradicionales.', fields: [] },
+          { name: 'Alimentos / Agro', icon: '🐝', color: 'orange', description: 'Miel, granos y productos del campo.', fields: [] }
+        ];
+        for (const s of defaults) {
+          await addSector(s, effectiveUser);
+        }
+        const updated = await getSectors();
+        setSectorsData(updated);
+      }
+    };
+    init();
   }, [user]);
 
   // Si empezamos a suplantar, volvemos al resumen para ver el estado del nuevo usuario
@@ -119,14 +140,14 @@ export default function AdminDashboard() {
   }
 
   // Handlers (Migrated from old page.js)
-  const handleAddCategory = async ({ name, description }) => {
+  const handleAddCategory = async (data) => {
     setInfoModal('loading');
     try {
-      await addCategory({ name, description });
-      const data = await getCategories();
-      setCategoriesData(data);
+      await addCategory(data);
+      const updated = await getCategories();
+      setCategoriesData(updated);
       setInfoMessage('Categoría agregada con éxito.');
-      logAction(effectiveUser, `Creó la categoría "${name}"`, 'Catálogo', 'success');
+      logAction(effectiveUser, `Creó la categoría "${data.name}"`, 'Catálogo', 'success');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -144,7 +165,6 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteCategory = async (id) => {
-    // La confirmación se manejará dentro del componente o aquí
     setInfoModal('loading');
     try {
       await deleteCategory(id);
@@ -152,6 +172,72 @@ export default function AdminDashboard() {
       setCategoriesData(data);
       setInfoMessage('Categoría eliminada con éxito.');
       logAction(effectiveUser, `Eliminó la categoría ID: ${id}`, 'Catálogo', 'warning');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleAddSector = async (data) => {
+    setInfoModal('loading');
+    try {
+      await addSector(data, effectiveUser);
+      const updated = await getSectors();
+      setSectorsData(updated);
+      setInfoMessage(`Sector "${data.name}" registrado.`);
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleUpdateSector = async (id, data) => {
+    setInfoModal('loading');
+    try {
+      await updateSector(id, data, effectiveUser);
+      const updated = await getSectors();
+      setSectorsData(updated);
+      setInfoMessage('Sector actualizado.');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleDeleteSector = async (id, name) => {
+    setInfoModal('loading');
+    try {
+      await deleteSectorSvc(id, name, effectiveUser);
+      const updated = await getSectors();
+      setSectorsData(updated);
+      setInfoMessage('Sector eliminado.');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleAddCollection = async (data) => {
+    setInfoModal('loading');
+    try {
+      await addCollection(data);
+      const updated = await getCollections();
+      setCollectionsData(updated);
+      setInfoMessage(`Colección "${data.name}" creada.`);
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleUpdateCollection = async (data) => {
+    setInfoModal('loading');
+    try {
+      await updateCollection(data.id, data);
+      const updated = await getCollections();
+      setCollectionsData(updated);
+      setInfoMessage('Colección actualizada.');
+      setInfoModal('success');
+    } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
+  };
+
+  const handleDeleteCollection = async (id) => {
+    setInfoModal('loading');
+    try {
+      await deleteCollection(id);
+      const updated = await getCollections();
+      setCollectionsData(updated);
+      setInfoMessage('Colección eliminada.');
       setInfoModal('success');
     } catch (e) { setInfoModal('error'); setInfoMessage(e.message); }
   };
@@ -214,8 +300,11 @@ export default function AdminDashboard() {
     setInfoModal('loading');
     try {
       await updateUser(userData.id, userData, effectiveUser);
-      const updated = await getUsers();
-      setUsersList(updated);
+      
+      // Refresco crítico: de la lista de usuarios y de la sesión actual
+      await refreshData(true);
+      await refreshAuthUser();
+
       setInfoMessage('Usuario actualizado con éxito.');
       setInfoModal('success');
     } catch (e) {
@@ -246,12 +335,12 @@ export default function AdminDashboard() {
       {/* Bloqueo de Seguridad Institucional */}
       {effectiveUser.status !== 'active' && effectiveUser.role !== 'superadmin' ? (
         <PendingApprovalView 
-          user={effectiveUser} 
+          user={effectiveUser} sectors={sectorsData} 
           onLogout={logout} 
         />
       ) : (
         <DashboardLayout 
-          user={effectiveUser} 
+          user={effectiveUser} sectors={sectorsData} 
           currentView={dashboardView} 
           setView={setDashboardView} 
           onLogout={logout} 
@@ -260,7 +349,7 @@ export default function AdminDashboard() {
           {dashboardView === 'overview' && (
              <DashboardOverview 
                products={products} 
-               user={effectiveUser} 
+               user={effectiveUser} sectors={sectorsData} 
                users={usersList}
                setView={setDashboardView}
                refreshData={refreshData}
@@ -273,6 +362,7 @@ export default function AdminDashboard() {
                setProducts={setProducts} 
                categories={categoriesData} 
                collections={collectionsData}
+               sectors={sectorsData}
                user={effectiveUser} 
                users={usersList}
                setFeedback={handleFeedback}
@@ -281,8 +371,22 @@ export default function AdminDashboard() {
           {dashboardView === 'categories' && (
              <CategoryManager 
                categories={categoriesData} 
+               sectors={sectorsData}
+               products={products}
                onAdd={handleAddCategory} 
+               onUpdate={handleUpdateCategory}
                onDelete={handleDeleteCategory}
+               onReorder={handleReorderCategories}
+               setFeedback={handleFeedback}
+             />
+          )}
+          {dashboardView === 'sectors' && effectiveUser.role === 'superadmin' && (
+             <SectorManager 
+                sectors={sectorsData}
+                onAdd={handleAddSector}
+                onUpdate={handleUpdateSector}
+                onDelete={handleDeleteSector}
+                setFeedback={handleFeedback}
              />
           )}
           {dashboardView === 'users' && effectiveUser.role === 'superadmin' && (
@@ -292,18 +396,20 @@ export default function AdminDashboard() {
                 onEdit={handleEditUser}
                 onDelete={handleDeleteUser}
                 onImpersonate={startImpersonating}
+                sectors={sectorsData}
                 setFeedback={handleFeedback}
-                adminUser={effectiveUser}
+                adminuser={effectiveUser}
              />
           )}
           {dashboardView === 'collections' && (
              <CollectionManager 
                 collections={collectionsData}
-                onAdd={addCollection}
-                onUpdate={updateCollection}
-                onDelete={deleteCollection}
+                products={products}
+                onAdd={handleAddCollection}
+                onEdit={handleUpdateCollection}
+                onDelete={handleDeleteCollection}
                 setFeedback={handleFeedback}
-                user={effectiveUser}
+                user={effectiveUser} sectors={sectorsData}
              />
           )}
           {dashboardView === 'impact' && (effectiveUser.role === 'superadmin' || effectiveUser.role === 'redactor') && (
@@ -318,6 +424,7 @@ export default function AdminDashboard() {
           {dashboardView === 'profile' && (
              <ProfileManager 
                 user={effectiveUser} 
+                sectors={sectorsData} 
                 onUpdate={handleEditUser} 
                 setFeedback={handleFeedback}
              />

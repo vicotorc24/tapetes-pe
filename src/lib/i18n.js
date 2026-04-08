@@ -1,24 +1,26 @@
 export const translations = {
   es: {
-    nav: { catalog: "Catálogo", story: "Nosotras", heritage: "Herencia", impact: "Impacto", admin: "Acceso", dashboard: "Mi Taller", join: "Únete", banner: "✨ ¿Tejes un legado? Únete a nuestra comunidad de artesanas • Postula aquí ✨", language: "Idioma", slogan: "Artesanía de Contumazá" },
+    nav: { catalog: "Catálogo", story: "Propósito", heritage: "Herencia", impact: "Cifras", admin: "Acceso", dashboard: "Panel Gestión", join: "Sé Parte", banner: "✨ ¿Eres productor en Contumazá? Únete a nuestro marketplace • Postula aquí ✨", language: "Idioma", slogan: "Sello de Origen y Calidad" },
     hero: { 
-      subtitle: "Artesanía & Tradición", 
-      title1: "Tejidos con Alma", 
-      title2: "de Contumazá", 
-      desc: "Piezas únicas tejidas a mano por madres artesanas bajo la neblina del cerro El Calvario.", 
-      cta: "Ver Colección", 
-      heritage: "Nuestra Herencia", 
-      origin_btn: "Nuestro Origen",
-      fair_trade_badge: "100% Comercio Justo",
-      workforce_label: "Mano de Obra:",
-      authentic_label: "100% Auténtico de Contumazá"
+      subtitle: "El Corazón de los Andes", 
+      title1: "Lo Mejor de", 
+      title2: "Contumazá", 
+      desc: "Desde tejidos magistrales hasta miel pura y granos andinos. La riqueza de nuestra tierra, directo a tu hogar.", 
+      cta: "Explorar Mercado", 
+      heritage: "Nuestra Tierra", 
+      origin_btn: "Ver Origen",
+      fair_trade_badge: "Comercio Justo Directo",
+      workforce_label: "Origen:",
+      authentic_label: "100% Hecho en Contumazá",
+      showcase_label: "Curaduría Local",
+      showcase_desc: "Identidad expuesta al mundo"
     },
     catalog: { 
       title: "Colección Exclusiva", 
       featured: "DESTACADO", 
       view: "Ver Detalle", 
-      empty: "No hay productos aquí.", 
-      search_placeholder: "Buscar tapetes, manteles o artesanas...", 
+      empty: "No hay productos disponibles por ahora.", 
+      search_placeholder: "Buscar miel, tapetes, granos o productores...", 
       categories_label: "Categorías:", 
       filters_label: "Filtros:",
       filter_category: "Categoría",
@@ -46,12 +48,17 @@ export const translations = {
       impact_cta: "Postular como Artesana",
       collections_subtitle: "Inspiración",
       collections_title: "Colecciones Oficiales",
-      collection_default_desc: "Explora esta colección exclusiva"
+      collection_default_desc: "Explora esta colección exclusiva",
+      explore_sectors: "Nuestros Sectores",
+      brands_title: "Marcas con Propósito",
+      coming_soon: "Muy Pronto",
+      coming_soon_desc: "Estamos preparando tesoros y experiencias únicas en este sector para ti.",
+      filter_sector: "Sector"
     },
     impact: {
       section_subtitle: 'Nuestro Motor de Desarrollo',
-      section_title: 'El Impacto de Tapetes.pe',
-      section_desc: 'Conectamos la herencia viva de Contumazá con el mercado digital, generando una economía autosostenible para nuestras mujeres tejedoras.',
+      section_title: 'El Impacto de Made In Contumazá',
+      section_desc: 'Conectamos la producción local de Contumazá con el mercado global, impulsando una economía sostenible para nuestros artesanos y productores.',
       card1_title: 'Mujeres Líderes',
       card1_desc: 'El 100% de nuestros ingresos brutos regresan directamente a manos de las artesanas.',
       card2_title: 'Crecimiento Local',
@@ -71,7 +78,11 @@ export const translations = {
       desc: '"Bajo el cielo de Contumazá, el tiempo se detiene en cada lazada." Descubre el legado de un pueblo que teje su historia con hilos de sol y niebla.',
       location_badge: "Desde la Plaza de Armas hasta el Mirador La Ermita",
       hands_label: "Mano de Obra",
-      hands_desc: "Arte que trasciende generaciones"
+      hands_desc: "Arte que trasciende generaciones",
+      wheat_badge: "Sabor & Herencia",
+      wheat_title: "Tierra del Buen Trigo",
+      wheat_desc: "Donde el sol andino se convierte en grano de oro. Descubre la milenaria tradición de la trilla en las eras de Contumazá.",
+      wheat_label: "Cosecha Local"
     },
     product: { back: "Volver al catálogo", add: "Agregar al Pedido", unique: "Pieza Única", by: "Tejido por", support: "Apoyas directamente a su familia.", related: "También te podría gustar", stock: "Disponibles" },
     cart: { title: "Tu Pedido", empty: "Tu canasta está vacía", total: "Total Estimado", pay_method: "Elige cómo pagar:", wa_btn: "Enviar Pedido", card_btn: "Pagar Ahora", wa_desc: "Sin comisión", card_desc: "Pago seguro" },
@@ -108,14 +119,8 @@ export const translations = {
       festivities: {
         title: "Tradiciones y Fervor",
         semana_santa: {
-          title: "Semana Santa de Contumazá",
-          tag: "Patrimonio Cultural de la Nación",
-          desc: "Una celebración única en el Perú, reconocida por su solemnidad, sus cristos articulados y la devoción de su gente. Es considerada la mejor del norte peruano."
-        },
-        san_mateo: {
-          title: "Fiesta Patronal de San Mateo",
-          date: "Setiembre",
-          desc: "La fiesta principal que une a todos los contumacinos en una celebración de fe, danza y tradición en honor a nuestro santo patrón."
+          title: "Semana Santa",
+          desc: "Una de las festividades más importantes de Contumazá, mezclando fervor religioso con el arte de las alfombras y tejidos que visten las calles."
         }
       }
     },
@@ -147,6 +152,7 @@ export const translations = {
       form_subtitle: "Completa tus datos para iniciar el proceso",
       firstName_placeholder: "Nombres",
       lastName_placeholder: "Apellidos",
+      brandName_placeholder: "Nombre de Marca / Emprendimiento (Si tienes)",
       email_placeholder: "Correo Electrónico",
       pass_placeholder: "Crear Contraseña",
       pass_confirm_placeholder: "Confirmar Contraseña",
@@ -161,21 +167,23 @@ export const translations = {
       success_desc: "Gracias {name}, tu solicitud para unirte como artesana ha sido recibida correctamente. El personal encargado de la Municipalidad validará tu taller y se pondrá en contacto pronto vía WhatsApp para darte de alta.",
       back_btn: "Volver al inicio"
     },
-    footer: { purpose: "Conectando el talento ancestral de las madres de Contumazá con hogares que valoran la autenticidad.", explore: "Explorar", help: "Ayuda", contact: "Contacto", slogan: "Artesanía de Contumazá", impact: "Impacto Social", shipping: "Envíos", care: "Cuidado", faq: "FAQ", legacy: "Legado Ancestral", backed_by: "Respaldado por la", municipality: "Municipalidad Provincial de Contumazá" }
+    footer: { purpose: "Llevamos el talento y la riqueza natural de Contumazá a hogares que valoran el origen y la pureza.", explore: "Explorar", help: "Ayuda", contact: "Contacto", slogan: "Sello de Origen y Calidad", impact: "Desarrollo Local", shipping: "Envíos", care: "Garantía", faq: "FAQ", legacy: "Orgullo Contumacino", backed_by: "Gestión Institucional:", municipality: "Municipalidad de Contumazá" }
   },
   en: {
-    nav: { catalog: "Shop", story: "Our Story", heritage: "Heritage", impact: "Impact", admin: "Login", dashboard: "Dashboard", join: "Join Us", banner: "✨ Weave a legacy? Join our artisan community • Apply here ✨", language: "Language", slogan: "Crafts of Contumazá" },
+    nav: { catalog: "Marketplace", story: "Purpose", heritage: "Heritage", impact: "Stats", admin: "Access", dashboard: "Admin Panel", join: "Be Part", banner: "✨ Producer in Contumazá? Join our marketplace • Apply here ✨", language: "Language", slogan: "Source of Origin & Quality" },
     hero: { 
-      subtitle: "Craft & Tradition", 
-      title1: "Weavings with Soul", 
-      title2: "from the Andes", 
-      desc: "Unique pieces handwoven by artisan mothers beneath the mist of Mount Calvario.", 
-      cta: "Shop Collection", 
-      heritage: "Our Heritage", 
-      origin_btn: "Our Origin",
-      fair_trade_badge: "100% Fair Trade",
-      workforce_label: "Workmanship:",
-      authentic_label: "100% Authentic from Contumazá"
+      subtitle: "Heart of the Andes", 
+      title1: "The Best of", 
+      title2: "Contumazá", 
+      desc: "From master weavings to pure honey and Andean grains. Our land's richness, straight to your home.", 
+      cta: "Explore Marketplace", 
+      heritage: "Our Land", 
+      origin_btn: "View Origin",
+      fair_trade_badge: "Direct Fair Trade",
+      workforce_label: "Origin:",
+      authentic_label: "100% Made in Contumazá",
+      showcase_label: "Local Curation",
+      showcase_desc: "Identity exposed to the world"
     },
     catalog: { 
       title: "Exclusive Collection", 
@@ -210,7 +218,12 @@ export const translations = {
       impact_cta: "Apply as Artisan",
       collections_subtitle: "Inspiration",
       collections_title: "Official Collections",
-      collection_default_desc: "Explore this exclusive collection"
+      collection_default_desc: "Explore this exclusive collection",
+      explore_sectors: "Our Sectors",
+      brands_title: "Purposeful Brands",
+      coming_soon: "Coming Soon",
+      coming_soon_desc: "We are preparing unique treasures and experiences for this sector.",
+      filter_sector: "Sector"
     },
     impact: {
       section_subtitle: 'Our Development Engine',
@@ -221,110 +234,109 @@ export const translations = {
       card2_title: 'Local Growth',
       card2_desc: 'By purchasing, you strengthen the economy of remote Andean provinces.',
       card3_title: 'Ancestral Art',
-      card3_desc: 'We keep alive the crochet technique that is part of our historical identity.',
+      card3_desc: 'We preserve the ancestral technique of crochet which is part of our historical identity.',
       fair_trade_badge: 'FAIR TRADE',
-      impact_cta: "View Social Impact Details →",
-      stat1_label: "Direct Profit to the Creator Artisan",
-      stat2_label: "Digital and Business training sessions per year",
-      stat3_label: "Secured Legacy for Contumazá"
+      impact_cta: "View Social Impact Detail →",
+      stat1_label: "Direct Profit to the Creating Artisan",
+      stat2_label: "Digital training and business sessions per year",
+      stat3_label: "Heritage Secured for Contumazá"
     },
     banner: {
       heritage_badge: "Living Heritage",
       title_nest: "The Nest of",
       title_condors: "Condors",
-      desc: '"Beneath the sky of Contumazá, time stops in every stitch." Discover the legacy of a people who weave their history with threads of sun and mist.',
-      location_badge: "From Plaza de Armas to the Ermita Viewpoint",
-      hands_label: "Workmanship",
-      hands_desc: "Art that transcends generations"
+      desc: '"Under the sky of Contumazá, time stops in every stitch." Discover the legacy of a people that weaves its history with threads of sun and mist.',
+      location_badge: "From the Main Square to the Ermita Viewpoint",
+      hands_label: "Handicraft",
+      hands_desc: "Art that transcends generations",
+      wheat_badge: "Flavor & Heritage",
+      wheat_title: "Land of Good Wheat",
+      wheat_desc: "Where the Andean sun turns into golden grain. Discover the millenary tradition of threshing in the 'eras' of Contumazá.",
+      wheat_label: "Local Harvest"
     },
-    product: { back: "Back to Shop", add: "Add to Order", unique: "One of a Kind", by: "Woven by", support: "Directly supports her family.", related: "You might also like", stock: "Available" },
-    cart: { title: "Your Order", empty: "Your cart is empty", total: "Estimated Total", pay_method: "Choose payment method:", wa_btn: "Order via WhatsApp", card_btn: "Pay Now", wa_desc: "No fees", card_desc: "Secure payment" },
+    product: { back: "Back to catalog", add: "Add to Order", unique: "Unique Piece", by: "Woven by", support: "Directly support their family.", related: "You might also like", stock: "Available" },
+    cart: { title: "Your Order", empty: "Your basket is empty", total: "Estimated Total", pay_method: "Choose how to pay:", wa_btn: "Send Order", card_btn: "Pay Now", wa_desc: "No commission", card_desc: "Secure payment" },
     history: {
-      title: "Cradle of Talent",
-      subtitle: "Land of Poets and Condors' Nest",
+      title: "Cradle of Talents",
+      subtitle: "Land of Poets and Nest of Condors",
       walter_alva: {
         name: "Walter Alva Alva",
         role: "Archaeologist",
-        desc: "Illustrious son of Contumazá, discoverer of the Royal Tombs of the Lord of Sipán, one of the most important archaeological finds in the Americas."
+        desc: "Illustrious son of Contumazá, discoverer of the Royal Tombs of the Lord of Sipán, one of the most important findings in America."
       },
       poets: {
         title: "Land of Poets",
         names: "Marco Antonio Corcuera, Mario Florián",
-        desc: "Birthplace of great writers who have sung to the land and life, keeping the intellectual essence of our region alive."
+        desc: "Cradle of great writers who have sung to the earth and life, keeping the intellectual essence of our region alive."
       },
       general: {
         title: "Our History",
-        desc: "Contumazá, created in 1872, owes its name to the expression 'Condors' Flight'. A town of unwavering faith that honors Saint Matthew and delights in its famous 'pan contumacino'."
+        desc: "Contumazá, created in 1872, owes its name to the expression 'Flight of Condors'. A people of unwavering faith who honor Saint Matthew and enjoy its famous contumacino bread."
       },
       loading: "Loading cultural legacy...",
-      read_more: "Read more →",
+      read_more: "Keep reading →",
       others: "Other notable figures",
       condor: {
-        title: "Condors' Nest",
-        desc: "At 2,675 meters above sea level, Contumazá is a balcony to the Andes. Its geography shapes the character of its people: strong, resilient, and deeply connected to the land and its traditions."
+        title: "Nest of Condors",
+        desc: "At 2675 m.a.s.l, Contumazá is a balcony to the Andes. Its geography shapes the character of its people: strong, resilient and deeply connected with the earth and its traditions."
       },
       sites: {
-        title: "Historic Landmarks",
-        subtitle: "Explore the touristic and archaeological richness of our land."
+        title: "Places with History",
+        subtitle: "Explore the tourist and archaeological richness of our land."
       },
-      illustrious_title: "Illustrious Children of Contumazá",
-      illustrious_desc: "Get to know the personalities who have taken the name of our land to the world.",
+      illustrious_title: "Illustrious Sons of Contumazá",
+      illustrious_desc: "Meet the personalities that have taken the name of our land to the world.",
       festivities: {
         title: "Traditions and Fervor",
         semana_santa: {
-          title: "Holy Week in Contumazá",
-          tag: "National Cultural Heritage",
-          desc: "A unique celebration in Peru, renowned for its solemnity, articulated Christs, and the devotion of its people. Considered the best in northern Peru."
-        },
-        san_mateo: {
-          title: "Saint Matthew Patronal Feast",
-          date: "September",
-          desc: "The main festival uniting all Contumacinos in a celebration of faith, dance, and tradition in honor of our patron saint."
+          title: "Holy Week",
+          desc: "One of the most important festivities of Contumazá, mixing religious fervor with the art of carpets and weavings that dress the streets."
         }
       }
     },
     about: {
       essence: "Our Essence",
       title: "Our Story",
-      subtitle: "Threads connecting generations in the heart of Contumazá.",
+      subtitle: "Threads that unite generations in the heart of Contumazá.",
       legacy_tag: "The Legacy",
       legacy_title: "The Tradition of <br/><span class='italic text-terracotta-600'>Stitch and Soul</span>",
-      p1: "In the heights of Contumazá, weaving is not just a craft, it's a way of telling stories. Since childhood, we learn to intertwine threads watching the mist descend Mount Calvario, inheriting techniques passed from mothers to daughters for centuries.",
-      p2: "Every piece you find at <strong>Tapetes.pe</strong> carries hours of dedication, patience, and the hope of entrepreneurial women striving to support their families while honoring their identity.",
+      p1: "In the heights of Contumazá, weaving is not just a job, it's a way of telling stories. From childhood, we learn to intertwine threads watching the mist come down from the El Calvario hill, inheriting techniques that have passed from mothers to daughters for centuries.",
+      p2: "Every piece you find on <strong>Tapetes.pe</strong> carries hours of dedication, patience and the hope of entrepreneurial women who seek to move their families forward by honoring their identity.",
       ethics: {
         title: "Ethical & Social Commitment",
-        desc: "By choosing a piece from our collection, you don't just decorate your home; you directly support fair trade and the empowerment of rural Peruvian women.",
+        desc: "By choosing a piece from our collection, you're not just decorating your home; you're directly supporting fair trade and the empowerment of Peruvian rural women.",
         pay: "100% Direct Payment",
         auth: "Guaranteed Authenticity",
-        cta: "Message us on WhatsApp"
+        cta: "Write us on WhatsApp"
       },
       land_title: "Our Land",
-      land_desc: "Contumazá, Cajamarca, Peru. At 2,675 m.a.s.l., on the balcony to the Andes."
+      land_desc: "Contumazá, Cajamarca, Peru. At 2,675 m.a.s.l, on the balcony towards the Andes."
     },
     unete: {
       tag: "Join the Legacy",
-      title: "Weave the future of Contumazá with us",
-      desc: "We are looking for talented hands who wish to share their art with the world. By registering, you will enter a validation process to ensure the authenticity of our community.",
+      title: "Weave with us the future of Contumazá",
+      desc: "We look for talented hands who want to share their art with the world. By registering, you will enter a validation process to ensure the authenticity of our community.",
       benefit_title: "Direct Evaluation",
-      benefit_desc: "We review each application individually to maintain premium quality.",
-      form_title: "Application Form",
-      form_subtitle: "Complete your details to start the process",
-      firstName_placeholder: "First Names",
-      lastName_placeholder: "Last Names",
+      benefit_desc: "We review each request individually to maintain premium quality.",
+      form_title: "Request Form",
+      form_subtitle: "Complete your data to start the process",
+      firstName_placeholder: "First Name",
+      lastName_placeholder: "Last Name",
+      brandName_placeholder: "Brand / Business Name (If any)",
       email_placeholder: "Email Address",
       pass_placeholder: "Create Password",
       pass_confirm_placeholder: "Confirm Password",
       pass_mismatch: "Passwords do not match.",
-      phone_placeholder: "Phone",
+      phone_placeholder: "Phone Number",
       location_placeholder: "Location",
       specialty_placeholder: "Tell us about your specialty (e.g., circular rugs, crochet...)",
-      submit_btn: "Submit Application",
+      submit_btn: "Send Request",
       loading_btn: "Sending...",
-      privacy: "By submitting your data, you agree that Tapetes.pe will store your information for the artisan selection process.",
-      success_title: "Application Submitted!",
-      success_desc: "Thank you {name}, your application to join as an artisan has been successfully received. The Municipality staff will validate your workshop and contact you soon via WhatsApp to activate your account.",
+      privacy: "By sending your data, you accept that Tapetes.pe saves your information for the artisan selection process.",
+      success_title: "Request Sent!",
+      success_desc: "Thank you {name}, your request to join as an artisan has been received correctly. The staff in charge at the Municipality will validate your workshop and will contact you soon via WhatsApp to set you up.",
       back_btn: "Back to Home"
     },
-    footer: { purpose: "Connecting the ancestral talent of Contumazá mothers with homes that value authenticity.", explore: "Explore", help: "Help", contact: "Contact", slogan: "Crafts of Contumazá", impact: "Social Impact", shipping: "Shipping", care: "Care", faq: "FAQ", legacy: "Ancestral Legacy", backed_by: "Supported by the", municipality: "Provincial Municipality of Contumazá" }
+    footer: { purpose: "We bring the talent and natural richness of Contumazá to homes that value origin and purity.", explore: "Explore", help: "Help", contact: "Contact", slogan: "Source of Origin & Quality", impact: "Local Development", shipping: "Shipping", care: "Warranty", faq: "FAQ", legacy: "Contumacino Pride", backed_by: "Institutional Management:", municipality: "Municipality of Contumazá" }
   }
 };

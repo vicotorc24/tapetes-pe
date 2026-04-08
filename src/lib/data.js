@@ -6,6 +6,7 @@ export const initialSeedData = [
   { id: 5, title: 'Tapete Flores del Trigo', price: 50.00, category: 'Decoración', description: 'Tapete rectangular formado por unión de flores evocando los campos de trigo locales. Uso versátil.', isPromoted: false, sellerName: 'Rosa', stock: 5, image: '/images/fb_2.jpg' },
   { id: 6, title: 'Tapete Cielos Andinos 3D', price: 70.00, category: 'Decoración', description: 'Tapete blanco con relieves 3D que captura la inmensidad de los cielos andinos, ideal para centros de mesa elegantes.', isPromoted: true, sellerName: 'Victoria', stock: 2, image: '/images/fb_3.jpg' },
   { id: 7, title: 'Camino Imperial de Contumazá', price: 120.00, category: 'Mesa', description: 'Camino largo con medallones grandes que narra el talento ancestral en cada hebra. Una pieza de lujo.', isPromoted: true, sellerName: 'Carmen', stock: 1, image: '/images/fb_2.jpg' },
+  { id: 8, title: 'Miel de Abeja Castillo - 100% Pura', price: 30.00, sector: 'food', weight: '500g', category: 'Miel y Derivados', description: 'Miel 100% natural, sin aditivos ni preservantes. Cosechada en Guzmango, Contumazá. Producto de Apicultura Sin Fronteras.', isPromoted: true, sellerName: 'Castillo - Apicultura', stock: 24, image: '/images/honey.png' },
 ];
 
 export const initialUsersData = [

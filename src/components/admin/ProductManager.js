@@ -1,34 +1,59 @@
 "use client";
-import React, { useState } from 'react';
-import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle, LucidePackage } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { addProduct, updateProduct, deleteProduct, getProducts } from '../../lib/services/products';
 import { ImageUpload } from '../ui/ImageUpload';
+import { CONFIG } from '@/lib/config';
 
-export function ProductManager({ products, setProducts, categories, collections, user, users, setFeedback }) {
+export function ProductManager({ products, setProducts, categories, collections, sectors = [], user, users, setFeedback }) {
   const myProducts = user.role === 'superadmin' ? products : products.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Logic for smart default sector filter
+  const getUserSectors = () => {
+    if (user.role === 'superadmin') return 'all';
+    const userSectors = Array.isArray(user.sectors) ? user.sectors : (user.sector ? [user.sector] : []);
+    return userSectors.length === 1 ? userSectors[0] : 'all';
+  };
+
+  const [listFilterSector, setListFilterSector] = useState(getUserSectors());
   const [formData, setFormData] = useState({ 
     title: '', 
     price: '', 
-    category: categories[0]?.name || '', 
+    category: '', 
+    sector: '', // Force selection: Artesanía, Alimentos, etc.
     description: '', 
     stock: 1, 
     isPromoted: false,
     image: '',
     images: [],
     collection: '',
+    // Textile specific
     materials: '',
     technique: '',
     dimensions: '',
     laborDays: '',
     stitchType: [],
+    // Food specific
+    weight: '',
+    harvestDate: '',
+    expirationDate: '',
+    ingredients: '',
+    registroSanitario: '',
     sellerEmail: '',
-    sellerName: ''
+    attributes: {} // For dynamic sector fields
   });
+
+  // Ayudante para encontrar el sector de forma robusta (soporta IDs antiguos y nuevos)
+  const currentSector = useMemo(() => {
+    if (!formData.sector) return null;
+    return sectors.find(s => s.id === formData.sector) || 
+           sectors.find(s => (s.name || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(formData.sector.toLowerCase()));
+  }, [formData.sector, sectors]);
   
   const STITCH_OPTIONS = [
     { id: 'jersey', name: 'Punto Jersey', desc: 'Clásico del tejido a dos agujas.' },
@@ -50,7 +75,48 @@ export function ProductManager({ products, setProducts, categories, collections,
     { id: 'elastico', name: 'Punto Elástico', desc: 'Ideal para puños y cuellos.' }
   ];
   const [stitchType, setStitchType] = useState(''); // Just for context, line 31 is filter
-  const filteredProducts = myProducts.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // 1. Filtramos categorías por el sector seleccionado
+  const filteredCategories = useMemo(() => {
+    return categories.filter(c => !c.sector || c.sector === formData.sector);
+  }, [categories, formData.sector]);
+
+  // Aseguramos que la categoría seleccionada sea válida para el sector
+  useEffect(() => {
+    const isValid = filteredCategories.some(c => c.name === formData.category);
+    if (!isValid && filteredCategories.length > 0) {
+      setFormData(prev => ({ ...prev, category: filteredCategories[0].name }));
+    }
+  }, [formData.sector, filteredCategories]);
+  const filteredProducts = myProducts.filter(p => {
+    // 1. Filtro por término de búsqueda (Título)
+    const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // 2. Filtro por Sector (Rubro)
+    let matchesSector = true;
+    if (listFilterSector !== 'all') {
+      const activeSectorObj = sectors.find(s => s.id === listFilterSector);
+      const activeNameRaw = activeSectorObj?.name || '';
+      const activeNameNormalized = activeNameRaw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      const prodSector = p.sector;
+      const prodSectorStr = (prodSector || '').toString();
+      const prodSectorNormalized = prodSectorStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+      // Lógica resiliente similar a CategoryManager
+      const isArtesania = activeNameNormalized.includes('artesania') || listFilterSector === 'textile' || listFilterSector === 'j0xk99eU7jyPLn9Zi8WU';
+      const isAlimentos = activeNameNormalized.includes('alimento') || activeNameNormalized.includes('agro') || listFilterSector === 'food' || listFilterSector === 'a2z1ewWmF5lDEJz4sFcl';
+
+      const matchesID = prodSector === listFilterSector;
+      const matchesName = activeNameNormalized && prodSectorNormalized === activeNameNormalized;
+      const matchesLegacyArtesania = isArtesania && (prodSectorNormalized === 'textile' || prodSectorNormalized === 'artesania' || prodSectorNormalized.includes('artesania'));
+      const matchesLegacyAlimentos = isAlimentos && (prodSectorNormalized === 'food' || prodSectorNormalized === 'alimentos' || prodSectorNormalized.includes('alimento') || prodSectorNormalized.includes('agro'));
+
+      matchesSector = matchesID || matchesName || matchesLegacyArtesania || matchesLegacyAlimentos;
+    }
+
+    return matchesSearch && matchesSector;
+  });
 
   const canManage = (p) => {
     const isOwner = p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim();
@@ -66,9 +132,10 @@ export function ProductManager({ products, setProducts, categories, collections,
   const handleEditClick = (product) => { 
     setEditingProduct(product); 
     setFormData({ 
-      title: product.title, 
-      price: product.price, 
-      category: product.category, 
+      title: product.title || '', 
+      price: product.price || '', 
+      category: product.category || '', 
+      sector: product.sector || 'textile',
       description: product.description || '', 
       stock: product.stock || 1, 
       isPromoted: product.isPromoted || false,
@@ -79,10 +146,15 @@ export function ProductManager({ products, setProducts, categories, collections,
       technique: product.technique || '',
       dimensions: product.dimensions || '', 
       laborDays: product.laborDays || '', 
-      laborDays: product.laborDays || '', 
       stitchType: Array.isArray(product.stitchType) ? product.stitchType : (product.stitchType ? [product.stitchType] : []),
+      weight: product.weight || '',
+      harvestDate: product.harvestDate || '',
+      expirationDate: product.expirationDate || '',
+      ingredients: product.ingredients || '',
+      registroSanitario: product.registroSanitario || '',
       sellerEmail: product.sellerEmail || '',
-      sellerName: product.sellerName || ''
+      sellerName: product.sellerName || '',
+      attributes: product.attributes || {}
     }); 
     setIsCreating(true); 
   };
@@ -98,11 +170,24 @@ export function ProductManager({ products, setProducts, categories, collections,
         });
       }
 
+      // VALIDACIÓN CRÍTICA: Sector obligatorio
+      if (!formData.sector || formData.sector.trim() === '') {
+        if (setFeedback) {
+          setFeedback({ 
+            type: 'error', 
+            message: '¡Atención! Debes seleccionar un Sector Productivo (Artesanía, Alimentos o Turismo) para que el producto sea visible en el catálogo.' 
+          });
+        }
+        setIsSaving(false);
+        return;
+      }
+
       const productPayload = {
         ...formData,
         image: typeof formData.images?.[0] === 'string' ? formData.images[0] : (formData.images?.[0]?.url || ''),
         sellerEmail: user.role === 'superadmin' ? (formData.sellerEmail || user.email) : user.email,
         sellerName: user.role === 'superadmin' ? (formData.sellerName || user.name) : user.name,
+        sellerPhoto: user.photo || '' // Persist current photo in product for quick access
       };
 
       if (editingProduct) { 
@@ -113,7 +198,13 @@ export function ProductManager({ products, setProducts, categories, collections,
       
       await refreshProducts();
       setIsCreating(false); 
-      setFormData({ title: '', price: '', category: categories[0]?.name || '', description: '', stock: 1, isPromoted: false, image: '', images: [], collection: '', materials: '', technique: '', dimensions: '', laborDays: '', stitchType: '' }); 
+      setFormData({ 
+        title: '', price: '', category: '', sector: '',
+        description: '', stock: 1, isPromoted: false, image: '', images: [], 
+        collection: '', materials: '', technique: '', dimensions: '', 
+        laborDays: '', stitchType: [], weight: '', harvestDate: '', expirationDate: '',
+        ingredients: '', registroSanitario: ''
+      }); 
       setEditingProduct(null);
 
       if (setFeedback) {
@@ -163,7 +254,7 @@ export function ProductManager({ products, setProducts, categories, collections,
 
   if (isCreating) {
     return (
-      <div className="max-w-2xl bg-white p-8 rounded-xl border border-stone-200 shadow-sm animate-in slide-in-from-right">
+      <div className="max-w-4xl bg-white p-10 rounded-2xl border border-stone-200 shadow-sm animate-in slide-in-from-right">
         <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-bold text-stone-900">{editingProduct ? 'Editar Producto' : 'Nuevo Producto'}</h2><button onClick={() => setIsCreating(false)}><LucideX/></button></div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
@@ -184,9 +275,39 @@ export function ProductManager({ products, setProducts, categories, collections,
 
           <div className="grid grid-cols-2 gap-6">
             <div>
-                <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Categoría</label>
-                <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none font-medium text-stone-900" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
-                    {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans">Sector Productivo</label>
+                <div className="flex gap-2">
+                  {sectors.map(sec => (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      onClick={() => setFormData({...formData, sector: sec.id})}
+                      className={`flex-1 p-3 rounded-xl border text-sm font-bold transition-all duration-300 ${
+                        formData.sector === sec.id 
+                          ? 'bg-stone-900 text-white border-stone-900 shadow-lg scale-[1.02]' 
+                          : 'bg-stone-50 text-stone-500 border-stone-100 hover:bg-stone-100'
+                      }`}
+                    >
+                      <span className="mr-2">{sec.icon}</span>
+                      {sec.name}
+                    </button>
+                  ))}
+                </div>
+            </div>
+            <div>
+                <label className={`text-xs font-bold uppercase mb-2 block font-sans transition-colors ${!formData.sector ? 'text-orange-600' : 'text-stone-500'}`}>
+                  Categoría {!formData.sector && '(Elige un rubro primero)'}
+                </label>
+                <select 
+                  disabled={!formData.sector}
+                  className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none font-medium transition-all ${
+                    !formData.sector ? 'bg-stone-100 text-stone-400 cursor-not-allowed' : 'bg-stone-50 text-stone-900 border-stone-200'
+                  }`} 
+                  value={formData.category} 
+                  onChange={e => setFormData({...formData, category: e.target.value})}
+                >
+                    <option value="">Selecciona Categoría...</option>
+                    {filteredCategories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                 </select>
             </div>
             {/* Guía de Categorización */}
@@ -210,66 +331,152 @@ export function ProductManager({ products, setProducts, categories, collections,
                 <input required type="number" className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Colección Oficial</label>
-              <select className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none appearance-none" value={formData.collection} onChange={e => setFormData({...formData, collection: e.target.value})}>
-                <option value="">(Ninguna)</option>
-                {collections.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Dimensiones / Medidas</label>
-              <input className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.dimensions} onChange={e => setFormData({...formData, dimensions: e.target.value})} placeholder="Ej: 40cm x 40cm" />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Materiales</label>
-              <input className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.materials} onChange={e => setFormData({...formData, materials: e.target.value})} placeholder="Ej: Lana de ovino, Algodón" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Técnica Artesanal</label>
-              <input className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.technique} onChange={e => setFormData({...formData, technique: e.target.value})} placeholder="Ej: Telar de cintura, Crochet" />
-            </div>
-          </div>
+          <div className="bg-stone-50/50 p-6 rounded-3xl border border-stone-100 space-y-6">
+            <h4 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-4">
+              {currentSector?.name || 'Detalles de Producción'}
+            </h4>
 
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Días de Labor / Dedicación</label>
-              <input type="number" className="w-full p-3 bg-stone-50 border rounded-lg focus:ring-2 focus:ring-orange-100 outline-none" value={formData.laborDays} onChange={e => setFormData({...formData, laborDays: e.target.value})} placeholder="Ej: 15" />
-            </div>
-            <div className="col-span-2">
-              <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                {STITCH_OPTIONS.map(opt => {
-                  const isSelected = (formData.stitchType || []).includes(opt.name);
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => {
-                        const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
-                        const next = isSelected 
-                          ? current.filter(s => s !== opt.name)
-                          : [...current, opt.name];
-                        setFormData({ ...formData, stitchType: next });
-                      }}
-                      className={`flex flex-col p-3 rounded-xl border text-left transition-all duration-200 ${
-                        isSelected 
-                          ? 'bg-orange-50 border-orange-200 ring-2 ring-orange-50' 
-                          : 'bg-stone-50 border-stone-100 hover:border-stone-200'
-                      }`}
-                    >
-                      <span className={`text-xs font-bold ${isSelected ? 'text-orange-700' : 'text-stone-700'}`}>{opt.name}</span>
-                      <span className="text-[9px] text-stone-400 line-clamp-1 mt-0.5">{opt.desc}</span>
-                    </button>
-                  );
-                })}
+            {/* 1. Campos Legacy (Base) - Siempre visibles en sus respectivos rubros */}
+            {(currentSector?.name?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes('artesania') || formData.sector === 'textile') ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
+                  <div className="md:col-span-1">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Dimensiones / Medidas</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none focus:border-orange-200" value={formData.dimensions} onChange={e => setFormData({...formData, dimensions: e.target.value})} placeholder="Ej: 40cm x 40cm" />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Materiales</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.materials} onChange={e => setFormData({...formData, materials: e.target.value})} placeholder="Ej: Lana de ovino" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block">Técnica</label>
+                    <input className="w-full p-3 bg-white border border-stone-200 rounded-lg outline-none" value={formData.technique} onChange={e => setFormData({...formData, technique: e.target.value})} placeholder="Ej: Telar de cintura" />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-stone-100">
+                  <label className="text-xs font-bold text-stone-500 uppercase mb-3 block">Puntos Maestros Predominantes</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {STITCH_OPTIONS.map(opt => {
+                      const isSelected = (formData.stitchType || []).includes(opt.name);
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            const current = Array.isArray(formData.stitchType) ? formData.stitchType : [];
+                            const next = isSelected 
+                              ? current.filter(s => s !== opt.name)
+                              : [...current, opt.name];
+                            setFormData({ ...formData, stitchType: next });
+                          }}
+                          className={`p-2 rounded-lg border text-left transition-all text-[10px] font-bold ${
+                            isSelected ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-white border-stone-100 text-stone-600 hover:border-stone-200'
+                          }`}
+                        >
+                          {opt.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (currentSector?.name?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes('alimento') || currentSector?.name?.toLowerCase().includes('agro') || formData.sector === 'food') ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 scale-in-95 animate-in duration-500">
+                  <div className="md:col-span-1">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans tracking-wide">Contenido / Peso</label>
+                    <input className="w-full p-4 bg-white border border-stone-200 rounded-2xl outline-none font-medium focus:border-orange-200" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} placeholder="Ej: 500g, 1 Litro" />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans tracking-wide">Registro Sanitario (Si aplica)</label>
+                    <input className="w-full p-4 bg-white border border-stone-200 rounded-2xl outline-none font-medium text-stone-600 focus:border-orange-200" value={formData.registroSanitario} onChange={e => setFormData({...formData, registroSanitario: e.target.value})} placeholder="Ej: RSA-0000-X" />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans tracking-wide">Fecha de Cosecha / Producción</label>
+                    <input type="date" className="w-full p-4 bg-white border border-stone-200 rounded-2xl outline-none text-sm font-medium focus:border-orange-200" value={formData.harvestDate} onChange={e => setFormData({...formData, harvestDate: e.target.value})} />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="text-xs font-bold text-stone-500 uppercase mb-2 block font-sans tracking-wide">Fecha de Vencimiento (Aprox)</label>
+                    <input type="date" className="w-full p-4 bg-white border border-stone-200 rounded-2xl outline-none text-sm font-medium focus:border-orange-200" value={formData.expirationDate} onChange={e => setFormData({...formData, expirationDate: e.target.value})} />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-stone-100 mt-6">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div>
+                      <label className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] block mb-3 font-sans">Ingredientes / Insumos Principales</label>
+                      <textarea 
+                        className="w-full p-5 bg-white border border-stone-200 rounded-3xl outline-none focus:ring-4 focus:ring-orange-50/50 focus:border-orange-200 transition-all text-sm resize-none h-32 font-sans leading-relaxed" 
+                        value={formData.ingredients} 
+                        onChange={e => setFormData({...formData, ingredients: e.target.value})} 
+                        placeholder="Describe los insumos de origen... ej: Miel de abeja 100% pura recolectada en los bosques de Contumazá..." 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : null}
+
+            {/* Separador visual opcional si hay campos dinámicos */}
+            {currentSector?.fields?.length > 0 && (
+              <div className="pt-8 border-t border-stone-100 mt-8">
+                <h5 className="text-[9px] font-black text-stone-300 uppercase tracking-[0.3em] mb-6">Detalles Complementarios</h5>
               </div>
-              <p className="text-[10px] text-stone-400 italic mt-3">* Puedes seleccionar varios puntos para una misma pieza.</p>
-            </div>
+            )}
+
+            {/* 2. Campos de Schema Dinámicos (Accesorios) */}
+            {(() => {
+              if (!currentSector || !currentSector.fields || currentSector.fields.length === 0) return null;
+              
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in slide-in-from-top-1">
+                  {currentSector.fields.map(field => (
+                    <div key={field.id}>
+                      <label className="text-[10px] font-bold text-stone-500 uppercase mb-2 block tracking-wider">{field.label}</label>
+                      {field.type === 'textarea' ? (
+                        <textarea 
+                          className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none text-sm resize-none h-24"
+                          placeholder={field.label}
+                          value={formData.attributes?.[field.label] || ''}
+                          onChange={e => setFormData({ 
+                            ...formData, 
+                            attributes: { ...formData.attributes, [field.label]: e.target.value } 
+                          })}
+                        />
+                      ) : field.type === 'checkbox' ? (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ 
+                            ...formData, 
+                            attributes: { ...formData.attributes, [field.label]: !formData.attributes?.[field.label] } 
+                          })}
+                          className={`w-full p-3 rounded-xl border text-left text-sm font-bold transition-all ${
+                            formData.attributes?.[field.label] 
+                              ? 'bg-stone-900 text-white border-stone-900' 
+                              : 'bg-white border-stone-200 text-stone-500'
+                          }`}
+                        >
+                          {formData.attributes?.[field.label] ? '✅ Sí' : '❌ No'}
+                        </button>
+                      ) : (
+                        <input 
+                          type={field.type || 'text'}
+                          className="w-full p-3 bg-white border border-stone-200 rounded-xl outline-none text-sm"
+                          placeholder={field.label}
+                          value={formData.attributes?.[field.label] || ''}
+                          onChange={e => setFormData({ 
+                            ...formData, 
+                            attributes: { ...formData.attributes, [field.label]: e.target.value } 
+                          })}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="space-y-4">
@@ -372,7 +579,7 @@ export function ProductManager({ products, setProducts, categories, collections,
               </h4>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="text-[10px] font-bold text-stone-500 uppercase mb-2 block">Asignar a Artesana (Vendedor)</label>
+                  <label className="text-[10px] font-bold text-stone-500 uppercase mb-2 block">Asignar a Productor/a (Vendedor)</label>
                   <select 
                     className="w-full p-2.5 text-sm bg-stone-800 border border-stone-700 text-white rounded-lg outline-none focus:ring-1 focus:ring-purple-500 transition-all cursor-pointer"
                     value={formData.sellerEmail || ''}
@@ -394,7 +601,7 @@ export function ProductManager({ products, setProducts, categories, collections,
                       }
                     }}
                   >
-                    <option value="">Seleccionar Artesana...</option>
+                    <option value="">Seleccionar Productor/a...</option>
                     {(users || []).filter(u => u.role === 'seller' || u.role === 'artisan').map(u => (
                       <option key={u.id} value={u.email}>
                         {u.name} — {u.email}
@@ -443,14 +650,70 @@ export function ProductManager({ products, setProducts, categories, collections,
     <div className="animate-in fade-in">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-stone-900">Mis Productos</h2>
-          <p className="text-stone-500 text-sm">Gestiona tu catálogo y stock</p>
+          <h2 className="text-2xl font-bold text-stone-900 font-serif">Made In Contumazá</h2>
+          <p className="text-stone-500 text-sm">Gestiona el catálogo territorial y stock</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => { setEditingProduct(null); setFormData({ title: '', price: '', category: categories[0]?.name || '', description: '', stock: 1, isPromoted: false, image: '', images: [], collection: '', materials: '', technique: '', dimensions: '' }); setIsCreating(true); }} className="bg-orange-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-orange-800 transition"><LucidePlus size={18} /> Nuevo</button>
+          <button 
+            onClick={() => { 
+               setEditingProduct(null); 
+               const uSectors = Array.isArray(user.sectors) ? user.sectors : (user.sector ? [user.sector] : []);
+               const defaultSector = uSectors.length === 1 ? uSectors[0] : '';
+               
+               setFormData({ 
+                  title: '', 
+                  price: '', 
+                  category: categories.find(c => c.sector === defaultSector)?.name || '', 
+                  description: '', 
+                  sector: defaultSector, // INTELLIGENT DEFAULT FROM MULTI-RUBRO PROFILE
+                  stock: 1, 
+                  isPromoted: false, 
+                  image: '', 
+                  images: [], 
+                  collection: '', 
+                  materials: '', 
+                  technique: '', 
+                  dimensions: '' 
+               }); 
+               setIsCreating(true); 
+            }} 
+            className="bg-orange-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-orange-800 transition"
+          >
+            <LucidePlus size={18} /> Nuevo
+          </button>
         </div>
       </div>
-      <div className="mb-6 relative max-w-md"><LucideSearch className="absolute left-3 top-2.5 text-stone-400" size={20}/><input type="text" placeholder="Buscar producto..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-100" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/></div>
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="relative flex-1 max-w-md">
+          <LucideSearch className="absolute left-3 top-2.5 text-stone-400" size={20}/>
+          <input 
+            type="text" 
+            placeholder="Buscar producto por nombre..." 
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-100 transition-all shadow-sm" 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex gap-1.5 p-1 bg-stone-100 rounded-2xl w-fit">
+          <button 
+            onClick={() => setListFilterSector('all')}
+            className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${listFilterSector === 'all' ? 'bg-white text-stone-900 shadow-md' : 'text-stone-400 hover:text-stone-600'}`}
+          >
+            Todos
+          </button>
+          {sectors.map(sec => (
+            <button 
+              key={sec.id}
+              onClick={() => setListFilterSector(sec.id)}
+              className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${listFilterSector === sec.id ? 'bg-white text-stone-950 shadow-md' : 'text-stone-400 hover:text-stone-700'}`}
+            >
+              <span>{sec.icon}</span>
+              <span className="hidden sm:inline">{sec.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-stone-50 border-b border-stone-200 text-xs font-bold uppercase text-stone-500">

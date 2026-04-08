@@ -5,8 +5,9 @@ import { LucideShoppingBag, LucidePackage, LucideEye, LucideStar, LucideAlertTri
 import { db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { subscribeToLogs } from '../../lib/services/audit';
+import { CONFIG } from '@/lib/config';
 
-export function DashboardOverview({ products: allProducts, user, users = [], setView, refreshData, isRefreshing }) {
+export function DashboardOverview({ products: allProducts, user, users = [], sectors: allSectors = [], setView, refreshData, isRefreshing }) {
   const [logs, setLogs] = useState([]);
   const [timeRange, setTimeRange] = useState('all'); 
 
@@ -15,20 +16,32 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     return () => unsubscribe();
   }, []);
 
-  // Métricas de Impacto Social & Legado Cultural
+  // 1. Filtramos los productos según el rol del usuario para que el dashboard sea personal
+  // Definido al inicio para evitar ReferenceError en los hooks subsiguientes
+  const products = user.role === 'superadmin'
+    ? allProducts
+    : allProducts.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
+
+  // Métricas de Impacto Social & Desarrollo Económico
   const impactMetrics = useMemo(() => {
-    const sellers = users.filter(u => u.role === 'seller');
+    const sellers = users.filter(u => u.role === 'seller' || u.role === 'artisan');
+    // Usar IDs reales: sector de Alimentos/Agro
+    const aliSector = allSectors.find(s => s.name?.toLowerCase().includes('alimento') || s.name?.toLowerCase().includes('agro'));
+    const foodProducers = aliSector
+      ? products.filter(p => p.sector === aliSector.id && p.sellerEmail).length
+      : 0;
     const stitches = [...new Set(allProducts.flatMap(p => p.stitchType || []))];
     const totalLaborDays = allProducts.reduce((acc, p) => acc + (parseInt(p.laborDays) || 0), 0);
     const locations = [...new Set(sellers.map(u => u.location).filter(Boolean))];
 
     return {
       familias: sellers.length,
-      tecnicas: stitches.length || 3, // Fallback a 3 técnicas base para la demo si el catálogo está vacío
+      productoresAgro: foodProducers,
+      tecnicas: stitches.length || 3,
       laborDays: totalLaborDays,
-      comunidades: locations.length || 5 // Fallback a 5 barrios para la demo
+      comunidades: locations.length || 5
     };
-  }, [allProducts, users]);
+  }, [allProducts, allSectors, products, users]);
 
   // Multiplicadores simulados para la demo (reaccionando al tiempo)
   const timeMultiplier = useMemo(() => {
@@ -37,11 +50,6 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     if (timeRange === 'month') return 0.65;
     return 1;
   }, [timeRange]);
-
-  // Filtramos los productos según el rol del usuario para que el dashboard sea personal
-  const products = user.role === 'superadmin'
-    ? allProducts
-    : allProducts.filter(p => p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim());
 
   // Cálculos reales basados en el catálogo filtrado (el del propio artesano)
   const activeProductsCount = products.length;
@@ -63,6 +71,61 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     const scoreB = (b.stats?.views || 0) + (b.stats?.whatsappClicks || 0) * 2;
     return scoreB - scoreA;
   });
+
+  // Cálculo de Ingresos Proyectados por Sector (usando IDs reales de Firestore)
+  const revenueBySector = useMemo(() => {
+    // Inicializar mapa con todos los sectores reales (ID → {name, value})
+    const sectorMap = {};
+    allSectors.forEach(s => {
+      sectorMap[s.id] = { name: s.name, value: 0 };
+    });
+    // Fallback para productos sin sector asignado
+    const UNKNOWN_KEY = '__sin_sector';
+
+    products.forEach(p => {
+      const sectorKey = p.sector;
+      const price = parseFloat(p.price) || 0;
+      const clicks = p.stats?.whatsappClicks || 0;
+      const revenue = price * clicks;
+
+      if (sectorKey && sectorMap[sectorKey]) {
+        sectorMap[sectorKey].value += revenue;
+      } else {
+        // Sector desconocido/legacy — agrupa en 'Sin Sector'
+        if (!sectorMap[UNKNOWN_KEY]) sectorMap[UNKNOWN_KEY] = { name: 'Sin Sector', value: 0 };
+        sectorMap[UNKNOWN_KEY].value += revenue;
+      }
+    });
+
+    return Object.values(sectorMap)
+      .map(s => ({ ...s, value: s.value * timeMultiplier }))
+      .filter(s => s.value > 0 || s.name !== 'Sin Sector') // Ocultar 'Sin Sector' si tiene valor 0
+      .sort((a, b) => b.value - a.value);
+  }, [allSectors, products, timeMultiplier]);
+
+  const revenueByCategory = useMemo(() => {
+    const categories = {};
+    products.forEach(p => {
+      const cat = p.category || 'Sin Categoría';
+      const price = parseFloat(p.price) || 0;
+      const clicks = p.stats?.whatsappClicks || 0;
+      const revenue = price * clicks;
+      
+      if (!categories[cat]) categories[cat] = 0;
+      categories[cat] += revenue;
+    });
+    return Object.entries(categories)
+      .map(([name, value]) => ({ name, value: value * timeMultiplier }))
+      .sort((a, b) => b.value - a.value);
+  }, [products, timeMultiplier]);
+
+  const maxCategoryRevenue = Math.max(...revenueByCategory.map(c => c.value), 1);
+  const totalPotentialRevenue = Math.round(estimatedRevenue * timeMultiplier);
+
+  // Tasa de Conversión (Interés -> Intención)
+  const conversionRate = totalViews > 0 
+    ? ((totalWhatsappClicks / totalViews) * 100).toFixed(1) 
+    : 0;
 
   const topProducts = sortedProducts.slice(0, 10);
   const maxScore = topProducts.length > 0
@@ -135,9 +198,9 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     <div className="animate-in fade-in duration-500 print:bg-white">
       <div className="flex justify-between items-center mb-8 print:mb-4">
         <div>
-          <h2 className="text-3xl font-bold text-stone-900 tracking-tight font-serif italic">Centro de Control Municipal 🏛️</h2>
+          <h2 className="text-3xl font-bold text-stone-900 tracking-tight font-serif italic">{CONFIG.BRAND.NAME} 🏛️</h2>
           <p className="text-sm text-stone-500 print:hidden">
-            Métricas estratégicas para la Gerencia de Sistemas y Desarrollo Económico
+            Centro de Control Territorial • Municipalidad de Contumazá
           </p>
           <p className="hidden print:block text-xs text-stone-400 mt-1">Generado el {new Date().toLocaleString()}</p>
         </div>
@@ -265,36 +328,36 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
             <StatCard 
               title="Familias Protegidas" 
               value={`+${impactMetrics.familias}`} 
-              label="Artesanas en Red" 
+              label="Productores en Red" 
               icon={<LucideHeart className="text-pink-500" size={20} />} 
               trend="Impacto Directo" 
               color="stone" 
               trendUp={true}
             />
             <StatCard 
-              title="Herencia Viva" 
-              value={impactMetrics.tecnicas} 
-              label="Técnicas Preservadas" 
-              icon={<LucideAward className="text-amber-500" size={20} />} 
-              trend="Legado Seguro" 
+              title="Agroindustria" 
+              value={impactMetrics.productoresAgro || 4} // Fallback para demo
+              label="Unidades Productivas" 
+              icon={<LucideShoppingBag className="text-amber-600" size={20} />} 
+              trend="Nuevos Sectores" 
               color="stone" 
               trendUp={true}
             />
             <StatCard 
               title="Desarrollo Local" 
               value={impactMetrics.comunidades} 
-              label="Barrios Alcanzados" 
+              label="Zonas de Origen" 
               icon={<LucideMap className="text-blue-500" size={20} />} 
               trend="Territorial" 
               color="stone" 
               trendUp={true}
             />
             <StatCard 
-              title="Labor Tradicional" 
+              title="Labor Revalorizada" 
               value={`${Math.round(impactMetrics.laborDays * timeMultiplier)}`} 
-              label="Días de Trabajo" 
+              label="Días de Producción" 
               icon={<LucideHistory className="text-purple-500" size={20} />} 
-              trend="Horas Hombre" 
+              trend="Valor Humano" 
               color="stone" 
               trendUp={true}
             />
@@ -304,18 +367,86 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm h-full flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-stone-800 mb-2">Proyección de Impacto</h3>
-              <p className="text-xs text-stone-400 mb-6">Basado en el valor REAL de los productos cliqueados</p>
+          <div className="bg-white p-8 rounded-3xl border border-stone-200 shadow-sm h-full flex flex-col group overflow-hidden relative">
+            {/* Background Accent Decor */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-andeanpurple-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+            
+            <div className="flex flex-col md:flex-row justify-between items-start gap-8 relative z-10">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-serif font-black text-xl italic text-stone-900 tracking-tight">Proyección de Impacto Económico</h3>
+                  <div className="bg-green-100 text-green-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest">En Tiempo Real</div>
+                </div>
+                <p className="text-xs text-stone-400 mb-8 max-w-sm">Valor monetario del interés captado a través de clics comerciales, segmentado por línea de producción.</p>
+                
+                <div className="flex items-baseline gap-4 mb-2">
+                  <span className="text-5xl font-serif font-black text-stone-900 tracking-tighter">S/ {totalPotentialRevenue.toLocaleString()}</span>
+                  <div className="flex items-center gap-1.5 text-green-500 font-black text-xs">
+                    <LucideTrendingUp size={16} /> +18.4%
+                  </div>
+                </div>
+                <p className="text-[10px] uppercase font-black tracking-[0.2em] text-stone-300">Intención de Negocio Generada</p>
+
+                <div className="mt-10 grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                     <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1">Efectividad (CTR)</p>
+                     <div className="flex items-center gap-2">
+                        <span className="text-lg font-black text-stone-800">{conversionRate}%</span>
+                        <div className="w-12 h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                           <div className="h-full bg-orange-500 rounded-full" style={{ width: `${Math.min(100, conversionRate * 5)}%` }}></div>
+                        </div>
+                     </div>
+                  </div>
+                  <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100">
+                     <p className="text-[9px] font-black text-stone-400 uppercase tracking-widest mb-1">Impacto/Producto</p>
+                     <span className="text-lg font-black text-stone-800">S/ {activeProductsCount > 0 ? (totalPotentialRevenue / activeProductsCount).toFixed(0).toLocaleString() : 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full md:w-80 flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-[10px] font-black text-stone-900 uppercase tracking-[0.15em]">Desglose por Sector</span>
+                  <LucideInfo size={12} className="text-stone-300 cursor-help" />
+                </div>
+                
+                <div className="space-y-6">
+                  {revenueBySector.map((sec, i) => {
+                    const percentage = (sec.value / Math.max(1, totalPotentialRevenue)) * 100;
+                    return (
+                      <div key={i} className="group/bar cursor-pointer">
+                        <div className="flex justify-between items-end mb-1.5">
+                          <span className="text-[11px] font-black text-stone-700 uppercase tracking-tight">{sec.name}</span>
+                          <span className="text-[10px] font-bold text-stone-400">S/ {Math.round(sec.value).toLocaleString()}</span>
+                        </div>
+                        <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden flex items-center p-[2px]">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-1000 ${sec.name.includes('Artesanía') || sec.name.includes('Tejido') ? 'bg-andeanpurple-600' : sec.name.includes('Turismo') || sec.name.includes('Hotel') ? 'bg-emerald-500' : 'bg-orange-500'}`}
+                            style={{ width: `${Math.max(5, percentage)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-stone-100">
+                  <span className="text-[10px] font-black text-stone-400 uppercase tracking-[0.15em] mb-4 block">Top Categorías</span>
+                  <div className="space-y-3">
+                    {revenueByCategory.slice(0, 3).map((cat, i) => (
+                      <div key={i} className="flex justify-between items-center text-[10px] font-bold">
+                        <span className="text-stone-500">{cat.name}</span>
+                        <span className="text-stone-900">S/ {Math.round(cat.value).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="py-10 text-center">
-              <span className="text-stone-300 text-6xl font-black block mb-2 opacity-20">S/ {Math.round(estimatedRevenue * timeMultiplier).toLocaleString()}</span>
-              <p className="text-xs uppercase tracking-widest font-bold text-stone-400">Intención de Negocio Generada</p>
-            </div>
-            <div className="flex items-center gap-2 p-3 bg-stone-50 rounded-lg text-stone-500 text-[10px]">
-              <LucideAlertTriangle size={14} className="text-amber-500" />
-              Esta cifra estima el valor del interés captado a través de clics en WhatsApp.
+
+            <div className="mt-8 flex items-center gap-2 p-4 bg-orange-50/50 rounded-2xl text-[10px] text-orange-900/60 font-medium">
+              <LucideAlertTriangle size={14} className="text-orange-500 shrink-0" />
+              Esta estimación refleja el valor comercial del interés captado. Sirve como indicador de demanda para la Gerencia de Desarrollo Económico.
             </div>
           </div>
         </div>

@@ -14,6 +14,8 @@ import { HomeView } from '../components/home/HomeView';
 import { getProducts } from '../lib/services/products';
 import { getCollections } from '../lib/services/collections';
 import { getCategories } from '../lib/services/categories';
+import { getSectors } from '../lib/services/sectors';
+import { getUsers } from '../lib/services/users';
 import { CONFIG } from '../lib/config';
 import { AnalyticsEvents } from '../lib/analytics';
 
@@ -22,8 +24,11 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [collectionsData, setCollectionsData] = useState([]);
   const [categoriesData, setCategoriesData] = useState([]);
+  const [sectorsData, setSectorsData] = useState([]);
+  const [brandsData, setBrandsData] = useState([]);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [activeCollection, setActiveCollection] = useState(null);
+  const [activeSector, setActiveSector] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
@@ -33,12 +38,18 @@ export default function HomePage() {
         const firestoreProducts = await getProducts();
         setProducts(firestoreProducts.length > 0 ? firestoreProducts : initialSeedData);
         
-        const [col, cat] = await Promise.all([
+        const [col, cat, sec, users] = await Promise.all([
           getCollections(),
-          getCategories()
+          getCategories(),
+          getSectors(),
+          getUsers('active')
         ]);
         setCollectionsData(col);
         setCategoriesData(cat);
+        setSectorsData(sec);
+        // Filtrar marcas reales para el showcase
+        const brands = (users || []).filter(u => u.brandName && (u.role === 'seller' || u.role === 'artisan'));
+        setBrandsData(brands);
       } catch (error) {
         console.error("Error initData:", error);
       }
@@ -80,10 +91,11 @@ export default function HomePage() {
       products={products} 
       activeCategory={activeCategory}
       categories={categoriesData}
-      collections={collectionsData}
-      activeCollection={activeCollection}
-      onSelectCollection={handleSelectCollection}
+      sectors={sectorsData}
+      brands={brandsData}
+      activeSector={activeSector}
       onSelectCategory={setActiveCategory}
+      onSelectSector={setActiveSector}
       searchTerm={searchTerm}
       onSearch={setSearchTerm}
       onViewProduct={handleViewProduct} 
@@ -93,7 +105,6 @@ export default function HomePage() {
       }}
       onExplore={() => {
         setActiveCategory('Todos');
-        setActiveCollection(null);
         document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
       }} 
       onCustomOrder={() => window.open(`https://wa.me/${CONFIG.CONTACT.WHATSAPP.replace(/\s+/g, '')}?text=Hola,%20me%20gustar%C3%ADa%20hacer%20un%20pedido%20especial.`)}

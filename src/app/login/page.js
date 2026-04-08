@@ -117,25 +117,6 @@ export default function LoginPage() {
             {isLoggingIn ? <><LucideLoader className="animate-spin" size={20} /> Ingresando...</> : 'Entrar al Panel'}
           </button>
 
-          <div className="text-center text-xs text-stone-400 mt-8 border-t border-stone-100 pt-6">
-            <p className="mb-4 uppercase tracking-[0.2em] font-bold text-[9px] text-stone-400">Cuentas de Acceso Rápido</p>
-            <div className="flex justify-center gap-6">
-              <button
-                type="button"
-                onClick={() => { setEmail('admin@tapetes.pe'); setPassword('TapetesAdmin2026'); }}
-                className="text-stone-900 font-bold hover:text-terracotta-600 transition-colors"
-              >
-                Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => { setEmail('victoria.plasencia@tapetes.pe'); setPassword('123456'); }}
-                className="text-stone-900 font-bold hover:text-terracotta-600 transition-colors"
-              >
-                Artesana
-              </button>
-            </div>
-          </div>
         </form>
       </div>
     </div>
