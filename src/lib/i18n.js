@@ -11,7 +11,9 @@ export const translations = {
       origin_btn: "Ver Origen",
       fair_trade_badge: "Comercio Justo Directo",
       workforce_label: "Origen:",
-      authentic_label: "100% Hecho en Contumazá"
+      authentic_label: "100% Hecho en Contumazá",
+      showcase_label: "Curaduría Local",
+      showcase_desc: "Identidad expuesta al mundo"
     },
     catalog: { 
       title: "Colección Exclusiva", 
@@ -76,7 +78,11 @@ export const translations = {
       desc: '"Bajo el cielo de Contumazá, el tiempo se detiene en cada lazada." Descubre el legado de un pueblo que teje su historia con hilos de sol y niebla.',
       location_badge: "Desde la Plaza de Armas hasta el Mirador La Ermita",
       hands_label: "Mano de Obra",
-      hands_desc: "Arte que trasciende generaciones"
+      hands_desc: "Arte que trasciende generaciones",
+      wheat_badge: "Sabor & Herencia",
+      wheat_title: "Tierra del Buen Trigo",
+      wheat_desc: "Donde el sol andino se convierte en grano de oro. Descubre la milenaria tradición de la trilla en las eras de Contumazá.",
+      wheat_label: "Cosecha Local"
     },
     product: { back: "Volver al catálogo", add: "Agregar al Pedido", unique: "Pieza Única", by: "Tejido por", support: "Apoyas directamente a su familia.", related: "También te podría gustar", stock: "Disponibles" },
     cart: { title: "Tu Pedido", empty: "Tu canasta está vacía", total: "Total Estimado", pay_method: "Elige cómo pagar:", wa_btn: "Enviar Pedido", card_btn: "Pagar Ahora", wa_desc: "Sin comisión", card_desc: "Pago seguro" },
@@ -175,7 +181,9 @@ export const translations = {
       origin_btn: "View Origin",
       fair_trade_badge: "Direct Fair Trade",
       workforce_label: "Origin:",
-      authentic_label: "100% Made in Contumazá"
+      authentic_label: "100% Made in Contumazá",
+      showcase_label: "Local Curation",
+      showcase_desc: "Identity exposed to the world"
     },
     catalog: { 
       title: "Exclusive Collection", 
@@ -240,7 +248,11 @@ export const translations = {
       desc: '"Under the sky of Contumazá, time stops in every stitch." Discover the legacy of a people that weaves its history with threads of sun and mist.',
       location_badge: "From the Main Square to the Ermita Viewpoint",
       hands_label: "Handicraft",
-      hands_desc: "Art that transcends generations"
+      hands_desc: "Art that transcends generations",
+      wheat_badge: "Flavor & Heritage",
+      wheat_title: "Land of Good Wheat",
+      wheat_desc: "Where the Andean sun turns into golden grain. Discover the millenary tradition of threshing in the 'eras' of Contumazá.",
+      wheat_label: "Local Harvest"
     },
     product: { back: "Back to catalog", add: "Add to Order", unique: "Unique Piece", by: "Woven by", support: "Directly support their family.", related: "You might also like", stock: "Available" },
     cart: { title: "Your Order", empty: "Your basket is empty", total: "Estimated Total", pay_method: "Choose how to pay:", wa_btn: "Send Order", card_btn: "Pay Now", wa_desc: "No commission", card_desc: "Secure payment" },
