@@ -34,7 +34,7 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { logAction } from '@/lib/services/audit';
 
 export default function AdminDashboard() {
-  const { user, effectiveUser, impersonatedUser, loading, logout, register, startImpersonating } = useAuth();
+  const { user, effectiveUser, impersonatedUser, loading, logout, register, startImpersonating, refreshAuthUser } = useAuth();
   const router = useRouter();
   
   // States
@@ -300,8 +300,11 @@ export default function AdminDashboard() {
     setInfoModal('loading');
     try {
       await updateUser(userData.id, userData, effectiveUser);
-      const updated = await getUsers();
-      setUsersList(updated);
+      
+      // Refresco crítico: de la lista de usuarios y de la sesión actual
+      await refreshData(true);
+      await refreshAuthUser();
+
       setInfoMessage('Usuario actualizado con éxito.');
       setInfoModal('success');
     } catch (e) {
@@ -360,7 +363,7 @@ export default function AdminDashboard() {
                categories={categoriesData} 
                collections={collectionsData}
                sectors={sectorsData}
-               user={effectiveUser} sectors={sectorsData} 
+               user={effectiveUser} 
                users={usersList}
                setFeedback={handleFeedback}
              />
@@ -395,7 +398,7 @@ export default function AdminDashboard() {
                 onImpersonate={startImpersonating}
                 sectors={sectorsData}
                 setFeedback={handleFeedback}
-                adminuser={effectiveUser} sectors={sectorsData}
+                adminuser={effectiveUser}
              />
           )}
           {dashboardView === 'collections' && (
@@ -420,7 +423,8 @@ export default function AdminDashboard() {
           )}
           {dashboardView === 'profile' && (
              <ProfileManager 
-                user={effectiveUser} sectors={sectorsData} 
+                user={effectiveUser} 
+                sectors={sectorsData} 
                 onUpdate={handleEditUser} 
                 setFeedback={handleFeedback}
              />

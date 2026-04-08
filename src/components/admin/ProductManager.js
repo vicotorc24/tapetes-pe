@@ -187,6 +187,7 @@ export function ProductManager({ products, setProducts, categories, collections,
         image: typeof formData.images?.[0] === 'string' ? formData.images[0] : (formData.images?.[0]?.url || ''),
         sellerEmail: user.role === 'superadmin' ? (formData.sellerEmail || user.email) : user.email,
         sellerName: user.role === 'superadmin' ? (formData.sellerName || user.name) : user.name,
+        sellerPhoto: user.photo || '' // Persist current photo in product for quick access
       };
 
       if (editingProduct) { 

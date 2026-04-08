@@ -126,14 +126,21 @@ export function ProductDetail({ product, allProducts, userInterests, onBack, onA
             </div>
           )}
           
-          <div className="bg-andeangreen-50 p-6 rounded-2xl border border-andeangreen-100 mb-8 flex items-center gap-4 shadow-sm animate-in zoom-in-95 duration-500">
-             <div className="w-14 h-14 rounded-full bg-white border-2 border-andeangreen-200 overflow-hidden shrink-0 shadow-inner">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${product.sellerName || 'Artesana'}`} alt={product.sellerName} className="w-full h-full object-cover" />
+          <div className="bg-stone-50 p-6 rounded-2xl border border-stone-100 mb-8 flex items-center gap-5 shadow-sm hover:border-andeansky-200 transition-colors duration-500 group">
+             <div className="w-16 h-16 rounded-2xl bg-white border-4 border-white overflow-hidden shrink-0 shadow-md group-hover:scale-105 transition-transform duration-500">
+                <img 
+                  src={product.sellerPhoto || `https://api.dicebear.com/7.x/initials/svg?seed=${product.sellerName || 'Artesana'}`} 
+                  alt={product.sellerName} 
+                  className="w-full h-full object-cover" 
+                />
              </div>
              <div>
-                <p className="text-[10px] font-bold text-andeangreen-700 uppercase tracking-[0.2em] mb-0.5">Tejido a mano por</p>
-                <h4 className="text-lg font-serif font-bold text-stone-900">{product.sellerName || "Artesana Contumacina"}</h4>
-                <p className="text-xs text-stone-500 italic leading-snug mt-1">{t('product.support')}</p>
+                <p className="text-[9px] font-black text-andeansky-600 uppercase tracking-[0.2em] mb-1">
+                  {(product.sector === 'a2z1ewWmF5lDEJz4sFcl' || product.sector === 'agro' || product.sector === 'food') ? 'Productor/a Local' : 
+                   (product.sector === 'aiA7GR53X1nSUO7Gf3Ox' || product.sector === 'turismo') ? 'Anfitrión/a Local' : 'Tu Maestra Artesana'}
+                </p>
+                <h4 className="text-xl font-serif font-black text-stone-900 leading-tight">{product.sellerName || "Emprendedor/a Contumacino/a"}</h4>
+                <p className="text-[10px] text-stone-400 mt-1 italic font-medium">Contumazá, Cajamarca • Perú</p>
              </div>
           </div>
           <div className="flex gap-4">

@@ -18,7 +18,7 @@ import {
 import { updateUser } from '../../lib/services/users';
 import { uploadFile } from '../../lib/services/storage';
 
-export function ProfileManager({ user, sectors = [], setFeedback }) {
+export function ProfileManager({ user, sectors = [], onUpdate, setFeedback }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -52,6 +52,23 @@ export function ProfileManager({ user, sectors = [], setFeedback }) {
     photo: user.photo || ''
   });
 
+  // Sincronizar estado si el usuario cambia externamente (ej: post auto-save o navegación)
+  React.useEffect(() => {
+    const names = getInitialNames();
+    setFormData(prev => ({
+      ...prev,
+      firstName: names.firstName,
+      lastName: names.lastName,
+      photo: user.photo || prev.photo, // Mantener foto nueva si existe en user
+      phone: user.phone || prev.phone,
+      bio: user.bio || prev.bio,
+      specialty: user.specialty || prev.specialty,
+      brandName: user.brandName || prev.brandName,
+      instagram: user.instagram || prev.instagram,
+      facebook: user.facebook || prev.facebook
+    }));
+  }, [user.id, user.photo, user.firstName, user.lastName]);
+
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -59,8 +76,18 @@ export function ProfileManager({ user, sectors = [], setFeedback }) {
     setIsUploading(true);
     try {
       const url = await uploadFile(file, 'avatars');
-      setFormData({ ...formData, photo: url });
-      if (setFeedback) setFeedback({ type: 'success', message: '¡Foto cargada! No olvides guardar los cambios.' });
+      
+      // Actualizar estado local
+      const updatedData = { ...formData, photo: url, id: user.id };
+      setFormData(updatedData);
+
+      // AUTO-SAVE: Guardar solo la foto inmediatamente en la DB
+      await updateUser(user.id, { photo: url }, user);
+      
+      // Refrescar UI global (Pasando el ID para que AdminDashboard sepa a quién actualizar)
+      if (onUpdate) await onUpdate(updatedData);
+
+      if (setFeedback) setFeedback({ type: 'success', message: '¡Foto de perfil actualizada y guardada automáticamente!' });
     } catch (error) {
       if (setFeedback) setFeedback({ type: 'error', message: 'Error al subir foto: ' + error.message });
     } finally {
@@ -74,7 +101,12 @@ export function ProfileManager({ user, sectors = [], setFeedback }) {
     if (setFeedback) setFeedback({ type: 'loading', message: 'Actualizando perfil...' });
 
     try {
-      await updateUser(user.id, formData);
+      // Pasamos el usuario actual como administrador para el log de auditoría
+      await updateUser(user.id, formData, user);
+      
+      // Notificar al padre para refrescar la data global (incluyendo el AuthContext)
+      if (onUpdate) await onUpdate({ ...formData, id: user.id });
+
       if (setFeedback) {
         setFeedback({ 
           type: 'success', 

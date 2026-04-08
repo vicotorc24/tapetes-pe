@@ -7,7 +7,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { subscribeToLogs } from '../../lib/services/audit';
 import { CONFIG } from '@/lib/config';
 
-export function DashboardOverview({ products: allProducts, user, users = [], setView, refreshData, isRefreshing }) {
+export function DashboardOverview({ products: allProducts, user, users = [], sectors: allSectors = [], setView, refreshData, isRefreshing }) {
   const [logs, setLogs] = useState([]);
   const [timeRange, setTimeRange] = useState('all'); 
 
@@ -25,7 +25,11 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
   // Métricas de Impacto Social & Desarrollo Económico
   const impactMetrics = useMemo(() => {
     const sellers = users.filter(u => u.role === 'seller' || u.role === 'artisan');
-    const foodProducers = products.filter(p => p.sector === 'food' && p.sellerEmail).length;
+    // Usar IDs reales: sector de Alimentos/Agro
+    const aliSector = allSectors.find(s => s.name?.toLowerCase().includes('alimento') || s.name?.toLowerCase().includes('agro'));
+    const foodProducers = aliSector
+      ? products.filter(p => p.sector === aliSector.id && p.sellerEmail).length
+      : 0;
     const stitches = [...new Set(allProducts.flatMap(p => p.stitchType || []))];
     const totalLaborDays = allProducts.reduce((acc, p) => acc + (parseInt(p.laborDays) || 0), 0);
     const locations = [...new Set(sellers.map(u => u.location).filter(Boolean))];
@@ -37,7 +41,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
       laborDays: totalLaborDays,
       comunidades: locations.length || 5
     };
-  }, [allProducts, products, users]);
+  }, [allProducts, allSectors, products, users]);
 
   // Multiplicadores simulados para la demo (reaccionando al tiempo)
   const timeMultiplier = useMemo(() => {
@@ -68,27 +72,36 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
     return scoreB - scoreA;
   });
 
-  // Cálculo de Ingresos Proyectados por Sector (Rebranding Multi-sector)
+  // Cálculo de Ingresos Proyectados por Sector (usando IDs reales de Firestore)
   const revenueBySector = useMemo(() => {
-    const sectors = { 
-      textile: { name: 'Artesanía (Tejidos)', value: 0 },
-      food: { name: 'Alimentos y Agro', value: 0 }
-    };
-    
+    // Inicializar mapa con todos los sectores reales (ID → {name, value})
+    const sectorMap = {};
+    allSectors.forEach(s => {
+      sectorMap[s.id] = { name: s.name, value: 0 };
+    });
+    // Fallback para productos sin sector asignado
+    const UNKNOWN_KEY = '__sin_sector';
+
     products.forEach(p => {
-      const sectorKey = p.sector || 'textile';
+      const sectorKey = p.sector;
       const price = parseFloat(p.price) || 0;
       const clicks = p.stats?.whatsappClicks || 0;
       const revenue = price * clicks;
-      
-      if (!sectors[sectorKey]) sectors[sectorKey] = { name: sectorKey === 'textile' ? 'Artesanía' : 'Alimentos', value: 0 };
-      sectors[sectorKey].value += revenue;
+
+      if (sectorKey && sectorMap[sectorKey]) {
+        sectorMap[sectorKey].value += revenue;
+      } else {
+        // Sector desconocido/legacy — agrupa en 'Sin Sector'
+        if (!sectorMap[UNKNOWN_KEY]) sectorMap[UNKNOWN_KEY] = { name: 'Sin Sector', value: 0 };
+        sectorMap[UNKNOWN_KEY].value += revenue;
+      }
     });
 
-    return Object.values(sectors)
+    return Object.values(sectorMap)
       .map(s => ({ ...s, value: s.value * timeMultiplier }))
+      .filter(s => s.value > 0 || s.name !== 'Sin Sector') // Ocultar 'Sin Sector' si tiene valor 0
       .sort((a, b) => b.value - a.value);
-  }, [products, timeMultiplier]);
+  }, [allSectors, products, timeMultiplier]);
 
   const revenueByCategory = useMemo(() => {
     const categories = {};
@@ -408,7 +421,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], set
                         </div>
                         <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden flex items-center p-[2px]">
                           <div 
-                            className={`h-full rounded-full transition-all duration-1000 ${sec.name.includes('Artesanía') ? 'bg-andeanpurple-600' : 'bg-orange-500'}`}
+                            className={`h-full rounded-full transition-all duration-1000 ${sec.name.includes('Artesanía') || sec.name.includes('Tejido') ? 'bg-andeanpurple-600' : sec.name.includes('Turismo') || sec.name.includes('Hotel') ? 'bg-emerald-500' : 'bg-orange-500'}`}
                             style={{ width: `${Math.max(5, percentage)}%` }}
                           ></div>
                         </div>

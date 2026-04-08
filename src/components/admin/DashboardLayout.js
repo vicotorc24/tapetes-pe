@@ -80,8 +80,8 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
       `}>
         <div className="h-20 flex items-center justify-between px-8 border-b border-stone-100 bg-stone-50/50 shrink-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-stone-900 rounded-lg flex items-center justify-center text-white font-bold font-serif">T</div>
-            <span className="text-xl font-bold font-serif text-stone-900 tracking-tight">Tapetes Admin</span>
+            <div className="w-8 h-8 bg-stone-900 rounded-lg flex items-center justify-center text-white font-bold font-serif">C</div>
+            <span className="text-xl font-bold font-serif text-stone-900 tracking-tight">Panel de Gestión</span>
           </div>
           <button onClick={() => setMobileMenuOpen(false)} className="lg:hidden p-2 text-stone-400 hover:text-stone-900">
              <LucideX size={24} />
@@ -89,23 +89,27 @@ export function DashboardLayout({ children, user, currentView, setView, onLogout
         </div>
 
         <div className="flex-1 overflow-y-auto py-8 px-4">
-          {menuSections.map((section, idx) => (
-            <div key={idx} className="mb-8 last:mb-0">
-              <p className="px-4 text-[10px] font-bold text-stone-400 uppercase tracking-[0.15em] mb-4">{section.title}</p>
-              <nav className="space-y-1">
-                {section.items.filter(item => item.roles.includes(user.role)).map(item => (
-                  <button 
-                    key={item.id} 
-                    onClick={() => handleSetView(item.id)} 
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${currentView === item.id ? 'bg-stone-900 text-white shadow-lg shadow-stone-200 translate-x-1' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-900'}`}
-                  >
-                    <item.icon size={18} className={currentView === item.id ? 'text-wheat-500' : ''} /> 
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
-            </div>
-          ))}
+          {menuSections.map((section, idx) => {
+              const visibleItems = section.items.filter(item => item.roles.includes(user.role));
+              if (visibleItems.length === 0) return null;
+              return (
+                <div key={idx} className="mb-8 last:mb-0">
+                  <p className="px-4 text-[10px] font-bold text-stone-400 uppercase tracking-[0.15em] mb-4">{section.title}</p>
+                  <nav className="space-y-1">
+                    {visibleItems.map(item => (
+                      <button 
+                        key={item.id} 
+                        onClick={() => handleSetView(item.id)} 
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${currentView === item.id ? 'bg-stone-900 text-white shadow-lg shadow-stone-200 translate-x-1' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-900'}`}
+                      >
+                        <item.icon size={18} className={currentView === item.id ? 'text-wheat-500' : ''} /> 
+                        {item.label}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              );
+            })}
         </div>
 
         <div className="p-6 border-t border-stone-100 bg-stone-50/30 flex-shrink-0">

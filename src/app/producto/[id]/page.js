@@ -126,8 +126,15 @@ export default function ProductPage({ params }) {
     const number = artisan?.whatsapp || artisan?.phone || '51999999999';
     const productUrl = typeof window !== 'undefined' ? window.location.href : '';
     
+    // Etiqueta dinámica para el mensaje inicial (Soporta IDs reales y strings legacy)
+    const isAgro = product?.sector === 'a2z1ewWmF5lDEJz4sFcl' || product?.sector === 'agro' || product?.sector === 'food';
+    const isTurismo = product?.sector === 'aiA7GR53X1nSUO7Gf3Ox' || product?.sector === 'turismo';
+    
+    const sectorRole = isAgro ? 'Productor/a' : 
+                       isTurismo ? 'Anfitrión/a' : 'Artesana';
+
     const message = encodeURIComponent(
-      `Hola ${artisan?.name || 'Artesana'}, me interesa este producto de Tapetes.pe:\n\n` +
+      `Hola ${artisan?.name || sectorRole}, me interesa este producto de Tapetes.pe:\n\n` +
       `*${product?.title}*\n` +
       `----------------------------------\n` +
       `» *Precio:* S/ ${product?.price}\n` +
@@ -256,34 +263,41 @@ export default function ProductPage({ params }) {
             </div>
           )}
 
-          {/* CARD DE LA ARTESANA (Lado Izquierdo) */}
-          <div className="bg-white rounded-[2.5rem] border border-stone-100 shadow-xl shadow-stone-100/40 relative overflow-hidden group">
-            <div className="absolute -bottom-4 -right-4 w-40 h-40 opacity-[0.05] grayscale pointer-events-none group-hover:opacity-[0.08] transition-opacity">
-              <img src="/images/andean_weaver.png" className="w-full h-full object-contain" alt="" />
+          {/* CARD DEL PRODUCTOR (Lado Izquierdo) */}
+          <div className="bg-white rounded-[2.5rem] border border-stone-100 shadow-2xl shadow-stone-200/40 relative overflow-hidden group hover:border-andeansky-200 transition-colors duration-500">
+            {/* Elemento decorativo sutil */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-andeansky-50/30 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-andeansky-100/40 transition-colors"></div>
+            
+            <div className="absolute -bottom-4 -right-4 w-40 h-40 opacity-[0.03] grayscale pointer-events-none group-hover:opacity-[0.06] transition-opacity duration-700">
+               <img src="/images/andean_weaver.png" className="w-full h-full object-contain" alt="" />
             </div>
             
             <div className="relative z-10 p-8">
-              <div className="flex items-center gap-6 mb-6">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-stone-50 shrink-0 border-2 border-white shadow-md">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
+                <div className="w-24 h-24 rounded-3xl overflow-hidden bg-stone-50 shrink-0 border-4 border-white shadow-xl group-hover:rotate-2 transition-transform duration-500">
                   <img 
                     src={artisan?.photo || `https://api.dicebear.com/7.x/notionists/svg?seed=${artisan?.name || product?.sellerEmail || 'weaver'}`} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                     alt={artisan?.name} 
                   />
                 </div>
-                <div>
-                  <span className="text-[9px] font-black text-andeansky-600 uppercase tracking-[0.2em] mb-1 block">Tu Maestra Artesana</span>
-                  <h4 className="text-xl font-serif font-black text-stone-900 leading-none">
-                    {artisan?.brandName ? artisan.brandName : (artisan?.name || 'Artesana de Contumazá')}
+                <div className="text-center sm:text-left">
+                  <span className="inline-block px-3 py-1 bg-andeansky-50 text-andeansky-700 text-[9px] font-black uppercase tracking-[0.2em] mb-3 rounded-full border border-andeansky-100">
+                    { (product?.sector === 'a2z1ewWmF5lDEJz4sFcl' || product?.sector === 'agro' || product?.sector === 'food') ? 'Productor Local' : 
+                      (product?.sector === 'aiA7GR53X1nSUO7Gf3Ox' || product?.sector === 'turismo') ? 'Anfitrión Local' : 'Tu Maestra Artesana'}
+                  </span>
+                  <h4 className="text-2xl font-serif font-black text-stone-900 leading-tight">
+                    {artisan?.brandName ? artisan.brandName : (artisan?.name || 'Productor/a de Contumazá')}
                   </h4>
-                  <p className="text-[10px] text-stone-400 mt-1 font-bold">
+                  <p className="text-[10px] text-stone-400 mt-2 font-bold flex items-center justify-center sm:justify-start gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
                     {artisan?.brandName ? `Por ${artisan.name} • ` : ''}{artisan?.location || 'Contumazá, Cajamarca'}
                   </p>
                 </div>
               </div>
 
-              <p className="text-sm text-stone-500 italic leading-relaxed mb-8 border-l-2 border-andeansky-100 pl-4 py-1">
-                {artisan?.bio || '"Con cada nudo y cada punto, tejemos la historia y el corazón de nuestro querido Contumazá."'}
+              <p className="text-sm text-stone-500 italic leading-relaxed mb-8 border-l-4 border-orange-100 pl-4 py-2 bg-stone-50/30 rounded-r-2xl">
+                {artisan?.bio || `"Con cada labor, compartimos la historia y el corazón de nuestro querido Contumazá."`}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-stone-100">
