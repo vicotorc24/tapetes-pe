@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useRef } from 'react';
-import { LucideUpload, LucideX, LucideImage, LucideRefreshCcw, LucideCheckCircle, LucideChevronLeft, LucideChevronRight, LucideTrash2 } from 'lucide-react';
+import { LucideUpload, LucideX, LucideImage, LucideRefreshCcw, LucideCheckCircle, LucideChevronLeft, LucideChevronRight, LucideTrash2, LucideCamera } from 'lucide-react';
 import { uploadFile } from '../../lib/services/storage';
 
-export function ImageUpload({ value, onChange, path = 'general', label = 'Imagen', multiple = false, maxFiles = 1 }) {
+export function ImageUpload({ value, onChange, path = 'general', label = 'Imagen', multiple = false, maxFiles = 1, mode = 'default' }) {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -85,6 +85,64 @@ export function ImageUpload({ value, onChange, path = 'general', label = 'Imagen
       await upload(imageFiles[0]);
     }
   };
+
+  if (mode === 'avatar') {
+    return (
+      <div className="relative group w-32 h-32">
+        <div 
+          onClick={() => !isUploading && fileInputRef.current?.click()}
+          className={`
+            w-full h-full rounded-[2.5rem] border-2 border-dashed overflow-hidden transition-all relative flex flex-col items-center justify-center cursor-pointer
+            ${isDragOver ? 'border-orange-500 bg-orange-50' : 'border-stone-200 hover:border-orange-300 bg-stone-50/50'}
+            ${value ? 'border-none' : ''}
+          `}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+        >
+          {value ? (
+            <>
+              <img src={value} className="w-full h-full object-cover shadow-inner" alt="Avatar"/>
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                <div className="flex gap-2">
+                   <button type="button" onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }} className="p-2 bg-white rounded-xl text-stone-900 shadow-xl hover:scale-110 transition-transform">
+                     <LucideRefreshCcw size={16}/>
+                   </button>
+                   <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(0); }} className="p-2 bg-red-500 rounded-xl text-white shadow-xl hover:scale-110 transition-transform">
+                     <LucideTrash2 size={16}/>
+                   </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {isUploading ? (
+                <div className="flex flex-col items-center gap-2">
+                   <LucideRefreshCcw className="animate-spin text-orange-600" size={24} />
+                   <div className="w-12 h-1 bg-stone-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-orange-600 transition-all" style={{ width: `${progress}%` }}></div>
+                   </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5 text-stone-300 group-hover:text-orange-400 transition-colors">
+                  <LucideCamera size={28} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Foto</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          onChange={handleFileChange} 
+          accept="image/*" 
+          className="hidden" 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

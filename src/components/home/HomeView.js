@@ -198,33 +198,60 @@ export function HomeView({
         </div>
       )}
 
-      {/* Reubicando Sección Impacto Social: Mayor Visibilidad antes del Catálogo */}
+      {/* Sección Impacto Social: Versión Compacta & Narrativa */}
       {impactData && (
-        <div className="bg-ANDEANGREEN border-y-8 border-terracotta-500 text-stone-800 bg-andeangreen-50 py-24 px-4 overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-andeangreen-200/20 blur-[100px] -z-0"></div>
-          <div className="max-w-6xl mx-auto relative z-10">
-            <div className="text-center mb-16">
-              <span className="text-andeangreen-700 font-bold text-xs uppercase tracking-widest block mb-2">{t('impact.section_subtitle')}</span>
-              <h2 className="text-4xl md:text-6xl font-serif font-black text-stone-900 mb-8 tracking-tighter leading-none">{t('impact.section_title')}</h2>
-              <div className="w-24 h-1 bg-andeangreen-300 mx-auto mb-8 rounded-full"></div>
-              <p className="text-xl text-stone-600 max-w-2xl mx-auto font-light leading-relaxed">{t('impact.section_desc')}</p>
+        <div className="bg-andeangreen-50/40 py-8 md:py-12 px-4 overflow-hidden relative border-y border-andeangreen-100/30">
+          {/* Acentos de luz sutiles */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-andeangreen-200/20 rounded-full blur-[100px] -z-0"></div>
+          
+          <div className="max-w-7xl mx-auto relative z-10 box-border">
+            <div className="text-center mb-6 md:mb-8">
+              <div className="flex items-center justify-center gap-3 mb-3">
+                 <span className="h-[1px] w-6 bg-andeangreen-300"></span>
+                 <span className="text-andeangreen-800 font-black text-[9px] md:text-xs uppercase tracking-[0.3em] opacity-70">{t('impact.section_subtitle')}</span>
+                 <span className="h-[1px] w-6 bg-andeangreen-300"></span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-serif font-black text-stone-900 mb-4 tracking-tighter leading-none">
+                {t('impact.section_title')}
+              </h2>
+              <p className="text-base text-stone-600 max-w-2xl mx-auto font-light leading-relaxed mb-0">
+                {t('impact.section_desc')}
+              </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-10">
+
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
               {impactData.stats?.slice(0, 3).map((stat, idx) => (
-                <div key={idx} className="bg-white p-8 rounded-[2.5rem] shadow-sm text-center border border-andeangreen-100 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 transform ${idx % 2 === 0 ? 'rotate-3 bg-andeansky-100 text-andeansky-700' : '-rotate-3 bg-terracotta-100 text-terracotta-600'}`}>
-                    {idx === 0 && <LucideHeart size={40} />}
-                    {idx === 1 && <LucideGlobe2 size={40} />}
-                    {idx === 2 && <LucideUsers size={40} />}
+                <div key={idx} className="group relative">
+                  <div className="absolute inset-0 bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-lg shadow-andeangreen-200/10 -z-10 group-hover:bg-white transition-all duration-700"></div>
+                  
+                  <div className="p-8 md:p-10 text-center h-full flex flex-col items-center">
+                    <div className="w-16 h-16 rounded-2xl bg-andeangreen-50 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-andeangreen-600 group-hover:text-white transition-all duration-500 transform rotate-2 group-hover:rotate-0 border border-andeangreen-100 shadow-sm text-andeangreen-700">
+                      {idx === 0 && <LucideHeart size={28} strokeWidth={1.5} />}
+                      {idx === 1 && <LucideGlobe2 size={28} strokeWidth={1.5} />}
+                      {idx === 2 && <LucideUsers size={28} strokeWidth={1.5} />}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-4xl md:text-5xl font-serif font-black text-stone-900 tracking-tighter tabular-nums mb-1">
+                        {stat.value}
+                      </h3>
+                      <div className="w-8 h-1 bg-andeangreen-300 mx-auto rounded-full group-hover:w-12 group-hover:bg-andeangreen-600 transition-all duration-700"></div>
+                      <p className="text-stone-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] leading-[1.4] pt-1">
+                        {t(`impact.stat${idx + 1}_label`) || stat.label}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold font-serif mb-4 text-stone-900">{stat.value}</h3>
-                  <p className="text-stone-500 leading-relaxed font-light">{t(`impact.stat${idx + 1}_label`) || stat.label}</p>
                 </div>
               ))}
             </div>
-            <div className="mt-16 text-center">
-               <button onClick={() => window.location.href = '/impacto'} className="text-andes-neutral-900 font-bold border-b-2 border-andeangreen-300 hover:border-andeangreen-600 transition-all text-sm uppercase tracking-widest pb-1 mt-4">
-                  {t('impact.impact_cta') || 'Ver más sobre nuestro compromiso social →'}
+
+            <div className="mt-8 md:mt-10 text-center">
+               <button 
+                onClick={() => window.location.href = '/impacto'} 
+                className="group inline-flex items-center gap-4 text-stone-900 text-[10px] font-black uppercase tracking-[0.2em] hover:text-white transition-all py-3 px-8 border border-stone-200 rounded-full hover:bg-andeangreen-600 hover:border-andeangreen-600 active:scale-95 shadow-sm"
+               >
+                  {t('impact.impact_cta') || 'Ver Compromiso Social'}
+                  <LucideArrowRight size={14} className="group-hover:translate-x-2 transition-transform duration-500" />
                </button>
             </div>
           </div>

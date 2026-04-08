@@ -13,15 +13,28 @@ import {
   LucideMail,
   LucideSparkles,
   LucideShield,
-  LucideMapPin
+  LucideMapPin,
+  LucideAlertCircle,
+  LucideCheckCircle2,
+  LucideLock
 } from 'lucide-react';
 import { updateUser } from '../../lib/services/users';
 import { uploadFile } from '../../lib/services/storage';
+import { useAuth } from '@/context/AuthContext';
 
 export function ProfileManager({ user, sectors = [], onUpdate, setFeedback }) {
+  const { updateUserPassword } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUpdatingPass, setIsUpdatingPass] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const fileInputRef = useRef(null);
+  
+  // Estados para gestión de contraseña
+  const [passData, setPassData] = useState({
+    password: '',
+    confirmPassword: ''
+  });
   
   // Lógica de migración: Si no tiene firstName, intentamos partir el 'name' antiguo
   const getInitialNames = () => {
@@ -94,6 +107,38 @@ export function ProfileManager({ user, sectors = [], onUpdate, setFeedback }) {
       setIsUploading(false);
     }
   };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    if (passData.password !== passData.confirmPassword) return;
+    if (passData.password.length < 6) {
+      if (setFeedback) setFeedback({ type: 'error', message: 'La contraseña debe tener al menos 6 caracteres.' });
+      return;
+    }
+
+    setIsUpdatingPass(true);
+    if (setFeedback) setFeedback({ type: 'loading', message: 'Sincronizando nueva clave...' });
+
+    const result = await updateUserPassword(passData.password);
+
+    if (result.success) {
+      setPassData({ password: '', confirmPassword: '' });
+      if (setFeedback) setFeedback({ type: 'success', message: '¡Contraseña actualizada con éxito!' });
+    } else {
+      if (result.error === 'auth/requires-recent-login') {
+        if (setFeedback) setFeedback({ 
+          type: 'error', 
+          message: 'Por seguridad, debes cerrar sesión e iniciarla de nuevo para cambiar tu contraseña.' 
+        });
+      } else {
+        if (setFeedback) setFeedback({ type: 'error', message: 'Error: ' + result.error });
+      }
+    }
+    setIsUpdatingPass(false);
+  };
+
+  const passwordsMatch = passData.password === passData.confirmPassword;
+  const showPassError = passData.confirmPassword !== '' && !passwordsMatch;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -295,6 +340,7 @@ export function ProfileManager({ user, sectors = [], onUpdate, setFeedback }) {
             </div>
 
             {/* Redes Sociales - Ahora más elegante */}
+            {/* Presencia en Redes */}
             <div className="bg-white/70 backdrop-blur-sm p-8 md:p-10 rounded-[2rem] border border-stone-100 shadow-xl shadow-stone-100/50 space-y-6">
               <h4 className="font-black text-stone-900 uppercase text-[11px] tracking-[0.2em] mb-4">Presencia en Redes</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -321,6 +367,66 @@ export function ProfileManager({ user, sectors = [], onUpdate, setFeedback }) {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Seguridad de la Cuenta */}
+            <div className="bg-blue-50/30 p-8 md:p-10 rounded-[2.5rem] border-2 border-blue-100/20 space-y-8 animate-in slide-in-from-bottom-6">
+               <div className="flex items-center gap-4">
+                  <div className="p-3 bg-blue-600 rounded-2xl text-white shadow-lg shadow-blue-200">
+                     <LucideShield size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-blue-900 uppercase text-[11px] tracking-[0.2em]">Seguridad & Acceso</h4>
+                    <p className="text-xs text-blue-600/60 font-medium">Gestiona tus credenciales privadas</p>
+                  </div>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="space-y-2">
+                   <label className="text-[10px] font-black text-blue-800/60 uppercase px-1 tracking-widest">Nueva Contraseña</label>
+                   <div className="relative">
+                      <LucideLock className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300" size={16} />
+                      <input 
+                        type="password" 
+                        placeholder="Mínimo 6 caracteres"
+                        value={passData.password} 
+                        onChange={e => setPassData({...passData, password: e.target.value})}
+                        className="w-full p-4 pl-12 bg-white border-2 border-transparent rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold text-stone-800"
+                      />
+                   </div>
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-[10px] font-black text-blue-800/60 uppercase px-1 tracking-widest">Confirmar Clave</label>
+                   <div className="relative">
+                      <LucideLock className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300" size={16} />
+                      <input 
+                        type="password" 
+                        placeholder="Repite la clave"
+                        value={passData.confirmPassword} 
+                        onChange={e => setPassData({...passData, confirmPassword: e.target.value})}
+                        className={`w-full p-4 pl-12 bg-white border-2 rounded-2xl outline-none transition-all font-bold text-stone-800
+                          ${showPassError ? 'border-red-500 focus:ring-red-100' : 'border-transparent focus:border-blue-500 focus:ring-blue-100'}
+                          ${passwordsMatch && passData.confirmPassword !== '' ? 'border-green-500 focus:ring-green-100' : ''}
+                        `}
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        {showPassError && <LucideAlertCircle className="text-red-500 animate-bounce" size={18} />}
+                        {passwordsMatch && passData.confirmPassword !== '' && <LucideCheckCircle2 className="text-green-500 animate-in zoom-in" size={18} />}
+                      </div>
+                   </div>
+                 </div>
+               </div>
+
+               <div className="flex justify-start">
+                  <button 
+                    type="button"
+                    onClick={handlePasswordUpdate}
+                    disabled={isUpdatingPass || !passwordsMatch || passData.password === ''}
+                    className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:grayscale disabled:scale-100"
+                  >
+                    {isUpdatingPass ? 'Actualizando...' : 'Actualizar Contraseña'}
+                  </button>
+               </div>
             </div>
           </div>
 

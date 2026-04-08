@@ -5,7 +5,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  updatePassword
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -154,6 +155,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUserPassword = async (newPassword) => {
+    try {
+      if (!auth.currentUser) throw new Error("No hay una sesión activa.");
+      await updatePassword(auth.currentUser, newPassword);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.code || error.message };
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -166,7 +177,8 @@ export const AuthProvider = ({ children }) => {
       register,
       startImpersonating,
       stopImpersonating,
-      refreshAuthUser
+      refreshAuthUser,
+      updateUserPassword
     }}>
       {children}
     </AuthContext.Provider>

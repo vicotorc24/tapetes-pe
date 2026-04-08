@@ -1,5 +1,5 @@
 import { db } from '../firebase';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, query, where, getCountFromServer } from 'firebase/firestore';
 
 const IMPACT_DOC_PATH = 'siteData/impact';
 
@@ -12,8 +12,23 @@ export const getImpactData = async () => {
     const docRef = doc(db, IMPACT_DOC_PATH);
     const docSnap = await getDoc(docRef);
     
+    // Obtener estadísticas reales de la plataforma
+    const liveStats = await getLiveImpactStats();
+    
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      const data = docSnap.data();
+      // Mezclamos la estructura guardada con los valores reales frescos
+      const mergedStats = (data.stats || []).map(stat => {
+        if (stat.id === 2 && liveStats.artisans) return { ...stat, value: liveStats.artisans.toString() };
+        if (stat.id === 3 && liveStats.products) return { ...stat, value: liveStats.products.toString() };
+        return stat;
+      });
+
+      return { 
+        id: docSnap.id, 
+        ...data,
+        stats: mergedStats
+      };
     } else {
       // Datos iniciales por defecto (Seed)
       const defaultData = {
@@ -51,6 +66,35 @@ export const getImpactData = async () => {
   } catch (error) {
     console.error("Error al obtener datos de impacto:", error);
     throw error;
+  }
+};
+
+/**
+ * Obtiene estadísticas reales de la plataforma para el impacto.
+ */
+export const getLiveImpactStats = async () => {
+  try {
+    const usersRef = collection(db, 'users');
+    const productsRef = collection(db, 'products');
+    const sectorsRef = collection(db, 'sectors');
+
+    // Contar artesanas activas
+    const artisansSnap = await getCountFromServer(query(usersRef, where('role', '==', 'seller'), where('status', '==', 'active')));
+    
+    // Contar productos totales
+    const productsSnap = await getCountFromServer(productsRef);
+
+    // Contar sectores
+    const sectorsSnap = await getCountFromServer(sectorsRef);
+
+    return {
+      artisans: artisansSnap.data().count,
+      products: productsSnap.data().count,
+      sectors: sectorsSnap.data().count
+    };
+  } catch (error) {
+    console.error("Error al obtener estadísticas reales:", error);
+    return { artisans: null, products: null, sectors: null };
   }
 };
 

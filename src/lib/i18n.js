@@ -67,9 +67,9 @@ export const translations = {
       card3_desc: 'Mantenemos viva la técnica del crochet que es parte de nuestra identidad histórica.',
       fair_trade_badge: 'COMERCIO JUSTO',
       impact_cta: "Ver Detalle de Impacto Social →",
-      stat1_label: "Ganancia Directa a la Artesana Creadora",
-      stat2_label: "De capacitación digital y negocios por año",
-      stat3_label: "Legado Asegurado para Contumazá"
+      stat1_label: "100% de Ganancia Directa para la Artesana",
+      stat2_label: "Productores con Empoderamiento Digital",
+      stat3_label: "Legado Cultural Protegido en el Catálogo"
     },
     banner: {
       heritage_badge: "Herencia Viva",
@@ -237,9 +237,9 @@ export const translations = {
       card3_desc: 'We preserve the ancestral technique of crochet which is part of our historical identity.',
       fair_trade_badge: 'FAIR TRADE',
       impact_cta: "View Social Impact Detail →",
-      stat1_label: "Direct Profit to the Creating Artisan",
-      stat2_label: "Digital training and business sessions per year",
-      stat3_label: "Heritage Secured for Contumazá"
+      stat1_label: "100% Direct Profit for the Artisan",
+      stat2_label: "Producers with Digital Empowerment",
+      stat3_label: "Cultural Heritage Protected in Catalog"
     },
     banner: {
       heritage_badge: "Living Heritage",

@@ -55,15 +55,25 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
   const activeProductsCount = products.length;
 
   // Sumamos las estadísticas de los productos filtrados para métricas individuales
-  const totalViews = products.reduce((acc, p) => acc + (p.stats?.views || 0), 0) + (user.profileViews || 0);
-  const totalWhatsappClicks = products.reduce((acc, p) => acc + (p.stats?.whatsappClicks || 0), 0) + (user.whatsappClicks || 0);
+  // Si es superadmin, sumamos los perfiles de todos los vendedores
+  const sellersProfileViews = user.role === 'superadmin' 
+    ? users.reduce((acc, u) => acc + (u.profileViews || 0), 0)
+    : (user.profileViews || 0);
+    
+  const sellersWhatsappClicks = user.role === 'superadmin'
+    ? users.reduce((acc, u) => acc + (u.whatsappClicks || 0), 0)
+    : (user.whatsappClicks || 0);
 
-  // Estimación de ventas basada en el valor REAL de los productos del artesano
-  const estimatedRevenue = products.reduce((acc, p) => {
-    const price = parseFloat(p.price) || 0;
-    const clicks = p.stats?.whatsappClicks || 0;
-    return acc + (price * clicks);
-  }, 0);
+  const totalViews = products.reduce((acc, p) => acc + (p.stats?.views || 0), 0) + sellersProfileViews;
+  const totalWhatsappClicks = products.reduce((acc, p) => acc + (p.stats?.whatsappClicks || 0), 0) + sellersWhatsappClicks;
+
+  // Calculamos el precio promedio para valorar los clics que no vienen de un producto específico (perfil)
+  const avgPrice = products.length > 0
+    ? products.reduce((acc, p) => acc + (parseFloat(p.price) || 0), 0) / products.length
+    : 0;
+
+  // Estimación de ventas basada en el valor comercial total (Clicks Productos + Clicks Perfil * Precio Promedio)
+  const estimatedRevenue = totalWhatsappClicks * avgPrice;
 
   // Ordenamos productos por popularidad (vistas + clics) para el TOP REAL
   const sortedProducts = [...products].sort((a, b) => {
@@ -97,6 +107,17 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
       }
     });
 
+    // DISTRIBUCIÓN DE CLICS DE PERFIL: Como los clics al perfil no tienen un sector asignado,
+    // los distribuimos proporcionalmente al volumen de productos de cada sector del vendedor actual
+    // Si es superadmin, esto ya se promedia por el impacto global de cada sector
+    const totalProductRevenue = Object.values(sectorMap).reduce((acc, s) => acc + s.value, 0) || 1;
+    const profileRevenue = sellersWhatsappClicks * avgPrice;
+    
+    Object.keys(sectorMap).forEach(key => {
+       const weight = sectorMap[key].value / totalProductRevenue;
+       sectorMap[key].value += (profileRevenue * weight);
+    });
+
     return Object.values(sectorMap)
       .map(s => ({ ...s, value: s.value * timeMultiplier }))
       .filter(s => s.value > 0 || s.name !== 'Sin Sector') // Ocultar 'Sin Sector' si tiene valor 0
@@ -114,10 +135,19 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
       if (!categories[cat]) categories[cat] = 0;
       categories[cat] += revenue;
     });
+
+    const totalProductRevenue = Object.values(categories).reduce((acc, v) => acc + v, 0) || 1;
+    const profileRevenue = sellersWhatsappClicks * avgPrice;
+
     return Object.entries(categories)
-      .map(([name, value]) => ({ name, value: value * timeMultiplier }))
+      .map(([name, value]) => {
+         // También distribuimos el valor de clics al perfil proporcionalmente a las categorías
+         const weight = value / totalProductRevenue;
+         const finalValue = (value + (profileRevenue * weight)) * timeMultiplier;
+         return { name, value: finalValue };
+      })
       .sort((a, b) => b.value - a.value);
-  }, [products, timeMultiplier]);
+  }, [products, timeMultiplier, sellersWhatsappClicks, avgPrice]);
 
   const maxCategoryRevenue = Math.max(...revenueByCategory.map(c => c.value), 1);
   const totalPotentialRevenue = Math.round(estimatedRevenue * timeMultiplier);
@@ -279,7 +309,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 print:grid-cols-4 print:gap-4">
         <StatCard 
           title="Intención de Venta" 
-          value={Math.round(totalWhatsappClicks * timeMultiplier)} 
+          value={totalWhatsappClicks * timeMultiplier < 1 && totalWhatsappClicks > 0 ? "< 1" : Math.round(totalWhatsappClicks * timeMultiplier)} 
           label="Clics WhatsApp" 
           icon={<LucideShoppingBag className="text-orange-600" size={20} />} 
           trend="+12%" 
