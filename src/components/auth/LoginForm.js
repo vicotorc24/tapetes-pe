@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 export function LoginForm({ onLogin }) { 
-  const [email, setEmail] = useState('victoria@tapetes.pe'); 
+  const [email, setEmail] = useState('victoria@madeincontumaza.pe'); 
   return ( 
     <form onSubmit={(e) => onLogin(e, email)} className="space-y-4">
       <div>
@@ -16,8 +16,8 @@ export function LoginForm({ onLogin }) {
       <button className="w-full bg-orange-700 text-white py-3 rounded-lg font-bold hover:bg-orange-800 transition">Ingresar</button>
       <div className="text-center text-xs text-stone-400 mt-4 border-t pt-4">
         <p className="mb-2">Cuentas Demo:</p>
-        <button type="button" onClick={() => setEmail('admin@tapetes.pe')} className="text-stone-600 underline mr-3">Super Admin</button>
-        <button type="button" onClick={() => setEmail('victoria@tapetes.pe')} className="text-stone-600 underline">Artesana</button>
+        <button type="button" onClick={() => setEmail('admin@madeincontumaza.pe')} className="text-stone-600 underline mr-3">Super Admin</button>
+        <button type="button" onClick={() => setEmail('victoria@madeincontumaza.pe')} className="text-stone-600 underline">Artesana</button>
       </div>
     </form> 
   ); 

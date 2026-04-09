@@ -443,7 +443,7 @@ export function ProfileManager({ user, sectors = [], onUpdate, setFeedback }) {
                     </div>
                     <div>
                       <h4 className="font-black text-white uppercase text-[11px] tracking-[0.2em]">Mi Historia</h4>
-                      <p className="text-xs text-stone-500 font-medium italic">Tu narrativa en Tapetes.pe</p>
+                      <p className="text-xs text-stone-500 font-medium italic">Tu narrativa en Made In Contumazá</p>
                     </div>
                  </div>
               </div>

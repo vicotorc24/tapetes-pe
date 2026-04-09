@@ -117,7 +117,7 @@ export function CollectionManager({ collections, products = [], onAdd, onEdit, o
                 <LucideLayers size={40} strokeWidth={1} />
               </div>
               <h3 className="text-xl font-black text-stone-900 mb-2 font-serif">No hay colecciones creadas</h3>
-              <p className="text-stone-400 text-sm max-w-sm mx-auto mb-8 font-sans leading-relaxed">Crea temas globales para agrupar los productos de todas las artesanas y darles una narrativa común.</p>
+              <p className="text-stone-400 text-sm max-w-sm mx-auto mb-8 font-sans leading-relaxed">Crea temas globales para agrupar los productos de todos los creadores y darles una narrativa común.</p>
               <button onClick={handleOpenAdd} className="bg-orange-50 text-orange-700 px-8 py-3 rounded-2xl font-black hover:bg-orange-100 transition-colors">Crear mi primera colección</button>
             </div>
           )}

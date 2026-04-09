@@ -1,8 +1,8 @@
 import { RegisterView } from '@/components/auth/RegisterView';
 
 export const metadata = {
-  title: 'Únete como Artesana | Tapetes.pe',
-  description: 'Solicita tu registro para formar parte de la comunidad de artesanas de Contumazá.'
+  title: 'Sé Parte de la Comunidad | Made In Contumazá',
+  description: 'Solicita tu registro para formar parte de la red de artesanos y productores de Contumazá.'
 };
 
 export default function RegisterPage() {

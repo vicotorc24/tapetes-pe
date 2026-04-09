@@ -13,7 +13,7 @@ export const trackEvent = (eventName, params = {}) => {
 };
 
 /**
- * Eventos Predefinidos para Tapetes.pe
+ * Eventos Predefinidos para Made In Contumazá
  */
 export const AnalyticsEvents = {
   WHATSAPP_CLICK: (product, seller) => {

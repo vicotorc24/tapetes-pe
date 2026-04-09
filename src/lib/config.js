@@ -1,5 +1,5 @@
 /**
- * Tapetes.pe - Centralized Production Configuration
+ * Made In Contumazá - Centralized Production Configuration
  * 
  * Update these values for the final production deployment.
  */

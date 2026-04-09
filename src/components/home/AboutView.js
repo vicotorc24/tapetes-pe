@@ -50,7 +50,7 @@ export function AboutView() {
            <div className="relative group">
              <div className="absolute -inset-4 bg-stone-100 rounded-[3rem] -rotate-3 transition-transform group-hover:rotate-0 duration-700"></div>
              <div className="relative aspect-[4/5] bg-stone-200 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white z-10 transition-transform group-hover:-translate-y-2 duration-700">
-               <img src="/images/hero_authentic.png" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt="Artesanas de Contumazá"/>
+               <img src="/images/hero_authentic.png" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000" alt="Productores y Artesanos de Contumazá"/>
              </div>
            </div>
         </div>

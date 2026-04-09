@@ -10,8 +10,8 @@ export const initialSeedData = [
 ];
 
 export const initialUsersData = [
-  { id: 1, name: 'Victoria', email: 'victoria@tapetes.pe', role: 'seller', status: 'active', productsCount: 12, photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Victoria' },
-  { id: 2, name: 'Rosa', email: 'rosa@tapetes.pe', role: 'seller', status: 'active', productsCount: 8, photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rosa' },
-  { id: 3, name: 'Carmen', email: 'carmen@tapetes.pe', role: 'seller', status: 'inactive', productsCount: 5, photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carmen' },
-  { id: 99, name: 'Admin', email: 'admin@tapetes.pe', role: 'superadmin', status: 'active', productsCount: 0, photo: 'https://api.dicebear.com/7.x/initials/svg?seed=AD' }
+  { id: 1, name: 'Victoria', email: 'victoria@madeincontumaza.pe', role: 'seller', status: 'active', productsCount: 12, photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Victoria' },
+  { id: 2, name: 'Rosa', email: 'rosa@madeincontumaza.pe', role: 'seller', status: 'active', productsCount: 8, photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rosa' },
+  { id: 3, name: 'Carmen', email: 'carmen@madeincontumaza.pe', role: 'seller', status: 'inactive', productsCount: 5, photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carmen' },
+  { id: 99, name: 'Admin', email: 'admin@madeincontumaza.pe', role: 'superadmin', status: 'active', productsCount: 0, photo: 'https://api.dicebear.com/7.x/initials/svg?seed=AD' }
 ];

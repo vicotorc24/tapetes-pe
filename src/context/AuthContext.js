@@ -93,10 +93,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     // Override de Emergencia para la cuenta Admin de Demo
     // Solo para uso de desarrollo cuando no hay acceso al correo real
-    if (email === 'admin@tapetes.pe' && password === 'TapetesAdmin2026') {
+    if (email === 'admin@madeincontumaza.pe' && password === 'ContumazaAdmin2026') {
       setUser({
         uid: 'admin-override',
-        email: 'admin@tapetes.pe',
+        email: 'admin@madeincontumaza.pe',
         role: 'superadmin',
         name: 'Super Admin (Bypass)',
         status: 'active',

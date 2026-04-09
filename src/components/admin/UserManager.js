@@ -28,7 +28,7 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, sec
       const uName = u.firstName ? `${u.firstName} ${u.lastName}` : (u.name || '');
       setFeedback({
         type: 'confirm',
-        message: `¿Deseas dar de alta a ${uName}? Una vez activa, podrá acceder a su taller y subir productos.`,
+        message: `¿Deseas dar de alta a ${uName}? Una vez activa, podrá acceder a su panel y gestionar su producción.`,
         onConfirm: () => onEdit({ ...u, status: 'active' }),
         confirmText: 'Dar de Alta',
         confirmColor: 'green'
@@ -40,14 +40,14 @@ export function UserManager({ users, onImpersonate, onAdd, onEdit, onDelete, sec
     if (!u.phone) return '#';
     const number = u.phone.replace(/\D/g, '');
     const uName = u.firstName || u.name || 'Productor/a';
-    const message = encodeURIComponent(`Hola ${uName}, te escribo de la Municipalidad respecto a tu solicitud en Tapetes.pe. ¿Podemos coordinar la validación de tu taller?`);
+    const message = encodeURIComponent(`Hola ${uName}, te escribo de la Municipalidad respecto a tu solicitud en Made In Contumazá. ¿Podemos coordinar la validación de tu taller?`);
     return `https://wa.me/${number}?text=${message}`;
   };
 
   return (
     <div className="animate-in fade-in">
       <div className="flex justify-between items-center mb-6">
-        <div><h2 className="text-2xl font-bold text-stone-900">Gestión de Usuarios</h2><p className="text-stone-500 text-sm">Administra accesos y solicitudes de artesanas</p></div>
+        <div><h2 className="text-2xl font-bold text-stone-900">Gestión de Usuarios</h2><p className="text-stone-500 text-sm">Administra accesos y solicitudes de artesanos y productores</p></div>
         <button onClick={handleOpenAdd} className="bg-purple-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-purple-700 transition flex items-center gap-2 shadow-sm"><LucidePlus size={16}/> Nuevo Usuario</button>
       </div>
 

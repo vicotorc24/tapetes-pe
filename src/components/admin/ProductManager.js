@@ -608,7 +608,7 @@ export function ProductManager({ products, setProducts, categories, collections,
                       </option>
                     ))}
                     <option value="divider" disabled>──────────</option>
-                    <option value="admin@tapetes.pe">Admin (Self)</option>
+                    <option value="admin@madeincontumaza.pe">Admin (Self)</option>
                   </select>
                 </div>
               </div>
@@ -619,7 +619,7 @@ export function ProductManager({ products, setProducts, categories, collections,
                 </div>
               )}
               <p className="text-[9px] text-stone-500 italic mt-2">
-                * Cambiar estos valores transferirá el producto al taller de la artesana seleccionada.
+                * Cambiar estos valores transferirá el producto al taller o unidad productiva del creador seleccionado.
               </p>
             </div>
           )}

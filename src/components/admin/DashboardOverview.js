@@ -204,7 +204,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
     // Agregamos BOM (\uFEFF) para que Excel reconozca acentos UTF-8
     const csvContent = 
       "\uFEFF" +
-      `Reporte de Gestión Tapetes.pe\n` +
+      `Reporte de Gestión Made In Contumazá\n` +
       `Generado por:;${user.name}\n` +
       `Fecha:;${new Date().toLocaleString()}\n\n` +
       `RESUMEN DE METRICAS\n` +
@@ -451,7 +451,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
                         </div>
                         <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden flex items-center p-[2px]">
                           <div 
-                            className={`h-full rounded-full transition-all duration-1000 ${sec.name.includes('Artesanía') || sec.name.includes('Tejido') ? 'bg-andeanpurple-600' : sec.name.includes('Turismo') || sec.name.includes('Hotel') ? 'bg-emerald-500' : 'bg-orange-500'}`}
+                            className={`h-full rounded-full transition-all duration-1000 ${sec.name.includes('Artesanía') || sec.name.includes('Tejido') || sec.name.includes('Productor') ? 'bg-andeanpurple-600' : sec.name.includes('Turismo') || sec.name.includes('Hotel') ? 'bg-emerald-500' : 'bg-orange-500'}`}
                             style={{ width: `${Math.max(5, percentage)}%` }}
                           ></div>
                         </div>

@@ -69,7 +69,7 @@ export default function ProductPage({ params }) {
   const viewRecorded = React.useRef(false);
 
   // Registro de Visita de Producto (Analíticas Internas + GA4)
-  // Esperamos a que la artesana esté cargada para que el dato llegue a su dashboard personal
+  // Esperamos a que el creador esté cargado para que el dato llegue a su dashboard personal
   useEffect(() => {
     if (product?.id && artisan?.id && !viewRecorded.current) {
       AnalyticsEvents.PRODUCT_VIEW(product, artisan);
@@ -77,7 +77,7 @@ export default function ProductPage({ params }) {
     }
   }, [product?.id, artisan?.id]);
 
-  // Registro de Visita de Perfil de Artesana
+  // Registro de Visita de Perfil de Creador/Productor
   useEffect(() => {
     if (artisan?.id) {
       AnalyticsEvents.PROFILE_VIEW(artisan);
@@ -131,10 +131,10 @@ export default function ProductPage({ params }) {
     const isTurismo = product?.sector === 'aiA7GR53X1nSUO7Gf3Ox' || product?.sector === 'turismo';
     
     const sectorRole = isAgro ? 'Productor/a' : 
-                       isTurismo ? 'Anfitrión/a' : 'Artesana';
+                       isTurismo ? 'Anfitrión/a' : 'Artesano/a';
 
     const message = encodeURIComponent(
-      `Hola ${artisan?.name || sectorRole}, me interesa este producto de Tapetes.pe:\n\n` +
+      `Hola ${artisan?.name || sectorRole}, me interesa este producto de Made In Contumazá:\n\n` +
       `*${product?.title}*\n` +
       `----------------------------------\n` +
       `» *Precio:* S/ ${product?.price}\n` +
@@ -149,7 +149,7 @@ export default function ProductPage({ params }) {
   if (loading) return (
     <div className="pt-40 text-center animate-in fade-in">
        <div className="w-16 h-16 border-4 border-andeansky-100 border-t-andeansky-700 rounded-full animate-spin mx-auto mb-6"></div>
-       <p className="text-stone-500 font-serif text-2xl animate-pulse">Cargando tesoro artesanal...</p>
+       <p className="text-stone-500 font-serif text-2xl animate-pulse">Cargando tesoro local...</p>
     </div>
   );
 
@@ -284,10 +284,10 @@ export default function ProductPage({ params }) {
                 <div className="text-center sm:text-left">
                   <span className="inline-block px-3 py-1 bg-andeansky-50 text-andeansky-700 text-[9px] font-black uppercase tracking-[0.2em] mb-3 rounded-full border border-andeansky-100">
                     { (product?.sector === 'a2z1ewWmF5lDEJz4sFcl' || product?.sector === 'agro' || product?.sector === 'food') ? 'Productor Local' : 
-                      (product?.sector === 'aiA7GR53X1nSUO7Gf3Ox' || product?.sector === 'turismo') ? 'Anfitrión Local' : 'Tu Maestra Artesana'}
+                      (product?.sector === 'aiA7GR53X1nSUO7Gf3Ox' || product?.sector === 'turismo') ? 'Anfitrión Local' : 'Maestra/o del Origen'}
                   </span>
                   <h4 className="text-2xl font-serif font-black text-stone-900 leading-tight">
-                    {artisan?.brandName ? artisan.brandName : (artisan?.name || 'Productor/a de Contumazá')}
+                    {artisan?.brandName ? artisan.brandName : (artisan?.name || 'Creador local de Contumazá')}
                   </h4>
                   <p className="text-[10px] text-stone-400 mt-2 font-bold flex items-center justify-center sm:justify-start gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
@@ -312,7 +312,7 @@ export default function ProductPage({ params }) {
                   <div className="w-8 h-8 rounded-xl bg-andeansky-50 flex items-center justify-center text-andeansky-600 shrink-0"><LucideCheckCircle size={16}/></div>
                   <div className="overflow-hidden">
                     <p className="text-[8px] font-black text-stone-400 uppercase tracking-widest leading-none mb-1">Correo</p>
-                    <p className="text-xs font-black text-stone-800 truncate">{artisan?.email || 'ventas@tapetes.pe'}</p>
+                    <p className="text-xs font-black text-stone-800 truncate">{artisan?.email || 'ventas@madeincontumaza.pe'}</p>
                   </div>
                 </div>
               </div>

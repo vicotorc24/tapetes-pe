@@ -18,8 +18,8 @@ const merriweather = Merriweather({
 });
 
 export const metadata = {
-  title: "Tapetes.pe - Arte de Contumazá",
-  description: "Piezas únicas tejidas a mano por madres artesanas en Contumazá.",
+  title: "Made In Contumazá - Arte de Contumazá",
+  description: "Piezas únicas y productos de la tierra creados por artesanos y productores del norte peruano.",
 };
 
 export default function RootLayout({ children }) {

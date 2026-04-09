@@ -27,7 +27,7 @@ export function CartDrawer() {
   const handleCheckout = () => {
     AnalyticsEvents.BEGIN_CHECKOUT(cartTotal, paymentMethod);
     if (paymentMethod === 'whatsapp') {
-      const text = `Hola, deseo adquirir estos productos de Tapetes.pe:\n\n` +
+      const text = `Hola, deseo adquirir estos productos de Made In Contumazá:\n\n` +
         cart.map(i => `» *${i.title}* (S/${i.price})\n  Cod. Producto: ${i.id?.substring(0, 8).toUpperCase()}`).join('\n\n') +
         ` \n\n----------------------------------\n*TOTAL: S/${cartTotal.toFixed(2)}*\n\n¿Me confirmarían la disponibilidad y los pasos para el envío?`;
         

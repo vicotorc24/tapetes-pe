@@ -54,7 +54,7 @@ export function PendingApprovalView({ user, onLogout }) {
           </div>
           
           <div className="mt-10 pt-8 border-t border-stone-50">
-             <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest">Tapetes.pe - Módulo Institucional 2026</p>
+             <p className="text-[10px] font-black text-stone-300 uppercase tracking-widest">Made In Contumazá - Módulo Institucional 2026</p>
           </div>
         </div>
       </div>

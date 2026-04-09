@@ -13,7 +13,7 @@ export default function Loading() {
       </div>
       
       <div className="text-center space-y-3">
-        <h2 className="text-2xl font-serif text-stone-900 animate-pulse">Cargando Tapetes.pe</h2>
+        <h2 className="text-2xl font-serif text-stone-900 animate-pulse">Cargando Made In Contumazá</h2>
         <p className="text-stone-400 font-medium tracking-[0.2em] uppercase text-xs animate-bounce delay-150">Artesanía de Contumazá</p>
       </div>
       

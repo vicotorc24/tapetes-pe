@@ -643,7 +643,7 @@ export function HomeView({
                   </div>
                 )}
                 <div className="relative aspect-square overflow-hidden bg-stone-100">
-                  <img src={p.image} alt={p.title} className="w-full h-full object-cover transition-opacity duration-300" onError={(e) => {e.target.src = 'https://placehold.co/400?text=Tapete'}}/>
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover transition-opacity duration-300" onError={(e) => {e.target.src = 'https://placehold.co/400?text=Producto'}}/>
                   <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/30 transition-all duration-700"></div>
                   
                   {/* Floating Action Button */}

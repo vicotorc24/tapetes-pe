@@ -74,7 +74,7 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-full p-4 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:ring-2 focus:ring-terracotta-200 transition-all font-medium text-stone-900"
-              placeholder="admin@tapetes.pe"
+              placeholder="admin@madeincontumaza.pe"
             />
           </div>
           <div className="relative">
