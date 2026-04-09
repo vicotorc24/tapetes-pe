@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useMemo, useEffect } from 'react';
-import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle, LucidePackage } from 'lucide-react';
+import { LucideSearch, LucidePlus, LucideCrown, LucideEdit, LucideTrash2, LucideX, LucideImage, LucideInfo, LucideGripVertical, LucideShield, LucideCheckCircle, LucidePackage, LucideAward, LucideMapPin } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { addProduct, updateProduct, deleteProduct, getProducts } from '../../lib/services/products';
 import { ImageUpload } from '../ui/ImageUpload';
@@ -624,6 +624,41 @@ export function ProductManager({ products, setProducts, categories, collections,
             </div>
           )}
 
+          {/* Sello de Origen Preview */}
+          <div className="p-8 bg-stone-50 rounded-[2.5rem] border border-stone-100 shadow-inner group">
+             <div className="flex items-center gap-4 mb-4">
+               <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
+                  <LucideAward size={20} />
+               </div>
+               <div>
+                  <h5 className="text-[10px] font-black uppercase tracking-widest-plus text-stone-900">Sello de Origen</h5>
+                  <p className="text-[9px] text-stone-400 font-medium">Así se verá la garantía en el catálogo</p>
+               </div>
+             </div>
+             
+             <div className="bg-white p-5 rounded-2xl border border-stone-100 flex items-center gap-4 group-hover:border-orange-200 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-stone-50 border-2 border-white overflow-hidden shadow-sm">
+                   <img 
+                    src={user.role === 'superadmin' ? (users?.find(u => u.email === formData.sellerEmail)?.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(formData.sellerName || 'Artesano')}`) : (user.photo || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name || 'User')}`)} 
+                    className="w-full h-full object-cover" 
+                    alt="Preview" 
+                    onError={(e) => { e.target.src = 'https://placehold.co/100?text=A'; }}
+                   />
+                </div>
+                <div>
+                   <p className="text-[10px] font-bold text-stone-900">{formData.sellerName || (user.role === 'superadmin' ? 'Selecciona un productor' : user.name)}</p>
+                   <p className="text-[8px] text-stone-400 uppercase tracking-widest font-black flex items-center gap-1.5 pt-0.5">
+                      <LucideMapPin size={10} className="text-orange-600" /> Contumazá, Cajamarca
+                   </p>
+                </div>
+                <div className="ml-auto">
+                   <span className="bg-green-50 text-green-700 text-[8px] font-black px-2 py-1 rounded-md border border-green-100 uppercase tracking-tighter">
+                      Garantía Social
+                   </span>
+                </div>
+             </div>
+          </div>
+
           <div className="flex justify-end gap-3 pt-4 border-t">
             <button type="button" onClick={() => setIsCreating(false)} className="px-6 py-2 text-stone-600 font-bold hover:bg-stone-100 rounded-lg transition" disabled={isSaving}>Cancelar</button>
             <button 
@@ -694,7 +729,6 @@ export function ProductManager({ products, setProducts, categories, collections,
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
         <div className="flex gap-1.5 p-1 bg-stone-100 rounded-2xl w-fit">
           <button 
             onClick={() => setListFilterSector('all')}

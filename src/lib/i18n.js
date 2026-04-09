@@ -1,6 +1,6 @@
 export const translations = {
   es: {
-    nav: { catalog: "Catálogo", story: "Propósito", heritage: "Herencia", impact: "Cifras", admin: "Acceso", dashboard: "Panel Gestión", join: "Sé Parte", banner: "✨ ¿Eres productor en Contumazá? Únete a nuestro marketplace • Postula aquí ✨", language: "Idioma", slogan: "Sello de Origen y Calidad" },
+    nav: { catalog: "Catálogo", story: "Propósito", heritage: "Herencia", impact: "Nuestro Impacto", admin: "Acceso", dashboard: "Panel Gestión", join: "Sé Parte", banner: "✨ ¿Eres productor en Contumazá? Únete a nuestro marketplace • Postula aquí ✨", language: "Idioma", slogan: "Sello de Origen y Calidad" },
     hero: { 
       subtitle: "El Corazón de los Andes", 
       title1: "Lo Mejor de", 
@@ -177,7 +177,7 @@ export const translations = {
     footer: { purpose: "Llevamos el talento y la riqueza natural de Contumazá a hogares que valoran el origen y la pureza.", explore: "Explorar", help: "Ayuda", contact: "Contacto", slogan: "Sello de Origen y Calidad", impact: "Desarrollo Local", shipping: "Envíos", care: "Garantía", faq: "FAQ", legacy: "Orgullo Contumacino", backed_by: "Gestión Institucional:", municipality: "Municipalidad de Contumazá" }
   },
   en: {
-    nav: { catalog: "Marketplace", story: "Purpose", heritage: "Heritage", impact: "Stats", admin: "Access", dashboard: "Admin Panel", join: "Be Part", banner: "✨ Producer in Contumazá? Join our marketplace • Apply here ✨", language: "Language", slogan: "Source of Origin & Quality" },
+    nav: { catalog: "Catalog", story: "Purpose", heritage: "Heritage", impact: "Our Impact", admin: "Access", dashboard: "Dashboard", join: "Join Us", banner: "✨ Are you a producer in Contumazá? Join our marketplace • Apply here ✨", language: "Language", slogan: "Origin & Quality Seal" },
     hero: { 
       subtitle: "Heart of the Andes", 
       title1: "The Best of", 

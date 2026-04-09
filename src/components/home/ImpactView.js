@@ -88,7 +88,7 @@ export function ImpactView() {
              <span className="h-[1px] w-8 bg-andeangreen-400"></span>
           </div>
           <h1 className="text-5xl md:text-[7rem] font-serif font-black text-white mb-8 tracking-tighter leading-none drop-shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            {data.hero?.title || t('impact.section_title')}
+            {(data.hero?.title || t('impact.section_title')).replace(/Tapetes\.pe/g, 'Made In Contumazá')}
           </h1>
           <p className="text-white max-w-3xl mx-auto text-lg md:text-xl font-light leading-relaxed drop-shadow-md opacity-90 animate-in fade-in duration-1000 delay-300">
             {data.hero?.description}
