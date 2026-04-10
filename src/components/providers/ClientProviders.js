@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { Suspense } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -34,7 +34,9 @@ export function ClientProviders({ children }) {
 
   return (
     <LanguageProvider>
-      <PageTracker />
+      <Suspense fallback={null}>
+        <PageTracker />
+      </Suspense>
       <AuthProvider>
         <CartProvider>
           {!isAdminPath && <Navbar />}
