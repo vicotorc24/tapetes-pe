@@ -182,6 +182,29 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
     return () => unsubscribe();
   }, [user.uid, user.id, user.role]);
 
+  // Seguimiento de Popularidad por Sección (NUEVO)
+  const [pagesStats, setPagesStats] = useState({ views: {} });
+
+  useEffect(() => {
+    if (user.role !== 'superadmin') return;
+
+    const pagesPath = doc(db, 'stats', 'pages');
+    const unsubscribe = onSnapshot(pagesPath, (doc) => {
+      if (doc.exists()) {
+        setPagesStats(doc.data());
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user.role]);
+
+  // Procesamiento de datos de páginas
+  const topPages = Object.entries(pagesStats.views || {})
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 6);
+
+  const maxPageView = Math.max(...Object.values(pagesStats.views || {}), 1);
+
   // Procesamiento de datos geográficos para el ranking (ordenado por clicks + vistas)
   const topCities = Object.entries(geoStats.cities || {})
     .sort(([, a], [, b]) => {
@@ -626,6 +649,52 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
             </div>
           </div>
         </div>
+
+        {/* Nuevo Widget: Popularidad por Sección */}
+        {user.role === 'superadmin' && (
+          <div className="bg-white p-6 rounded-xl border border-stone-200 shadow-sm flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+               <h3 className="font-bold text-stone-800 flex items-center gap-2">
+                 <LucideMap size={18} className="text-orange-500" /> Popularidad por Sección
+               </h3>
+               <span className="text-[9px] text-stone-400 font-bold uppercase tracking-wider">Vistas Totales</span>
+            </div>
+            
+            <div className="space-y-6 flex-1">
+               {topPages.length === 0 ? (
+                 <div className="py-20 text-center flex flex-col items-center gap-3">
+                    <LucideHistory size={24} className="text-stone-200" />
+                    <p className="italic text-stone-300 text-[10px]">Aún no hay datos de navegación.</p>
+                 </div>
+               ) : (
+                 topPages.map(([page, views], idx) => {
+                   const progress = (views / maxPageView) * 100;
+                   return (
+                     <div key={page} className="space-y-2 animate-in slide-in-from-bottom" style={{ animationDelay: `${idx * 100}ms` }}>
+                       <div className="flex justify-between items-end">
+                         <span className="text-[11px] font-bold text-stone-700 uppercase tracking-tight">{page}</span>
+                         <div className="flex items-center gap-2">
+                           <span className="text-[10px] font-black text-stone-900">{views}</span>
+                           <LucideEye size={10} className="text-stone-300" />
+                         </div>
+                       </div>
+                       <div className="h-2 w-full bg-stone-50 rounded-full overflow-hidden">
+                         <div 
+                           className="h-full bg-orange-500 rounded-full transition-all duration-1000"
+                           style={{ width: `${Math.max(2, progress)}%` }}
+                         ></div>
+                       </div>
+                     </div>
+                   );
+                 })
+               )}
+            </div>
+            
+            <div className="mt-8 pt-4 border-t border-stone-100 text-[9px] text-stone-400 italic">
+               Este ranking muestra qué secciones institucionales generan mayor interacción digital.
+            </div>
+          </div>
+        )}
 
         {/* Bitácora de Auditoría en Tiempo Real - Solo para Super Admins */}
         {user.role === 'superadmin' && (

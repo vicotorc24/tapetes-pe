@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { LucideSearch, LucidePlus, LucideEdit, LucideTrash2, LucideX, LucideUser, LucideCheckCircle, LucidePartyPopper, LucideGripVertical, LucideImage } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getPersonalities, addPersonality, updatePersonality, deletePersonality } from '../../lib/services/personalities';
+import { db } from '../../lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import RichTextEditor from '../ui/RichTextEditor';
 import { ImageUpload } from '../ui/ImageUpload';
 import { Autocomplete } from '../ui/Autocomplete';
@@ -29,6 +31,32 @@ export function LegacyManager({ setFeedback }) {
   useEffect(() => {
     loadPersonalities();
   }, []);
+
+  // Seguimiento de Popularidad por Personaje (NUEVO)
+  const [legacyStats, setLegacyStats] = useState({ views: {} });
+
+  useEffect(() => {
+    const statsPath = doc(db, 'stats', 'legacy');
+    const unsubscribe = onSnapshot(statsPath, (snapshot) => {
+      if (snapshot.exists()) {
+        setLegacyStats(snapshot.data());
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Procesamiento de Top Personajes
+  const topPersonalities = personalities
+    .map(p => ({
+      ...p,
+      views: legacyStats.views?.[p.id] || 0
+    }))
+    .filter(p => p.views > 0)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5);
+
+  const maxViews = Math.max(...topPersonalities.map(p => p.views), 1);
 
   const loadPersonalities = async () => {
     setLoading(true);
@@ -335,6 +363,55 @@ export function LegacyManager({ setFeedback }) {
         }} className="bg-stone-900 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 hover:bg-stone-800 transition shadow-md">
           <LucidePlus size={18} /> Nuevo Registro
         </button>
+      </div>
+
+      {/* Widget de Popularidad de Personajes (NUEVO) */}
+      <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+        <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm overflow-hidden relative group">
+           <div className="absolute -top-12 -right-12 w-48 h-48 bg-orange-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+           
+           <div className="flex items-center gap-3 mb-6 relative z-10">
+              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                 <LucidePartyPopper className="text-orange-600" size={20} />
+              </div>
+              <h3 className="font-bold text-stone-800 font-serif italic">Impacto y Relevancia Cultural</h3>
+           </div>
+
+           {topPersonalities.length === 0 ? (
+             <div className="py-12 text-center bg-stone-50 rounded-2xl border border-dotted border-stone-200">
+                <p className="text-xs text-stone-400 italic">Aún no hay interacciones registradas para estos personajes.</p>
+             </div>
+           ) : (
+             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {topPersonalities.map((p, i) => {
+                  const progress = (p.views / maxViews) * 100;
+                  return (
+                    <div key={p.id} className="bg-stone-50/50 p-4 rounded-2xl border border-stone-100 relative group/card cursor-help">
+                       <div className="flex items-center gap-3 mb-3">
+                          <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-white shadow-sm">
+                             <img src={p.image} className="w-full h-full object-cover" alt="" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                             <p className="text-[10px] font-black text-stone-900 truncate uppercase tracking-tight">{p.name}</p>
+                             <div className="flex items-center gap-1">
+                               <p className="text-[9px] font-bold text-orange-600">{p.views} vistas</p>
+                               <span className="w-1 h-1 bg-stone-200 rounded-full"></span>
+                               <p className="text-[9px] text-stone-400">{Math.round(progress)}%</p>
+                             </div>
+                          </div>
+                       </div>
+                       <div className="h-1.5 w-full bg-stone-200/50 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-1000 ${i === 0 ? 'bg-orange-500' : 'bg-stone-400'}`}
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                       </div>
+                    </div>
+                  );
+                })}
+             </div>
+           )}
+        </div>
       </div>
 
       <div className="mb-8 relative max-w-md">

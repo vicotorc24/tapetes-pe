@@ -12,7 +12,7 @@ export async function POST(request) {
     const bodyText = await request.text();
     if (!bodyText) return NextResponse.json({ error: 'Body vacío' }, { status: 400 });
     
-    const { type, productId, artisanId } = JSON.parse(bodyText);
+    const { type, productId, artisanId, pageId, legacyId } = JSON.parse(bodyText);
     const headersList = await headers();
     
     // Captura de ubicación desde Vercel Edge Headers
@@ -32,7 +32,7 @@ export async function POST(request) {
     const cleanCity = sanitize(city) || 'Ciudad_Desconocida';
     const cleanCountry = sanitize(country) || 'Pais_Desconocido';
 
-    if (!productId && !artisanId) {
+    if (!productId && !artisanId && !pageId && !legacyId) {
       return NextResponse.json({ error: 'Faltan parámetros' }, { status: 400 });
     }
 
@@ -70,16 +70,40 @@ export async function POST(request) {
       });
     }
 
-    // 3. Registro Geográfico Global (Solo para Dashboard)
-    // Lanzaremos error si esto falla para verlo en los logs de Vercel como un 500
+    // 3. Registro Geográfico Global (Dashboard)
     const statsRef = doc(db, 'stats', 'locations');
-    await updateDoc(statsRef, updatePayload).catch(async (err) => {
-      console.log("Global update failed, attempting setDoc...", err.message);
+    await updateDoc(statsRef, updatePayload).catch(async () => {
       await setDoc(statsRef, {
         cities: { [cleanCity]: { [baseField]: 1 } },
         countries: { [cleanCountry]: { [baseField]: 1 } }
       }, { merge: true });
     });
+
+    // 4. Registro de Páginas más visitadas (NUEVO)
+    if (pageId) {
+      const cleanPageId = sanitize(pageId);
+      const pagesRef = doc(db, 'stats', 'pages');
+      await updateDoc(pagesRef, {
+        [`views.${cleanPageId}`]: increment(1)
+      }).catch(async () => {
+        await setDoc(pagesRef, {
+          views: { [cleanPageId]: 1 }
+        }, { merge: true });
+      });
+    }
+
+    // 5. Registro de Legado Cultural (NUEVO)
+    if (legacyId) {
+      const cleanLegacyId = sanitize(legacyId);
+      const legacyStatsRef = doc(db, 'stats', 'legacy');
+      await updateDoc(legacyStatsRef, {
+        [`views.${cleanLegacyId}`]: increment(1)
+      }).catch(async () => {
+        await setDoc(legacyStatsRef, {
+          views: { [cleanLegacyId]: 1 }
+        }, { merge: true });
+      });
+    }
 
     return NextResponse.json({ 
       success: true, 

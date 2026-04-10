@@ -11,6 +11,7 @@ import { CartDrawer } from '@/components/ecommerce/CartDrawer';
 import { usePathname, useRouter } from 'next/navigation';
 import { AnalyticsEvents } from '@/lib/analytics';
 import { InfoModal } from '@/components/ui/InfoModal';
+import { PageTracker } from '@/components/analytics/PageTracker';
 
 export function ClientProviders({ children }) {
   const pathname = usePathname();
@@ -33,6 +34,7 @@ export function ClientProviders({ children }) {
 
   return (
     <LanguageProvider>
+      <PageTracker />
       <AuthProvider>
         <CartProvider>
           {!isAdminPath && <Navbar />}

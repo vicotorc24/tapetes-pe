@@ -5,6 +5,7 @@ import { LucideQuote, LucideMountain, LucideFeather, LucideHistory, LucideCompas
 import { getPersonalities } from '../../lib/services/personalities';
 import { CONFIG } from '../../lib/config';
 import { AnalyticsEvents } from '../../lib/analytics';
+import { recordLegacyInteraction } from '../../lib/services/stats';
 
 export function HistoryView() {
   const { t } = useTranslation();
@@ -49,7 +50,10 @@ export function HistoryView() {
     });
 
   const goToPersonality = (item) => {
-    if (item) AnalyticsEvents.LEGACY_VIEW(item);
+    if (item) {
+      AnalyticsEvents.LEGACY_VIEW(item);
+      recordLegacyInteraction(item.id);
+    }
     window.location.href = `/historia/${item.slug || item}`;
   };
 
