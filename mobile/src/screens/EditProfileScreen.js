@@ -3,6 +3,9 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAr
 import { User, Phone, MapPin, Tag, Briefcase, Save, ArrowLeft } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { updateProfile } from '../services/auth';
+import { ArtisanEvents } from '../services/analytics';
+
+import { useEffect } from 'react';
 
 export default function EditProfileScreen({ user, onNavigate, onSaveSuccess }) {
   const [firstName, setFirstName] = useState(user.firstName || '');
@@ -12,6 +15,10 @@ export default function EditProfileScreen({ user, onNavigate, onSaveSuccess }) {
   const [sector, setSector] = useState(user.sector || '');
   const [location, setLocation] = useState(user.location || '');
   const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    ArtisanEvents.PROFILE_UPDATE_START(user.id || user.uid);
+  }, []);
 
   const handleSave = async () => {
     if (!firstName || !lastName || !phone) {
@@ -31,6 +38,7 @@ export default function EditProfileScreen({ user, onNavigate, onSaveSuccess }) {
       };
       
       await updateProfile(user.id, updatedData);
+      ArtisanEvents.PROFILE_UPDATED(user.id || user.uid);
       
       Alert.alert('Éxito', 'Perfil actualizado correctamente.');
       onSaveSuccess({ ...user, ...updatedData });

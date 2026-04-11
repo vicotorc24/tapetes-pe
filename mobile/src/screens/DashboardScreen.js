@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { Package, TrendingUp, MessageSquare, Plus, Settings, LogOut, ChevronRight, MapPin, Edit3, Award, Eye, DollarSign } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { getProducts } from '../services/products';
+import { ArtisanEvents } from '../services/analytics';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +14,7 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
 
   useEffect(() => {
     loadDashboardData();
+    ArtisanEvents.DASHBOARD_VIEW(user.uid);
   }, []);
 
   const loadDashboardData = async () => {
@@ -157,7 +159,10 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
                 <View style={styles.cardActions}>
                    <TouchableOpacity 
                     style={styles.editCardBtn}
-                    onPress={() => onNavigate('EditProduct', product)}
+                    onPress={() => {
+                      ArtisanEvents.PRODUCT_EDIT_START(user.uid, product.id);
+                      onNavigate('EditProduct', product);
+                    }}
                    >
                      <Edit3 size={16} color={COLORS.secondary} />
                      <Text style={styles.editBtnText}>Editar</Text>

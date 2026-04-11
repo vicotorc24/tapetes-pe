@@ -8,6 +8,7 @@ import { addProduct } from '../services/products';
 import { getCategories } from '../services/categories';
 import { getSectors } from '../services/sectors';
 import { uploadImage } from '../services/storage';
+import { ArtisanEvents } from '../services/analytics';
 
 const STITCH_OPTIONS = [
   'Punto Jersey', 'Punto Santa Clara', 'Punto Arroz', 'Punto Piña', 
@@ -45,6 +46,7 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
 
   useEffect(() => {
     loadMetaData();
+    ArtisanEvents.PRODUCT_CREATE_START(user.uid);
   }, []);
 
   const loadMetaData = async () => {
@@ -78,6 +80,7 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
 
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
+      ArtisanEvents.PHOTO_UPLOAD(user.uid, 'product_new');
     }
   };
 
@@ -127,6 +130,7 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
       };
       
       await addProduct(payload);
+      ArtisanEvents.PRODUCT_CREATED(user.uid, payload.title, sectorId);
       Alert.alert('¡Éxito!', 'Tu nuevo producto ha sido publicado exitosamente.');
       onPublishSuccess();
     } catch (error) {

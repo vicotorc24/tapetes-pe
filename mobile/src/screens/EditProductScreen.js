@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAr
 import { Package, Tag, DollarSign, List, Briefcase, Save, ArrowLeft, Crown, History, Layers, Info } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { updateProduct } from '../services/products';
+import { ArtisanEvents } from '../services/analytics';
 import { getCategories } from '../services/categories';
 import { getSectors } from '../services/sectors';
 
@@ -107,6 +108,7 @@ export default function EditProductScreen({ product, onNavigate, onSaveSuccess }
       };
       
       await updateProduct(product.id, payload);
+      ArtisanEvents.PRODUCT_UPDATED(product.sellerId || '', product.id);
       Alert.alert('¡Éxito!', 'Producto actualizado correctamente.');
       onSaveSuccess();
     } catch (error) {

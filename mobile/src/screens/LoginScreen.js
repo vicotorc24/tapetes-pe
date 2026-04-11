@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaVie
 import { Mail, Lock, ArrowRight, UserCircle, Eye, EyeOff } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { login } from '../services/auth';
+import { ArtisanEvents } from '../services/analytics';
 
 const { width } = Dimensions.get('window');
 
@@ -21,6 +22,7 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
     try {
       setLoading(true);
       const user = await login(email, password);
+      ArtisanEvents.LOGIN(user.uid, user.email);
       onLoginSuccess(user);
     } catch (error) {
       alert(error.message);
