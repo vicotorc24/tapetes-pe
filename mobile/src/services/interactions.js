@@ -48,17 +48,15 @@ export const recordInteraction = async (productId, metric, producerId = null, le
     const statsRef = doc(db, 'stats', 'locations');
     const platformField = `platforms.mobile.${baseField}`;
     
-    if (productId) {
-      await updateDoc(statsRef, {
-        [platformField]: increment(1),
-        [`total_${baseField}`]: increment(1)
-      }).catch(async () => {
-        await setDoc(statsRef, {
-          platforms: { mobile: { [baseField]: 1 } },
-          [`total_${baseField}`]: 1
-        }, { merge: true });
-      });
-    }
+    await updateDoc(statsRef, {
+      [platformField]: increment(1),
+      [`total_${baseField}`]: increment(1)
+    }).catch(async () => {
+      await setDoc(statsRef, {
+        platforms: { mobile: { [baseField]: 1 } },
+        [`total_${baseField}`]: 1
+      }, { merge: true });
+    });
 
     // 4. Registro de Legado Cultural (Si aplica)
     if (legacyId) {

@@ -217,6 +217,12 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
   const totalGeoViews = Object.values(geoStats.cities || {}).reduce((acc, val) => acc + (val.views || 0), 0) || 1;
   const totalGeoClicks = Object.values(geoStats.cities || {}).reduce((acc, val) => acc + (val.clicks || 0), 0) || 1;
 
+  // Seguimiento por Plataforma (NUEVO)
+  const platformStats = geoStats.platforms || { web: { views: 0 }, mobile: { views: 0 } };
+  const totalPlatformViews = (platformStats.web?.views || 0) + (platformStats.mobile?.views || 0) || 1;
+  const webPercentage = ((platformStats.web?.views || 0) / totalPlatformViews) * 100;
+  const mobilePercentage = ((platformStats.mobile?.views || 0) / totalPlatformViews) * 100;
+
   const handleExportMetrics = (type) => {
     if (type === 'PDF') {
       window.print();
@@ -662,7 +668,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
             
             <div className="space-y-6 flex-1">
                {topPages.length === 0 ? (
-                 <div className="py-20 text-center flex flex-col items-center gap-3">
+                 <div className="py-10 text-center flex flex-col items-center gap-3">
                     <LucideHistory size={24} className="text-stone-200" />
                     <p className="italic text-stone-300 text-[10px]">Aún no hay datos de navegación.</p>
                  </div>
@@ -678,7 +684,7 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
                            <LucideEye size={10} className="text-stone-300" />
                          </div>
                        </div>
-                       <div className="h-2 w-full bg-stone-50 rounded-full overflow-hidden">
+                       <div className="h-1.5 w-full bg-stone-50 rounded-full overflow-hidden">
                          <div 
                            className="h-full bg-orange-500 rounded-full transition-all duration-1000"
                            style={{ width: `${Math.max(2, progress)}%` }}
@@ -690,8 +696,41 @@ export function DashboardOverview({ products: allProducts, user, users = [], sec
                )}
             </div>
             
-            <div className="mt-8 pt-4 border-t border-stone-100 text-[9px] text-stone-400 italic">
-               Este ranking muestra qué secciones institucionales generan mayor interacción digital.
+            {/* DISTRIBUCIÓN POR PLATAFORMA (Web vs Mobile) */}
+            <div className="mt-6 pt-6 border-t border-stone-100">
+               <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-black text-stone-900 uppercase tracking-widest">Tráfico por Dispositivo</span>
+                  <div className="flex gap-2 text-[9px] font-bold uppercase">
+                     <span className="text-blue-500">Web</span>
+                     <span className="text-andeanpurple-600">App</span>
+                  </div>
+               </div>
+               
+               <div className="h-4 w-full bg-stone-100 rounded-full overflow-hidden flex shadow-inner">
+                  <div 
+                    className="h-full bg-blue-500 transition-all duration-1000 flex items-center justify-center" 
+                    style={{ width: `${webPercentage}%` }}
+                  >
+                    {webPercentage > 15 && <span className="text-[8px] text-white font-black">{Math.round(webPercentage)}%</span>}
+                  </div>
+                  <div 
+                    className="h-full bg-andeanpurple-600 transition-all duration-1000 flex items-center justify-center" 
+                    style={{ width: `${mobilePercentage}%` }}
+                  >
+                    {mobilePercentage > 15 && <span className="text-[8px] text-white font-black">{Math.round(mobilePercentage)}%</span>}
+                  </div>
+               </div>
+               
+               <div className="mt-4 grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                     <span className="text-[9px] font-bold text-stone-500">WEB: {platformStats.web?.views || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                     <div className="w-1.5 h-1.5 rounded-full bg-andeanpurple-600"></div>
+                     <span className="text-[9px] font-bold text-stone-500">APP: {platformStats.mobile?.views || 0}</span>
+                  </div>
+               </div>
             </div>
           </div>
         )}

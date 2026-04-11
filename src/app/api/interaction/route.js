@@ -40,7 +40,9 @@ export async function POST(request) {
     const baseField = type === 'click' ? 'clicks' : 'views';
     const updatePayload = {
       [`countries.${cleanCountry}.${baseField}`]: increment(1),
-      [`cities.${cleanCity}.${baseField}`]: increment(1)
+      [`cities.${cleanCity}.${baseField}`]: increment(1),
+      [`platforms.web.${baseField}`]: increment(1),
+      [`total_${baseField}`]: increment(1)
     };
 
     // 1. Actualizar estadísticas del producto (si aplica)
@@ -70,12 +72,14 @@ export async function POST(request) {
       });
     }
 
-    // 3. Registro Geográfico Global (Dashboard)
+    // 3. Registro Geográfico y por Plataforma Global (Dashboard)
     const statsRef = doc(db, 'stats', 'locations');
     await updateDoc(statsRef, updatePayload).catch(async () => {
       await setDoc(statsRef, {
         cities: { [cleanCity]: { [baseField]: 1 } },
-        countries: { [cleanCountry]: { [baseField]: 1 } }
+        countries: { [cleanCountry]: { [baseField]: 1 } },
+        platforms: { web: { [baseField]: 1 } },
+        [`total_${baseField}`]: 1
       }, { merge: true });
     });
 
