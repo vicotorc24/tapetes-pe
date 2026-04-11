@@ -79,12 +79,13 @@ export const subscribeToLogs = (callback, limitValue = 50) => {
   const logsRef = collection(db, COLLECTION_NAME);
   const q = query(logsRef, orderBy('timestamp', 'desc'), limit(limitValue));
 
-  return onSnapshot(q, (querySnapshot) => {
+    return onSnapshot(q, (querySnapshot) => {
     const logs = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       // Convert Firestore Timestamp to readable string or Date
-      timestamp: doc.data().timestamp?.toDate().toLocaleString('es-PE') || 'Reciente'
+      timestamp: doc.data().timestamp?.toDate().toLocaleString('es-PE') || 'Reciente',
+      rawDate: doc.data().timestamp?.toDate() || new Date()
     }));
     callback(logs);
   });
@@ -93,7 +94,7 @@ export const subscribeToLogs = (callback, limitValue = 50) => {
 /**
  * Fetches logs with optional filtering (demo version)
  */
-export const getFilteredLogs = (callback, filters = {}, limitValue = 50) => {
+export const getFilteredLogs = (callback, filters = {}, onError = null, limitValue = 50) => {
   const logsRef = collection(db, COLLECTION_NAME);
   let constraints = [orderBy('timestamp', 'desc'), limit(limitValue)];
 
@@ -107,12 +108,19 @@ export const getFilteredLogs = (callback, filters = {}, limitValue = 50) => {
 
   const q = query(logsRef, ...constraints);
 
-  return onSnapshot(q, (querySnapshot) => {
-    const logs = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-      timestamp: doc.data().timestamp?.toDate().toLocaleString('es-PE') || 'Reciente'
-    }));
-    callback(logs);
-  });
+  return onSnapshot(q, 
+    (querySnapshot) => {
+      const logs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate().toLocaleString('es-PE') || 'Reciente',
+        rawDate: doc.data().timestamp?.toDate() || new Date()
+      }));
+      callback(logs);
+    },
+    (error) => {
+      console.error("Error en onSnapshot bitácora:", error);
+      if (onError) onError(error);
+    }
+  );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LucideShield, LucideHistory, LucideFilter, LucideSearch, LucideDownload, LucideAlertTriangle, LucideCheckCircle, LucideUser, LucidePackage } from 'lucide-react';
-import { getFilteredLogs } from '../../lib/services/audit';
+import { getFilteredLogs, subscribeToLogs } from '../../lib/services/audit';
 
 export function AuditLogManager() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,41 +10,52 @@ export function AuditLogManager() {
   const [showFilters, setShowFilters] = useState(false);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   useEffect(() => {
     setLoading(true);
-    // Usamos el servicio de filtrado en tiempo real
-    const unsubscribe = getFilteredLogs(
-      (data) => {
-        setLogs(data);
-        setLoading(false);
-      }, 
-      { category: categoryFilter, level: levelFilter }
-    );
+    setError(null);
+    // Descargamos un lote generoso (200) para filtrar todo localmente. 
+    // Esto elimina la necesidad de índices compuestos en Firestore y hace los filtros instantáneos.
+    const unsubscribe = subscribeToLogs((data) => {
+      setLogs(data);
+      setLoading(false);
+    }, 200);
 
     return () => unsubscribe();
-  }, [categoryFilter, levelFilter]);
+  }, []); // Sin dependencias de filtros para evitar re-suscripciones innecesarias
 
   const categories = ['Todas', 'Catálogo', 'Usuarios', 'Seguridad', 'Sistema', 'Infraestructura'];
   const levels = ['Todos', 'success', 'warning', 'info'];
 
   const filteredLogs = logs.filter(l => {
-    // Filtro de Búsqueda
+    // 1. Filtro por Módulo (Categoría) - Local
+    if (categoryFilter !== 'Todas' && l.category !== categoryFilter) return false;
+
+    // 2. Filtro por Nivel - Local
+    if (levelFilter !== 'Todos' && l.level !== levelFilter) return false;
+
+    // 3. Filtro de Búsqueda
     const matchesSearch = 
       (l.userName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) || 
       (l.action?.toLowerCase() || '').includes(searchTerm.toLowerCase());
     
-    // Filtro de Tiempo (Local)
+    // Filtro de Tiempo (Local de Alto Rendimiento)
     if (!matchesSearch) return false;
-    
     if (timeRange === 'all') return true;
     
-    const logDate = new Date(l.timestamp);
+    // Usamos rawDate que ahora viene como objeto Date real desde el servicio
+    const logDate = l.rawDate;
     const now = new Date();
+    
+    // Lógica por día calendario para "Hoy"
+    if (timeRange === 'today') {
+      return logDate.toDateString() === now.toDateString();
+    }
+
     const diffTime = Math.abs(now - logDate);
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-    if (timeRange === 'today' && diffDays > 1) return false;
     if (timeRange === 'week' && diffDays > 7) return false;
     if (timeRange === 'month' && diffDays > 30) return false;
 
@@ -146,12 +157,12 @@ export function AuditLogManager() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl">
           <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Total Actividad</p>
-          <p className="text-3xl font-black text-blue-900 leading-none mb-2">{logs.length}</p>
+          <p className="text-3xl font-black text-blue-900 leading-none mb-2">{filteredLogs.length}</p>
           <p className="text-xs text-blue-600 font-medium">Registros en esta vista</p>
         </div>
         <div className="bg-amber-50 border border-amber-100 p-6 rounded-2xl">
           <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-1">Alertas Generadas</p>
-          <p className="text-3xl font-black text-amber-900 leading-none mb-2">{logs.filter(l => l.level === 'warning').length}</p>
+          <p className="text-3xl font-black text-amber-900 leading-none mb-2">{filteredLogs.filter(l => l.level === 'warning').length}</p>
           <p className="text-xs text-amber-600 font-medium italic">Acciones Críticas Registradas</p>
         </div>
         <div className="bg-green-50 border border-green-100 p-6 rounded-2xl">
@@ -187,61 +198,83 @@ export function AuditLogManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-50">
-              {loading ? (
-                <tr>
-                  <td colSpan="5" className="p-20 text-center text-stone-400">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin"></div>
-                      <span className="text-xs font-bold uppercase tracking-widest">Sincronizando Bitácora Real...</span>
+            {error ? (
+              <tr>
+                <td colSpan="5" className="p-20 text-center">
+                  <div className="flex flex-col items-center gap-4 max-w-md mx-auto">
+                    <LucideAlertTriangle className="text-amber-500 animate-pulse" size={40} />
+                    <div>
+                      <h4 className="text-stone-900 font-black uppercase text-xs tracking-widest mb-2">Error de Filtro Compuesto</h4>
+                      <p className="text-stone-500 text-xs leading-relaxed mb-4">
+                        {error.includes('index') 
+                          ? 'Esta combinación de filtros requiere un índice compuesto en la base de datos (Firestore). Por favor, abre la consola del navegador (F12) y haz clic en el enlace generado automáticamente por Firebase para habilitarlo.' 
+                          : `Ha ocurrido un problema al sincronizar la bitácora: ${error}`}
+                      </p>
+                      <button 
+                        onClick={() => { setCategoryFilter('Todas'); setLevelFilter('Todos'); }} 
+                        className="bg-stone-900 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-stone-800 transition shadow-lg"
+                      >
+                        Restablecer Filtros
+                      </button>
                     </div>
-                  </td>
-                </tr>
-              ) : filteredLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-stone-50/80 transition-colors group">
-                  <td className="p-6 font-mono text-[11px] text-stone-400">{log.timestamp}</td>
-                  <td className="p-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-900">
-                        <LucideUser size={14} />
-                      </div>
-                      <span className="font-bold text-stone-800">{log.userName || log.user}</span>
+                  </div>
+                </td>
+              </tr>
+            ) : loading ? (
+              <tr>
+                <td colSpan="5" className="p-20 text-center text-stone-400">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-8 h-8 border-2 border-stone-200 border-t-stone-800 rounded-full animate-spin"></div>
+                    <span className="text-xs font-bold uppercase tracking-widest">Sincronizando Bitácora Real...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : filteredLogs.map((log) => (
+              <tr key={log.id} className="hover:bg-stone-50/80 transition-colors group">
+                <td className="p-6 font-mono text-[11px] text-stone-400">{log.timestamp}</td>
+                <td className="p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-stone-900">
+                      <LucideUser size={14} />
                     </div>
-                  </td>
-                  <td className="p-6">
-                    <p className="text-stone-600 font-medium">{log.action}</p>
-                  </td>
-                  <td className="p-6">
-                    <span className="px-2 py-1 bg-stone-100 text-stone-500 rounded-md text-[10px] font-black uppercase tracking-tighter">
-                      {log.category}
-                    </span>
-                  </td>
-                  <td className="p-6">
-                    <div 
-                      className="flex items-center gap-2 cursor-help group/tip" 
-                      title={
-                        log.level === 'success' ? 'Acción completada exitosamente sin incidencias.' : 
-                        log.level === 'warning' ? 'Acción crítica o advertencia que requiere atención.' : 
-                        'Registro de actividad informativa estándar.'
-                      }
-                    >
-                       {log.level === 'success' && <LucideCheckCircle size={14} className="text-green-500" />}
-                       {log.level === 'warning' && <LucideAlertTriangle size={14} className="text-amber-500" />}
-                       {log.level === 'info' && <LucideHistory size={14} className="text-blue-400" />}
-                       <span className={`text-[10px] font-bold uppercase ${
-                         log.level === 'success' ? 'text-green-600' : 
-                         log.level === 'warning' ? 'text-amber-600' : 'text-blue-600'
-                       }`}>
-                         {log.level}
-                       </span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!loading && filteredLogs.length === 0 && (
-            <div className="p-20 text-center text-stone-400 italic">No hay registros reales en este momento.</div>
-          )}
+                    <span className="font-bold text-stone-800">{log.userName || log.user}</span>
+                  </div>
+                </td>
+                <td className="p-6">
+                  <p className="text-stone-600 font-medium">{log.action}</p>
+                </td>
+                <td className="p-6">
+                  <span className="px-2 py-1 bg-stone-100 text-stone-500 rounded-md text-[10px] font-black uppercase tracking-tighter">
+                    {log.category}
+                  </span>
+                </td>
+                <td className="p-6">
+                  <div 
+                    className="flex items-center gap-2 cursor-help group/tip" 
+                    title={
+                      log.level === 'success' ? 'Acción completada exitosamente sin incidencias.' : 
+                      log.level === 'warning' ? 'Acción crítica o advertencia que requiere atención.' : 
+                      'Registro de actividad informativa estándar.'
+                    }
+                  >
+                     {log.level === 'success' && <LucideCheckCircle size={14} className="text-green-500" />}
+                     {log.level === 'warning' && <LucideAlertTriangle size={14} className="text-amber-500" />}
+                     {log.level === 'info' && <LucideHistory size={14} className="text-blue-400" />}
+                     <span className={`text-[10px] font-bold uppercase ${
+                       log.level === 'success' ? 'text-green-600' : 
+                       log.level === 'warning' ? 'text-amber-600' : 'text-blue-600'
+                     }`}>
+                       {log.level}
+                     </span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {!loading && !error && filteredLogs.length === 0 && (
+          <div className="p-20 text-center text-stone-400 italic">No hay registros que coincidan con los filtros seleccionados.</div>
+        )}
         </div>
       </div>
     </div>

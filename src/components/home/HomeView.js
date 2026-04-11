@@ -150,9 +150,9 @@ export function HomeView({
                 <div className="absolute -top-12 -right-12 w-48 h-48 z-20 animate-spin-slow pointer-events-none opacity-90">
                    <svg viewBox="0 0 200 200" className="w-full h-full">
                       <path id="circlePath" d="M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0 " fill="transparent"/>
-                      <text className="fill-white/80 font-bold uppercase tracking-[0.2em] text-[13px]">
-                         <textPath xlinkHref="#circlePath">
-                            Original de Contumazá • Tradición Viva • 100% Hecho a Mano • 
+                      <text className="fill-white/80 font-bold uppercase text-[11px]">
+                         <textPath xlinkHref="#circlePath" textLength="440" lengthAdjust="spacing">
+                            • ORIGINAL DE CONTUMAZÁ • TRADICIÓN • HECHO A MANO •
                          </textPath>
                       </text>
                    </svg>
