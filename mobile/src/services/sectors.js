@@ -3,13 +3,18 @@ import { db } from '../lib/firebase';
 
 const COLLECTION_NAME = 'sectors';
 
+/**
+ * Obtiene todos los sectores productivos (Rubros)
+ */
 export const getSectors = async () => {
   try {
-    const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'asc'));
+    const sectorsRef = collection(db, COLLECTION_NAME);
+    const q = query(sectorsRef, orderBy('createdAt', 'asc'));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ 
-      id: doc.id, 
-      ...doc.data() 
+    
+    return querySnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
     }));
   } catch (error) {
     console.error("[ERROR] Fallo al cargar sectores:", error);

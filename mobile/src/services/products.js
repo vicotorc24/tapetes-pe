@@ -1,8 +1,10 @@
 import { 
   collection, 
+  addDoc,
   getDocs, 
   doc, 
   getDoc,
+  updateDoc,
   query, 
   where,
   orderBy 
@@ -57,5 +59,41 @@ export const getProductById = async (productId) => {
   } catch (error) {
     console.error("Error en mobile/getProductById:", error);
     return null;
+  }
+};
+
+/**
+ * Actualiza los datos de un producto
+ */
+export const updateProduct = async (productId, productData) => {
+  try {
+    const productRef = doc(db, COLLECTION_NAME, productId);
+    await updateDoc(productRef, {
+      ...productData,
+      updatedAt: new Date().toISOString()
+    });
+    return true;
+  } catch (error) {
+    console.error("Error en mobile/updateProduct:", error);
+    throw error;
+  }
+};
+
+/**
+ * Crea un nuevo producto en el catálogo
+ */
+export const addProduct = async (productData) => {
+  try {
+    const productsRef = collection(db, COLLECTION_NAME);
+    const docRef = await addDoc(productsRef, {
+      ...productData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      stats: { views: 0, whatsappClicks: 0 } // Inicializar stats
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error("Error en mobile/addProduct:", error);
+    throw error;
   }
 };

@@ -16,6 +16,10 @@ import FavoritesScreen from './src/screens/FavoritesScreen';
 import ProductDetailScreen from './src/screens/ProductDetailScreen';
 import LegacyDetailScreen from './src/screens/LegacyDetailScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
+import EditProductScreen from './src/screens/EditProductScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
+import NewProductScreen from './src/screens/NewProductScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -23,7 +27,7 @@ function NavigationOverlay({ currentScreen, navigate, user }) {
   const insets = useSafeAreaInsets();
   
   // Ocultar en pantallas específicas
-  const hiddenScreens = ['Detail', 'LegacyDetail', 'Login'];
+  const hiddenScreens = ['Detail', 'LegacyDetail', 'Login', 'Register', 'EditProduct', 'EditProfile', 'NewProduct'];
   if (hiddenScreens.includes(currentScreen)) return null;
 
   const tabs = [
@@ -71,7 +75,7 @@ export default function App() {
 
   // Sistema de Navegación Simple
   const navigate = (screen, data = null) => {
-    if ((screen === 'Detail' || screen === 'LegacyDetail') && data) {
+    if ((screen === 'Detail' || screen === 'LegacyDetail' || screen === 'EditProduct') && data) {
       setSelectedProduct(data);
     }
     setCurrentScreen(screen);
@@ -85,8 +89,16 @@ export default function App() {
         return <CatalogScreen onNavigate={navigate} />;
       case 'Login':
         return <LoginScreen onNavigate={navigate} onLoginSuccess={(u) => { setUser(u); navigate('Dashboard'); }} />;
+      case 'Register':
+        return <RegisterScreen onNavigate={navigate} onRegisterSuccess={(u) => { setUser(u); navigate('Dashboard'); }} />;
       case 'Dashboard':
         return <DashboardScreen onNavigate={navigate} user={user} onLogout={() => { setUser(null); navigate('Home'); }} />;
+      case 'EditProduct':
+        return <EditProductScreen product={selectedProduct} onNavigate={navigate} onSaveSuccess={() => navigate('Dashboard')} />;
+      case 'EditProfile':
+        return <EditProfileScreen user={user} onNavigate={navigate} onSaveSuccess={(updatedUser) => { setUser(updatedUser); navigate('Dashboard'); }} />;
+      case 'NewProduct':
+        return <NewProductScreen user={user} onNavigate={navigate} onPublishSuccess={() => navigate('Dashboard')} />;
       case 'Impact':
         return <ImpactScreen onNavigate={navigate} />;
       case 'Legacy':

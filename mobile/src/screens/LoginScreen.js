@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
-import { Mail, Lock, ArrowRight, UserCircle } from 'lucide-react-native';
+import { Mail, Lock, ArrowRight, UserCircle, Eye, EyeOff } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
+import { login } from '../services/auth';
 
 const { width } = Dimensions.get('window');
 
@@ -9,27 +10,23 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       alert('Por favor ingrese sus credenciales');
       return;
     }
 
-    setLoading(true);
-    // Simulación de login - En el futuro se conecta con Firebase Auth
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      const user = await login(email, password);
+      onLoginSuccess(user);
+    } catch (error) {
+      alert(error.message);
+    } finally {
       setLoading(false);
-      
-      // Datos de prueba para el artesano
-      const mockUser = {
-        name: email.split('@')[0],
-        email: email,
-        role: 'seller'
-      };
-      
-      onLoginSuccess(mockUser);
-    }, 1500);
+    }
   };
 
   return (
@@ -47,8 +44,8 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
             <View style={styles.logoCircle}>
               <UserCircle color={COLORS.primary} size={50} />
             </View>
-            <Text style={styles.title}>Portal del Artesano (v1.1)</Text>
-            <Text style={styles.subtitle}>Gestione su identidad productiva y catalogue sus obras.</Text>
+            <Text style={styles.title}>Artesanos y Productores</Text>
+            <Text style={styles.subtitle}>Gestione su identidad productiva y catalogue sus obras para el mundo.</Text>
           </View>
 
           <View style={styles.form}>
@@ -71,8 +68,11 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
+                secureTextEntry={!showPassword}
               />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff color="#999" size={20} /> : <Eye color="#999" size={20} />}
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity style={styles.forgotBtn}>
@@ -87,8 +87,8 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>¿Todavía no está registrado?</Text>
-            <TouchableOpacity>
-              <Text style={styles.registerLink}>Contactar con la Municipalidad</Text>
+            <TouchableOpacity onPress={() => onNavigate('Register')}>
+              <Text style={styles.registerLink}>Registrarse como Productor / Artesano</Text>
             </TouchableOpacity>
           </View>
         </View>
