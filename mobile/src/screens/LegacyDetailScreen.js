@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { ArrowLeft, Share as ShareIcon, Bookmark } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { cleanHtml } from '../utils/textUtils';
+import { recordInteraction } from '../services/interactions';
 import ImageViewer from '../components/ImageViewer';
 
 const { width } = Dimensions.get('window');
@@ -11,6 +12,12 @@ const { width } = Dimensions.get('window');
 export default function LegacyDetailScreen({ item, onNavigate }) {
   const [viewerVisible, setViewerVisible] = React.useState(false);
   const [activeImageIndex, setActiveImageIndex] = React.useState(0);
+  
+  React.useEffect(() => {
+    if (item && item.id) {
+      recordInteraction(null, 'views', null, item.id);
+    }
+  }, []);
 
   if (!item) return null;
 

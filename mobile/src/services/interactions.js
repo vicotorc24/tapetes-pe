@@ -14,8 +14,8 @@ import {
  * SERVICIO DE INTERACCIONES ROBUSTAS (Paridad Web)
  * Actualiza estadísticas de Producto, Productor y Globales.
  */
-export const recordInteraction = async (productId, metric, producerId = null) => {
-  if (!productId) return;
+export const recordInteraction = async (productId, metric, producerId = null, legacyId = null) => {
+  if (!productId && !legacyId) return;
 
   try {
     const type = metric === 'whatsappClicks' ? 'click' : 'view';
@@ -26,11 +26,13 @@ export const recordInteraction = async (productId, metric, producerId = null) =>
     }
 
     // 1. Actualizar Estadísticas del Producto
-    const productRef = doc(db, 'products', productId);
-    const pField = type === 'click' ? 'stats.whatsappClicks' : 'stats.views';
-    await updateDoc(productRef, { [pField]: increment(1) }).catch(err => {
-      console.warn(`[INTERACTION] Product stats update failed:`, err.message);
-    });
+    if (productId) {
+      const productRef = doc(db, 'products', productId);
+      const pField = type === 'click' ? 'stats.whatsappClicks' : 'stats.views';
+      await updateDoc(productRef, { [pField]: increment(1) }).catch(err => {
+        console.warn(`[INTERACTION] Product stats update failed:`, err.message);
+      });
+    }
 
     // 2. Actualizar Estadísticas del Productor (Si tenemos el ID)
     if (producerId) {
@@ -46,16 +48,30 @@ export const recordInteraction = async (productId, metric, producerId = null) =>
     const statsRef = doc(db, 'stats', 'locations');
     const platformField = `platforms.mobile.${baseField}`;
     
-    await updateDoc(statsRef, {
-      [platformField]: increment(1),
-      [`total_${baseField}`]: increment(1)
-    }).catch(async () => {
-      // Si el documento no existe, lo creamos con merge
-      await setDoc(statsRef, {
-        platforms: { mobile: { [baseField]: 1 } },
-        [`total_${baseField}`]: 1
-      }, { merge: true });
-    });
+    if (productId) {
+      await updateDoc(statsRef, {
+        [platformField]: increment(1),
+        [`total_${baseField}`]: increment(1)
+      }).catch(async () => {
+        await setDoc(statsRef, {
+          platforms: { mobile: { [baseField]: 1 } },
+          [`total_${baseField}`]: 1
+        }, { merge: true });
+      });
+    }
+
+    // 4. Registro de Legado Cultural (Si aplica)
+    if (legacyId) {
+      const cleanLegacyId = legacyId.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9 ]/g, '').trim();
+      const legacyStatsRef = doc(db, 'stats', 'legacy');
+      await updateDoc(legacyStatsRef, {
+        [`views.${cleanLegacyId}`]: increment(1)
+      }).catch(async () => {
+        await setDoc(legacyStatsRef, {
+          views: { [cleanLegacyId]: 1 }
+        }, { merge: true });
+      });
+    }
 
     if (__DEV__) {
       console.log(`[INTERACTION] ✅ Successfully synchronized all metrics for ${type}`);
