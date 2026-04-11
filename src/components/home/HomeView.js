@@ -5,6 +5,7 @@ import { AnalyticsEvents } from '@/lib/analytics';
 import { LucideHeart, LucideGlobe2, LucideUsers, LucideArrowRight, LucideSearch, LucideX, LucidePlus, LucideCrown, LucidePalette, LucideSprout, LucideMountain } from 'lucide-react';
 import { getImpactData } from '@/lib/services/impact';
 import { IconTurismo, IconAlimentos, IconArtesania, IconTodos } from './TerritoryIcons';
+import { AppPromotion } from './AppPromotion';
 
 export function HomeView({ 
   products, 
@@ -379,6 +380,9 @@ export function HomeView({
           </div>
         </div>
       )}
+
+      {/* SECCIÓN MÓVIL: QR & Descarga */}
+      <AppPromotion />
 
       {/* NUEVA SECCIÓN: Marcador de Marcas con Propósito */}
       {brands && brands.length > 0 && (
