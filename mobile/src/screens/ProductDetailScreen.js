@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { ArrowLeft, MessageCircle, Share as ShareIcon, Info, Layout, Heart } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { isProductFavorite, toggleFavorite } from '../lib/favorites';
+import { recordInteraction, getProducerIdByEmail } from '../services/interactions';
 import ImageViewer from '../components/ImageViewer';
 
 export default function ProductDetailScreen({ product, onNavigate }) {
@@ -13,6 +14,22 @@ export default function ProductDetailScreen({ product, onNavigate }) {
 
   React.useEffect(() => {
     checkFavorite();
+    
+    // Track product view with ID resolution for legacy products
+    const trackView = async () => {
+      if (product && product.id) {
+        let sid = product.sellerId;
+        
+        // Fallback: Si no tiene sellerId (producto antiguo), lo buscamos por email
+        if (!sid && product.sellerEmail) {
+          sid = await getProducerIdByEmail(product.sellerEmail);
+        }
+        
+        recordInteraction(product.id, 'views', sid);
+      }
+    };
+    
+    trackView();
   }, []);
 
   const checkFavorite = async () => {
@@ -37,8 +54,17 @@ export default function ProductDetailScreen({ product, onNavigate }) {
     const phoneNumber = '51908513551';
     const message = `¡Hola! Me interesa este tesoro de Contumazá: *${product.title}* (S/ ${product.price}). ¿Podrían darme más información?`;
     const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-    
-    Linking.canOpenURL(url).then(supported => {
+
+    Linking.canOpenURL(url).then(async (supported) => {
+      // Track WhatsApp click with ID resolution
+      if (product && product.id) {
+        let sid = product.sellerId;
+        if (!sid && product.sellerEmail) {
+          sid = await getProducerIdByEmail(product.sellerEmail);
+        }
+        recordInteraction(product.id, 'whatsappClicks', sid);
+      }
+
       if (supported) {
         Linking.openURL(url);
       } else {
@@ -71,13 +97,13 @@ export default function ProductDetailScreen({ product, onNavigate }) {
         <TouchableOpacity onPress={() => onNavigate('Catalog')} style={styles.roundBtn}>
           <ArrowLeft color="#1A1A1A" size={24} />
         </TouchableOpacity>
-        
+
         <View style={styles.headerRight}>
           <TouchableOpacity onPress={handleToggleFavorite} style={[styles.roundBtn, { marginRight: 10 }]}>
-            <Heart 
-              color={isFavorite ? '#FF4444' : '#1A1A1A'} 
-              fill={isFavorite ? '#FF4444' : 'transparent'} 
-              size={24} 
+            <Heart
+              color={isFavorite ? '#FF4444' : '#1A1A1A'}
+              fill={isFavorite ? '#FF4444' : 'transparent'}
+              size={24}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleShare} style={styles.roundBtn}>
@@ -97,8 +123,8 @@ export default function ProductDetailScreen({ product, onNavigate }) {
             scrollEventThrottle={16}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item, index }) => (
-              <TouchableOpacity 
-                activeOpacity={0.9} 
+              <TouchableOpacity
+                activeOpacity={0.9}
                 onPress={() => {
                   setActiveImageIndex(index);
                   setViewerVisible(true);
@@ -108,22 +134,22 @@ export default function ProductDetailScreen({ product, onNavigate }) {
               </TouchableOpacity>
             )}
           />
-          
+
           {allImages.length > 1 && (
             <View style={styles.paginationDots}>
               {allImages.map((_, index) => (
-                <View 
-                  key={index} 
+                <View
+                  key={index}
                   style={[
-                    styles.dot, 
+                    styles.dot,
                     activeImageIndex === index && styles.activeDot
-                  ]} 
+                  ]}
                 />
               ))}
             </View>
           )}
         </View>
-        
+
         <View style={styles.content}>
           <View style={styles.infoRow}>
             <Text style={styles.category}>{product.category || 'Artesanía'}</Text>
@@ -180,11 +206,11 @@ export default function ProductDetailScreen({ product, onNavigate }) {
         </TouchableOpacity>
       </View>
 
-      <ImageViewer 
-        visible={viewerVisible} 
-        images={allImages} 
+      <ImageViewer
+        visible={viewerVisible}
+        images={allImages}
         initialIndex={activeImageIndex}
-        onClose={() => setViewerVisible(false)} 
+        onClose={() => setViewerVisible(false)}
       />
     </SafeAreaView>
   );

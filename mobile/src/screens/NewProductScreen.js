@@ -123,7 +123,8 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
         technique,
         dimensions,
         weight,
-        // Datos del Vendedor (Basado en el Auth actual)
+        // Datos del Vendedor (Paridad con la Web)
+        sellerId: user.id || user.uid,
         sellerEmail: user.email,
         sellerName: `${user.firstName} ${user.lastName}`,
         sellerPhoto: user.photo || ''
