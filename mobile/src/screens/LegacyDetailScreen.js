@@ -1,14 +1,24 @@
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Share } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Share, FlatList } from 'react-native';
 import { Image } from 'expo-image';
 import { ArrowLeft, Share as ShareIcon, Bookmark } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { cleanHtml } from '../utils/textUtils';
+import ImageViewer from '../components/ImageViewer';
 
 const { width } = Dimensions.get('window');
 
 export default function LegacyDetailScreen({ item, onNavigate }) {
+  const [viewerVisible, setViewerVisible] = React.useState(false);
+  const [activeImageIndex, setActiveImageIndex] = React.useState(0);
+
   if (!item) return null;
+
+  // Consolidar imágenes
+  const allImages = [
+    ...(item.image ? [item.image] : []),
+    ...(item.images || []).map(img => typeof img === 'string' ? img : img.url)
+  ].filter((img, index, self) => self.indexOf(img) === index);
 
   const handleShare = async () => {
     try {
@@ -23,16 +33,57 @@ export default function LegacyDetailScreen({ item, onNavigate }) {
     }
   };
 
+  const handleScroll = (event) => {
+    const contentOffset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(contentOffset / width);
+    setActiveImageIndex(index);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Imagen Hero */}
+        {/* Imagen Hero (Carousel) */}
         <View style={styles.imageContainer}>
-          <Image 
-            source={{ uri: item.image || 'https://via.placeholder.com/800' }} 
-            style={styles.heroImage}
-            contentFit="cover"
+          <FlatList
+            data={allImages}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity 
+                activeOpacity={0.9} 
+                onPress={() => {
+                  setActiveImageIndex(index);
+                  setViewerVisible(true);
+                }} 
+                style={{ width: width, height: 450 }}
+              >
+                <Image 
+                  source={{ uri: item }} 
+                  style={styles.heroImage}
+                  contentFit="cover"
+                />
+              </TouchableOpacity>
+            )}
           />
+          
+          {allImages.length > 1 && (
+            <View style={styles.paginationDots}>
+              {allImages.map((_, index) => (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.dot, 
+                    activeImageIndex === index && styles.activeDot
+                  ]} 
+                />
+              ))}
+            </View>
+          )}
+
           <View style={styles.headerOverlay}>
             <SafeAreaView>
               <View style={styles.headerActions}>
@@ -78,6 +129,13 @@ export default function LegacyDetailScreen({ item, onNavigate }) {
             <Text style={styles.backButtonText}>VOLVER AL LEGADO</Text>
          </TouchableOpacity>
       </View>
+
+      <ImageViewer 
+        visible={viewerVisible} 
+        images={allImages} 
+        initialIndex={activeImageIndex}
+        onClose={() => setViewerVisible(false)} 
+      />
     </View>
   );
 }
@@ -123,6 +181,24 @@ const styles = StyleSheet.create({
     right: 0,
     height: 150,
     backgroundColor: 'rgba(28, 25, 23, 0.4)', // Difuminado suave
+  },
+  paginationDots: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 50,
+    alignSelf: 'center',
+    gap: 8,
+    zIndex: 20,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  activeDot: {
+    backgroundColor: COLORS.primary,
+    width: 20,
   },
   content: {
     marginTop: -30,

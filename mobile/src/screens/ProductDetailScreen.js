@@ -1,12 +1,15 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Linking, Share } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Linking, Share, FlatList, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { ArrowLeft, MessageCircle, Share as ShareIcon, Info, Layout, Heart } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { isProductFavorite, toggleFavorite } from '../lib/favorites';
+import ImageViewer from '../components/ImageViewer';
 
 export default function ProductDetailScreen({ product, onNavigate }) {
   const [isFavorite, setIsFavorite] = React.useState(false);
+  const [viewerVisible, setViewerVisible] = React.useState(false);
+  const [activeImageIndex, setActiveImageIndex] = React.useState(0);
 
   React.useEffect(() => {
     checkFavorite();
@@ -24,6 +27,12 @@ export default function ProductDetailScreen({ product, onNavigate }) {
 
   if (!product) return null;
 
+  // Consolidar todas las imágenes en un solo array
+  const allImages = [
+    ...(product.image ? [product.image] : []),
+    ...(product.images || []).map(img => typeof img === 'string' ? img : img.url)
+  ].filter((img, index, self) => self.indexOf(img) === index); // Eliminar duplicados
+
   const handleWhatsApp = () => {
     const phoneNumber = '51908513551';
     const message = `¡Hola! Me interesa este tesoro de Contumazá: *${product.title}* (S/ ${product.price}). ¿Podrían darme más información?`;
@@ -37,6 +46,12 @@ export default function ProductDetailScreen({ product, onNavigate }) {
         Linking.openURL(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`);
       }
     });
+  };
+
+  const handleScroll = (event) => {
+    const contentOffset = event.nativeEvent.contentOffset.x;
+    const index = Math.round(contentOffset / Dimensions.get('window').width);
+    setActiveImageIndex(index);
   };
 
   const handleShare = async () => {
@@ -72,10 +87,42 @@ export default function ProductDetailScreen({ product, onNavigate }) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Image 
-          source={{ uri: product.image || (product.images && product.images[0]?.url) || 'https://via.placeholder.com/400' }} 
-          style={styles.mainImage} 
-        />
+        <View style={styles.imageContainer}>
+          <FlatList
+            data={allImages}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity 
+                activeOpacity={0.9} 
+                onPress={() => {
+                  setActiveImageIndex(index);
+                  setViewerVisible(true);
+                }}
+              >
+                <Image source={{ uri: item }} style={styles.mainImage} />
+              </TouchableOpacity>
+            )}
+          />
+          
+          {allImages.length > 1 && (
+            <View style={styles.paginationDots}>
+              {allImages.map((_, index) => (
+                <View 
+                  key={index} 
+                  style={[
+                    styles.dot, 
+                    activeImageIndex === index && styles.activeDot
+                  ]} 
+                />
+              ))}
+            </View>
+          )}
+        </View>
         
         <View style={styles.content}>
           <View style={styles.infoRow}>
@@ -132,6 +179,13 @@ export default function ProductDetailScreen({ product, onNavigate }) {
           <Text style={styles.whatsappText}>CONSULTAR PRODUCTO</Text>
         </TouchableOpacity>
       </View>
+
+      <ImageViewer 
+        visible={viewerVisible} 
+        images={allImages} 
+        initialIndex={activeImageIndex}
+        onClose={() => setViewerVisible(false)} 
+      />
     </SafeAreaView>
   );
 }
@@ -166,10 +220,30 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
   },
-  mainImage: {
-    width: '100%',
+  imageContainer: {
     height: 450,
     backgroundColor: '#f5f5f5',
+  },
+  mainImage: {
+    width: Dimensions.get('window').width,
+    height: 450,
+  },
+  paginationDots: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 60,
+    alignSelf: 'center',
+    gap: 8,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  activeDot: {
+    backgroundColor: '#fff',
+    width: 20,
   },
   content: {
     padding: 25,
