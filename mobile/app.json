@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "mobile",
-    "slug": "mobile",
+    "slug": "madeincontumaza",
     "scheme": "madeincontumaza",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,9 +14,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "pe.madeincontumaza.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta app requiere acceso a la cámara para que los artesanos puedan fotografiar sus productos.",
+        "NSPhotoLibraryUsageDescription": "Esta app requiere acceso a la galería para que los artesanos puedan subir fotos de sus productos."
+      }
     },
     "android": {
+      "package": "pe.madeincontumaza.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +31,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "efe63a5e-a9b0-4e9c-b180-269650aa5550"
+      }
     }
   }
 }
