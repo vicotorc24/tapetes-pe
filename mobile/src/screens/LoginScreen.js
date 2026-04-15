@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, SafeAreaView, KeyboardAvoidingView, ScrollView, Platform, Dimensions } from 'react-native';
 import { Mail, Lock, ArrowRight, UserCircle, Eye, EyeOff } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { login } from '../services/auth';
@@ -37,63 +37,69 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}
       >
-        <View style={styles.content}>
-          <TouchableOpacity onPress={() => onNavigate('Home')} style={styles.backLink}>
-            <Text style={styles.backText}>Volver al Inicio</Text>
-          </TouchableOpacity>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <View style={styles.content}>
+            <TouchableOpacity onPress={() => onNavigate('Home')} style={styles.backLink}>
+              <Text style={styles.backText}>Volver al Inicio</Text>
+            </TouchableOpacity>
 
-          <View style={styles.headerArea}>
-            <View style={styles.logoCircle}>
-              <UserCircle color={COLORS.primary} size={50} />
-            </View>
-            <Text style={styles.title}>Artesanos y Productores</Text>
-            <Text style={styles.subtitle}>Gestione su identidad productiva y catalogue sus obras para el mundo.</Text>
-          </View>
-
-          <View style={styles.form}>
-            <View style={styles.inputWrapper}>
-              <Mail color="#999" size={20} />
-              <TextInput
-                placeholder="Correo Electrónico"
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+            <View style={styles.headerArea}>
+              <View style={styles.logoCircle}>
+                <UserCircle color={COLORS.primary} size={50} />
+              </View>
+              <Text style={styles.title}>Artesanos y Productores</Text>
+              <Text style={styles.subtitle}>Gestione su identidad productiva y catalogue sus obras para el mundo.</Text>
             </View>
 
-            <View style={styles.inputWrapper}>
-              <Lock color="#999" size={20} />
-              <TextInput
-                placeholder="Contraseña"
-                style={styles.input}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                {showPassword ? <EyeOff color="#999" size={20} /> : <Eye color="#999" size={20} />}
+            <View style={styles.form}>
+              <View style={styles.inputWrapper}>
+                <Mail color="#999" size={20} />
+                <TextInput
+                  placeholder="Correo Electrónico"
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+
+              <View style={styles.inputWrapper}>
+                <Lock color="#999" size={20} />
+                <TextInput
+                  placeholder="Contraseña"
+                  style={styles.input}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff color="#999" size={20} /> : <Eye color="#999" size={20} />}
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity style={styles.forgotBtn}>
+                <Text style={styles.forgotText}>¿Olvidó su contraseña?</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
+                <Text style={styles.loginBtnText}>Iniciar Sesión</Text>
+                <ArrowRight color="white" size={20} />
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.forgotBtn}>
-              <Text style={styles.forgotText}>¿Olvidó su contraseña?</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-              <Text style={styles.loginBtnText}>Iniciar Sesión</Text>
-              <ArrowRight color="white" size={20} />
-            </TouchableOpacity>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>¿Todavía no está registrado?</Text>
+              <TouchableOpacity onPress={() => onNavigate('Register')}>
+                <Text style={styles.registerLink}>Registrarse como Productor / Artesano</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>¿Todavía no está registrado?</Text>
-            <TouchableOpacity onPress={() => onNavigate('Register')}>
-              <Text style={styles.registerLink}>Registrarse como Productor / Artesano</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -107,10 +113,14 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     padding: 30,
     justifyContent: 'center',
+    paddingTop: 100, // Espacio para el botón de "Volver"
   },
   backLink: {
     position: 'absolute',

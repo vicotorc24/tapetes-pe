@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Switch } from 'react-native';
-import { Package, Tag, DollarSign, List, Briefcase, Save, ArrowLeft, Crown, History, Layers, Info } from 'lucide-react-native';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { Package, Tag, DollarSign, List, Briefcase, Save, ArrowLeft, Crown, History, Layers, Info, Camera, Image as ImageIcon, X } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { updateProduct } from '../services/products';
+import { uploadImage } from '../services/storage';
 import { ArtisanEvents } from '../services/analytics';
 import { getCategories } from '../services/categories';
 import { getSectors } from '../services/sectors';
@@ -22,26 +25,38 @@ export default function EditProductScreen({ product, onNavigate, onSaveSuccess }
     );
   }
 
-  // --- Estados del Formulario ---
-  const [title, setTitle] = useState(product.title || '');
-  const [price, setPrice] = useState(product.price?.toString() || '');
-  const [description, setDescription] = useState(product.description || '');
-  const [stock, setStock] = useState(product.stock?.toString() || '1');
-  const [category, setCategory] = useState(product.category || '');
-  const [sectorId, setSectorId] = useState(product.sector || '');
-  const [isPromoted, setIsPromoted] = useState(product.isPromoted || false);
+  // --- Estados del Formulario (Null-Safe) ---
+  const [title, setTitle] = useState((product && product.title) || '');
+  const [price, setPrice] = useState((product && product.price) ? product.price.toString() : '');
+  const [description, setDescription] = useState((product && product.description) || '');
+  const [stock, setStock] = useState((product && product.stock) ? product.stock.toString() : '1');
+  const [category, setCategory] = useState((product && product.category) || '');
+  const [sectorId, setSectorId] = useState((product && product.sector) || '');
+  const [isPromoted, setIsPromoted] = useState(!!(product && product.isPromoted));
+  
+  // --- Gestión de Imágenes (Múltiples Fotos) ---
+  const initialImages = useMemo(() => {
+    if (product && Array.isArray(product.images) && product.images.length > 0) {
+      return product.images.map(img => (typeof img === 'string' ? img : img.url));
+    }
+    return (product && product.image) ? [product.image] : [];
+  }, [product]);
 
+  const [imageList, setImageList] = useState(initialImages);
+  const [removedImages, setRemovedImages] = useState([]);
+  const [newImages, setNewImages] = useState([]); // Almacena URIs locales para subir
+ 
   // Campos Legacy (Compatibilidad)
-  const [materials, setMaterials] = useState(product.materials || '');
-  const [technique, setTechnique] = useState(product.technique || '');
-  const [dimensions, setDimensions] = useState(product.dimensions || '');
-  const [stitchType, setStitchType] = useState(Array.isArray(product.stitchType) ? product.stitchType : []);
+  const [materials, setMaterials] = useState((product && product.materials) || '');
+  const [technique, setTechnique] = useState((product && product.technique) || '');
+  const [dimensions, setDimensions] = useState((product && product.dimensions) || '');
+  const [stitchType, setStitchType] = useState((product && Array.isArray(product.stitchType)) ? product.stitchType : []);
   
   // Campos Agro Legacy
-  const [weight, setWeight] = useState(product.weight || '');
-
+  const [weight, setWeight] = useState((product && product.weight) || '');
+ 
   // --- Campos Dinámicos (Atributos) ---
-  const [attributes, setAttributes] = useState(product.attributes || {});
+  const [attributes, setAttributes] = useState((product && product.attributes) || {});
 
   // Metadata
   const [loading, setLoading] = useState(false);
@@ -69,6 +84,38 @@ export default function EditProductScreen({ product, onNavigate, onSaveSuccess }
   }, [allCategories, sectorId]);
 
   // Manejo de Atributos Dinámicos
+  // Seleccionar Imagen (Cámara o Galería)
+  const pickImage = async (useCamera = false) => {
+    const permissionResult = useCamera 
+      ? await ImagePicker.requestCameraPermissionsAsync() 
+      : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert("Permisos necesarios", "Se requiere acceso a la cámara o galería para subir fotos.");
+      return;
+    }
+
+    const result = useCamera 
+      ? await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.7 })
+      : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.7 });
+
+    if (!result.canceled) {
+      const newUri = result.assets[0].uri;
+      setNewImages(prev => [...prev, newUri]);
+      setImageList(prev => [...prev, newUri]);
+      ArtisanEvents.PHOTO_UPLOAD(product.sellerId || '', 'product_edit_add');
+    }
+  };
+
+  const removePhoto = (uri, index) => {
+    setImageList(prev => prev.filter((_, i) => i !== index));
+    if (newImages.includes(uri)) {
+      setNewImages(prev => prev.filter(item => item !== uri));
+    } else {
+      setRemovedImages(prev => [...prev, uri]);
+    }
+  };
+
   const handleUpdateAttribute = (label, value) => {
     setAttributes(prev => ({
       ...prev,
@@ -90,6 +137,17 @@ export default function EditProductScreen({ product, onNavigate, onSaveSuccess }
 
     try {
       setLoading(true);
+      
+      // Subir solo las imágenes nuevas
+      const uploadedUrls = await Promise.all(
+        newImages.map(uri => uploadImage(uri, 'products'))
+      );
+
+      // Filtrar las imágenes eliminadas de las originales y añadir las nuevas subidas
+      const finalImages = imageList
+        .filter(img => !newImages.includes(img)) // Mantener las originales que no borramos
+        .concat(uploadedUrls);
+
       const payload = {
         title,
         price: parseFloat(price),
@@ -98,8 +156,9 @@ export default function EditProductScreen({ product, onNavigate, onSaveSuccess }
         category,
         sector: sectorId,
         isPromoted,
-        attributes, // Sincronizado con la web
-        // Mantener campos legacy para compatibilidad total
+        attributes,
+        image: finalImages[0] || '', // Imagen principal (primera de la lista)
+        images: finalImages,
         materials,
         technique,
         dimensions,
@@ -131,6 +190,44 @@ export default function EditProductScreen({ product, onNavigate, onSaveSuccess }
           <View style={styles.header}>
             <Text style={styles.title}>Refinar Producto</Text>
             <Text style={styles.subtitle}>Gestión dinámica de inventario para el catálogo oficial.</Text>
+          </View>
+
+          {/* Gestión de Galería de Fotos */}
+          <View style={styles.gallerySection}>
+            <View style={styles.cardHeader}>
+              <Camera size={16} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Galería de Fotos ({imageList.length})</Text>
+            </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
+               {imageList.map((uri, index) => (
+                 <View key={index} style={styles.galleryItem}>
+                    <Image source={{ uri }} style={styles.galleryImage} contentFit="cover" />
+                    <TouchableOpacity 
+                      style={styles.deletePhotoBtn} 
+                      onPress={() => removePhoto(uri, index)}
+                    >
+                      <X color="#fff" size={14} />
+                    </TouchableOpacity>
+                    {index === 0 && (
+                      <View style={styles.mainPhotoBadge}>
+                        <Text style={styles.mainPhotoText}>PRINCIPAL</Text>
+                      </View>
+                    )}
+                 </View>
+               ))}
+               
+               <View style={styles.addPhotoActions}>
+                  <TouchableOpacity style={styles.addPhotoBtn} onPress={() => pickImage(true)}>
+                    <Camera color={COLORS.primary} size={22} />
+                    <Text style={styles.addPhotoText}>Cámara</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.addPhotoBtn} onPress={() => pickImage(false)}>
+                    <ImageIcon color={COLORS.secondary} size={22} />
+                    <Text style={styles.addPhotoText}>Galería</Text>
+                  </TouchableOpacity>
+               </View>
+            </ScrollView>
           </View>
 
           {/* 1. Información General */}
@@ -318,6 +415,20 @@ const styles = StyleSheet.create({
   header: { marginBottom: 35 },
   title: { fontSize: 32, fontWeight: '900', color: COLORS.secondary, letterSpacing: -1 },
   subtitle: { fontSize: 13, color: '#6B7280', lineHeight: 20 },
+  
+  // Estilos de Galería (Mejorados)
+  gallerySection: { marginBottom: 25 },
+  galleryScroll: { flexDirection: 'row', marginTop: 10 },
+  galleryItem: { position: 'relative', marginRight: 15 },
+  galleryImage: { width: 120, height: 120, borderRadius: 20, backgroundColor: '#F3F4F6' },
+  deletePhotoBtn: { position: 'absolute', top: -5, right: -5, backgroundColor: '#EF4444', padding: 6, borderRadius: 12, borderWidth: 2, borderColor: '#fff' },
+  mainPhotoBadge: { position: 'absolute', bottom: 8, left: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  mainPhotoText: { color: '#fff', fontSize: 8, fontWeight: '900' },
+  addPhotoActions: { flexDirection: 'row', gap: 10 },
+  addPhotoBtn: { width: 100, height: 120, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#E5E7EB', borderStyle: 'dashed' },
+  addPhotoText: { marginTop: 8, fontSize: 10, fontWeight: '800', color: '#6B7280', textTransform: 'uppercase' },
+
+
   card: {
     backgroundColor: '#fff',
     borderRadius: 25,

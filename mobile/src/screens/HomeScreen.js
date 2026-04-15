@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    height: 480,
+    minHeight: 480,
+    paddingBottom: 80,
     backgroundColor: COLORS.secondary,
     borderBottomLeftRadius: 50,
     borderBottomRightRadius: 50,

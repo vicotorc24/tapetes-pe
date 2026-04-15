@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator, Dimensions } from 'react-native';
+import { db } from '../lib/firebase';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { Image } from 'expo-image';
-import { Package, TrendingUp, MessageSquare, Plus, Settings, LogOut, ChevronRight, MapPin, Edit3, Award, Eye, DollarSign } from 'lucide-react-native';
+import { Package, Award, MessageSquare, List, Settings, LogOut, ArrowRight, MapPin, Edit3, Eye, DollarSign, Plus } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { getProducts } from '../services/products';
 import { ArtisanEvents } from '../services/analytics';
@@ -9,21 +11,40 @@ import { ArtisanEvents } from '../services/analytics';
 const { width } = Dimensions.get('window');
 
 export default function DashboardScreen({ user, onNavigate, onLogout }) {
+  if (!user) return null;
   const [loading, setLoading] = useState(true);
   const [myProducts, setMyProducts] = useState([]);
+  const [geoStats, setGeoStats] = useState({ cities: {} });
 
   useEffect(() => {
     loadDashboardData();
     ArtisanEvents.DASHBOARD_VIEW(user.uid);
+
+    // Carga inicial de GeoStats (Más estable que el listener directo en el componente)
+    const loadGeoStats = async () => {
+      try {
+        const userId = user.uid || user.id;
+        const statsPath = doc(db, 'users', userId, 'stats', 'locations');
+        const snap = await getDoc(statsPath);
+        if (snap.exists()) {
+          setGeoStats(snap.data());
+        }
+      } catch (e) {
+        console.log("[GEO] Error loading stats:", e);
+      }
+    };
+    loadGeoStats();
   }, []);
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       const allProducts = await getProducts();
-      const filtered = allProducts.filter(p => 
-        p.sellerEmail?.toLowerCase().trim() === user.email?.toLowerCase().trim()
-      );
+      const filtered = allProducts.filter(p => {
+        const email = p.sellerEmail || '';
+        const userEmail = user.email || '';
+        return email.toLowerCase().trim() === userEmail.toLowerCase().trim();
+      });
       setMyProducts(filtered);
     } catch (e) {
       console.error(e);
@@ -37,8 +58,8 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
     const profileViews = user.profileViews || 0;
     const profileClicks = user.whatsappClicks || 0;
     
-    const productViews = myProducts.reduce((acc, p) => acc + (p.stats?.views || 0), 0);
-    const productClicks = myProducts.reduce((acc, p) => acc + (p.stats?.whatsappClicks || 0), 0);
+    const productViews = myProducts.reduce((acc, p) => acc + (p.stats && p.stats.views ? p.stats.views : 0), 0);
+    const productClicks = myProducts.reduce((acc, p) => acc + (p.stats && p.stats.whatsappClicks ? p.stats.whatsappClicks : 0), 0);
     
     const totalViews = productViews + profileViews;
     const totalClicks = productClicks + profileClicks;
@@ -46,21 +67,49 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
     const avgPrice = myProducts.length > 0 
       ? myProducts.reduce((acc, p) => acc + (parseFloat(p.price) || 0), 0) / myProducts.length 
       : 0;
-
+ 
     const estimatedRevenue = totalClicks * avgPrice;
+ 
+    // TOP 10 PRODUCTOS (Lógica sincronizada con Web)
+    const sorted = [...myProducts].sort((a, b) => {
+      const scoreA = (a.stats && a.stats.views ? a.stats.views : 0) + (a.stats && a.stats.whatsappClicks ? a.stats.whatsappClicks : 0) * 2;
+      const scoreB = (b.stats && b.stats.views ? b.stats.views : 0) + (b.stats && b.stats.whatsappClicks ? b.stats.whatsappClicks : 0) * 2;
+      return scoreB - scoreA;
+    });
+ 
+    const topProducts = sorted.slice(0, 10);
+    const maxScore = topProducts.length > 0
+      ? (topProducts[0].stats && topProducts[0].stats.views ? topProducts[0].stats.views : 0) + (topProducts[0].stats && topProducts[0].stats.whatsappClicks ? topProducts[0].stats.whatsappClicks : 0) * 2
+      : 1;
+
+    const citiesData = (geoStats && geoStats.cities) || {};
+    const topCities = Object.entries(citiesData)
+        .sort(([, a], [, b]) => {
+          const scoreA = (a.views || 0) + (a.clicks || 0) * 2;
+          const scoreB = (b.views || 0) + (b.clicks || 0) * 2;
+          return scoreB - scoreA;
+        })
+        .slice(0, 10);
+
+    const scores = Object.values(citiesData).map(s => (s.views || 0) + (s.clicks || 0) * 2);
+    if (scores.length === 0) scores.push(1);
 
     return {
       totalViews,
       totalClicks,
       estimatedRevenue,
-      productCount: myProducts.length
+      productCount: myProducts.length,
+      topProducts,
+      maxScore: maxScore || 1,
+      topCities,
+      totalGeoScore: scores.length > 0 ? Math.max.apply(Math, [1].concat(scores)) : 1
     };
-  }, [myProducts, user]);
+  }, [myProducts, user, geoStats]);
 
   const renderStat = (icon, label, value, color, unit = '') => (
     <View style={styles.statCard}>
       <View style={[styles.statIcon, { backgroundColor: color + '15' }]}>
-        {React.cloneElement(icon, { color: color, size: 20 })}
+        {icon && React.isValidElement(icon) ? React.cloneElement(icon, { color: color, size: 20 }) : null}
       </View>
       <View>
         <Text style={styles.statValue}>{unit}{value}</Text>
@@ -83,7 +132,7 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
           
           <View style={styles.profileRow}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{user.firstName?.charAt(0) || user.name?.charAt(0) || 'A'}</Text>
+              <Text style={styles.avatarText}>{(user.firstName && user.firstName.charAt(0)) || (user.name && user.name.charAt(0)) || 'A'}</Text>
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.welcomeText}>¡Hola, {user.firstName || user.name}!</Text>
@@ -108,7 +157,7 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
             <Text style={styles.revenueLabel}>INTENCIÓN DE VENTA PROYECTADA</Text>
             <Text style={styles.revenueValue}>S/ {Math.round(metrics.estimatedRevenue).toLocaleString()}</Text>
             <View style={styles.revenueTrend}>
-              <TrendingUp size={14} color={COLORS.success} />
+              <Award size={14} color={COLORS.success} />
               <Text style={styles.trendText}>Calculado según interés comercial</Text>
             </View>
           </View>
@@ -123,6 +172,104 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
           {renderStat(<MessageSquare />, 'Consultas', metrics.totalClicks, '#10B981')}
           {renderStat(<Package />, 'En Línea', metrics.productCount, COLORS.primary)}
         </View>
+
+        {/* Sección TOP 10: Popularidad (Paridad con Web) */}
+        {metrics.topProducts.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.rowAlign}>
+                <Award size={20} color="#EAB308" fill="#EAB308" />
+                <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Tesoros más populares</Text>
+              </View>
+              <View style={styles.badgePopularity}>
+                <Text style={styles.badgeText}>TOP 10</Text>
+              </View>
+            </View>
+
+            <View style={styles.rankingCard}>
+              {metrics.topProducts.map((p, index) => {
+                const pStats = p.stats || {};
+                const score = (pStats.views || 0) + (pStats.whatsappClicks || 0) * 2;
+                const progressWidth = (score / metrics.maxScore) * 100;
+                
+                return (
+                  <View key={p.id} style={styles.rankingItem}>
+                    <View style={styles.rankInfo}>
+                       <Text style={styles.rankNumber}>#{index + 1}</Text>
+                       <Image 
+                        source={{ uri: p.image || (p.images && p.images[0] && p.images[0].url) || 'https://via.placeholder.com/100' }} 
+                        style={styles.rankImg} 
+                       />
+                       <View style={{ flex: 1 }}>
+                          <Text style={styles.rankTitle} numberOfLines={1}>{p.title}</Text>
+                          <Text style={styles.rankStats}>
+                            {pStats.views || 0} visitas • {pStats.whatsappClicks || 0} clics
+                          </Text>
+                       </View>
+                       <Text style={styles.rankPerc}>{Math.round(progressWidth)}%</Text>
+                    </View>
+                    <View style={styles.progressBarBg}>
+                       <View 
+                        style={[
+                          styles.progressBarFill, 
+                          { width: `${Math.max(2, progressWidth)}%`, backgroundColor: index === 0 ? '#EAB308' : COLORS.secondary + '40' }
+                        ]} 
+                       />
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {/* Sección TOP 10: Alcance Territorial (Nueva) */}
+        {metrics.topCities.length > 0 && (
+          <View style={styles.sectionNoTop}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.rowAlign}>
+                <MapPin size={20} color={COLORS.primary} />
+                <Text style={[styles.sectionTitle, { marginLeft: 8 }]}>Alcance Territorial</Text>
+              </View>
+              <Text style={styles.geoCount}>{metrics.topCities.length} Ciudades</Text>
+            </View>
+
+            <View style={styles.geoCard}>
+              {metrics.topCities.map(([city, stats], index) => {
+                const score = (stats.views || 0) + (stats.clicks || 0) * 2;
+                const progressWidth = (score / metrics.totalGeoScore) * 100;
+
+                return (
+                  <View key={city} style={styles.geoRow}>
+                    <View style={styles.geoRowHeader}>
+                       <View style={styles.rowAlign}>
+                          <Text style={styles.geoRank}>{index + 1}</Text>
+                          <Text style={styles.geoName}>{city}</Text>
+                       </View>
+                       <View style={styles.geoStatItem}>
+                          <View style={styles.rowAlign}>
+                            <Eye size={12} color="#64748B" />
+                            <Text style={styles.geoStatValue}> {stats.views || 0}</Text>
+                            <Text style={styles.geoStatDivider}>  •  </Text>
+                            <MessageSquare size={10} color="#64748B" />
+                            <Text style={styles.geoStatValue}> {stats.clicks || 0}</Text>
+                          </View>
+                       </View>
+                    </View>
+                    <View style={styles.geoProgressBg}>
+                       <View 
+                        style={[
+                          styles.geoProgressFill, 
+                          { width: `${Math.max(2, progressWidth)}%`, backgroundColor: index === 0 ? COLORS.primary : '#94A3B8' }
+                        ]} 
+                       />
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
         {/* Lista de Productos con Edición */}
         <View style={styles.section}>
@@ -284,13 +431,45 @@ const styles = StyleSheet.create({
   },
   statValue: { fontSize: 17, fontWeight: '900', color: '#1A1A1A' },
   statLabel: { fontSize: 9, color: '#999', fontWeight: '800', textTransform: 'uppercase' },
-  section: { padding: 25 },
+  badgeText: { fontSize: 10, fontWeight: '900', color: '#854D0E' },
+
+  // Estilos de Estructura (Restaurados)
+  section: { padding: 25, paddingBottom: 10 },
   sectionHeader: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
     alignItems: 'center', 
     marginBottom: 20 
   },
+  rowAlign: { flexDirection: 'row', alignItems: 'center' },
+  badgePopularity: { backgroundColor: '#FEF9C3', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+  
+  // Estilos de Ranking
+  rankingCard: { backgroundColor: '#fff', borderRadius: 30, padding: 20, borderWidth: 1, borderColor: '#F0F0F0' },
+  rankingItem: { marginBottom: 18 },
+  rankInfo: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 8 },
+  rankNumber: { fontSize: 12, fontWeight: '900', color: '#CBD5E1', width: 25 },
+  rankImg: { width: 40, height: 40, borderRadius: 10, backgroundColor: '#F8F9FA' },
+  rankTitle: { fontSize: 13, fontWeight: '900', color: '#1C1917' },
+  rankStats: { fontSize: 10, color: '#94A3B8', marginTop: 2 },
+  rankPerc: { fontSize: 10, fontWeight: '900', color: '#1C1917' },
+  progressBarBg: { height: 6, backgroundColor: '#F1F5F9', borderRadius: 3, overflow: 'hidden' },
+  progressBarFill: { height: '100%', borderRadius: 3 },
+
+  // Estilos de Geo Ranking (Compactos)
+  sectionNoTop: { paddingHorizontal: 25, paddingBottom: 10, marginTop: 10 },
+  geoCount: { fontSize: 10, fontWeight: '900', color: '#64748B', textTransform: 'uppercase' },
+  geoCard: { backgroundColor: '#fff', borderRadius: 25, padding: 18, borderWidth: 1, borderColor: '#F0F0F0' },
+  geoRow: { marginBottom: 12 },
+  geoRowHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  geoRank: { fontSize: 10, fontWeight: '900', color: '#CBD5E1', marginRight: 8 },
+  geoName: { fontSize: 12, fontWeight: '800', color: '#334155' },
+  geoStatItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  geoStatValue: { fontSize: 10, fontWeight: '800', color: '#64748B' },
+  geoStatDivider: { fontSize: 10, color: '#CBD5E1' },
+  geoProgressBg: { height: 3, backgroundColor: '#F8FAFC', borderRadius: 2, overflow: 'hidden' },
+  geoProgressFill: { height: '100%', backgroundColor: '#3B82F6', borderRadius: 2 },
+
   sectionTitle: { fontSize: 20, fontWeight: '900', color: COLORS.secondary },
   refreshText: { color: COLORS.primary, fontSize: 13, fontWeight: 'bold' },
   productCard: {

@@ -178,9 +178,9 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.secondary },
   loadingText: { color: '#fff', marginTop: 20, fontWeight: '900', letterSpacing: 1 },
   
-  hero: { height: 600, width: width },
+  hero: { minHeight: 500, width: width },
   heroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)', padding: 30, justifyContent: 'space-between' },
-  backBtn: { width: 45, height: 45, borderRadius: 22.5, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginTop: 10 },
+  backBtn: { width: 45, height: 45, borderRadius: 22.5, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center', marginTop: 25 },
   heroTextContainer: { marginBottom: 40 },
   tagLine: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 15 },
   line: { height: 1.5, width: 25, backgroundColor: COLORS.primary },

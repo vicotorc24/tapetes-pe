@@ -1,7 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Linking, Share, FlatList, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { ArrowLeft, MessageCircle, Share as ShareIcon, Info, Layout, Heart } from 'lucide-react-native';
+import { 
+  ArrowLeft, MessageCircle, Share as ShareIcon, Info, Layout, Heart, 
+  Clock, Ruler, Box, Palette, Shield, Apple, Tags, ChevronRight 
+} from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
 import { isProductFavorite, toggleFavorite } from '../lib/favorites';
 import { recordInteraction, getProducerIdByEmail } from '../services/interactions';
@@ -159,20 +162,95 @@ export default function ProductDetailScreen({ product, onNavigate }) {
           </View>
 
           <Text style={styles.title}>{product.title}</Text>
-          <Text style={styles.price}>S/ {product.price}</Text>
+          <View style={styles.priceRowDetail}>
+            <Text style={styles.price}>S/ {product.price}</Text>
+            <View style={[styles.stockBadge, { backgroundColor: product.stock > 0 ? '#DCFCE7' : '#FEE2E2' }]}>
+              <Text style={[styles.stockText, { color: product.stock > 0 ? '#166534' : '#991B1B' }]}>
+                {product.stock > 0 ? `${product.stock} DISPONIBLES` : 'AGOTADO'}
+              </Text>
+            </View>
+          </View>
 
           <View style={styles.divider} />
 
-          {/* Beneficios Rápidos */}
-          <View style={styles.benefitsRow}>
-            <View style={styles.benefit}>
-              <View style={styles.benefitIcon}><Layout color={COLORS.primary} size={20} /></View>
-              <Text style={styles.benefitText}>Identidad Viva</Text>
+          {/* FICHA TÉCNICA ESTILO WEB */}
+          <View style={styles.specsSection}>
+            <View style={styles.specHeader}>
+              <Tags color={COLORS.primary} size={16} />
+              <Text style={styles.specHeaderTitle}>ESPECIFICACIONES</Text>
             </View>
-            <View style={styles.benefit}>
-              <View style={styles.benefitIcon}><Info color={COLORS.secondary} size={20} /></View>
-              <Text style={styles.benefitText}>Envío a todo Perú</Text>
+            
+            <View style={styles.specsGrid}>
+              {/* Atributos Legacy / Principales */}
+              {product.materials && (
+                <View style={styles.specItem}>
+                  <View style={styles.specIcon}><Box size={16} color="#A8A29E" /></View>
+                  <View>
+                    <Text style={styles.specLabel}>MATERIAL</Text>
+                    <Text style={styles.specValue}>{product.materials}</Text>
+                  </View>
+                </View>
+              )}
+              {product.technique && (
+                <View style={styles.specItem}>
+                  <View style={styles.specIcon}><Palette size={16} color="#A8A29E" /></View>
+                  <View>
+                    <Text style={styles.specLabel}>TÉCNICA</Text>
+                    <Text style={styles.specValue}>{product.technique}</Text>
+                  </View>
+                </View>
+              )}
+              {product.dimensions && (
+                <View style={styles.specItem}>
+                  <View style={styles.specIcon}><Ruler size={16} color="#A8A29E" /></View>
+                  <View>
+                    <Text style={styles.specLabel}>TAMAÑO / DIMENSIONES</Text>
+                    <Text style={styles.specValue}>{product.dimensions}</Text>
+                  </View>
+                </View>
+              )}
+              {product.weight && (
+                <View style={styles.specItem}>
+                  <View style={styles.specIcon}><Box size={16} color="#A8A29E" /></View>
+                  <View>
+                    <Text style={styles.specLabel}>PESO / CONTENIDO</Text>
+                    <Text style={styles.specValue}>{product.weight}</Text>
+                  </View>
+                </View>
+              )}
             </View>
+
+            {/* Sección Agro / Alimentos */}
+            {(product.ingredients || product.registroSanitario) && (
+              <View style={styles.agroSpecs}>
+                {product.ingredients && (
+                  <View style={styles.agroItem}>
+                    <View style={[styles.specIcon, { backgroundColor: '#FFF7ED' }]}><Apple size={16} color="#EA580C" /></View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.specLabel, { color: '#C2410C' }]}>INGREDIENTES / INSUMOS</Text>
+                      <Text style={styles.agroValue}>{product.ingredients}</Text>
+                    </View>
+                  </View>
+                )}
+                {product.registroSanitario && (
+                  <View style={styles.registryBadge}>
+                    <Shield size={14} color="#0369A1" />
+                    <Text style={styles.registryText}>REGISTRO SANITARIO: {product.registroSanitario}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Días de Labor */}
+            {product.laborDays && (
+              <View style={styles.laborCard}>
+                <Clock size={20} color="#EA580C" />
+                <View>
+                  <Text style={styles.laborLabel}>DÍAS DE TRABAJO MANUAL</Text>
+                  <Text style={styles.laborValue}>{product.laborDays} días de dedicación artesanal</Text>
+                </View>
+              </View>
+            )}
           </View>
 
           <Text style={styles.descriptionTitle}>Sobre esta pieza</Text>
@@ -187,11 +265,18 @@ export default function ProductDetailScreen({ product, onNavigate }) {
               <View style={styles.sellerAvatar}>
                 <Text style={styles.avatarText}>{product.sellerName?.charAt(0) || 'A'}</Text>
               </View>
-              <View>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.sellerName}>{product.sellerName || 'Maestro Artesano'}</Text>
                 <Text style={styles.sellerStatus}>Verificado • Contumazá</Text>
               </View>
             </View>
+            {product.sellerBio && (
+              <Text style={styles.sellerBio} numberOfLines={4}>{product.sellerBio}</Text>
+            )}
+            <TouchableOpacity style={styles.viewProfileRow}>
+              <Text style={styles.viewProfileText}>CONOCER MÁS DEL AUTOR</Text>
+              <ChevronRight size={14} color={COLORS.primary} />
+            </TouchableOpacity>
           </View>
 
           <View style={{ height: 120 }} />
@@ -322,6 +407,157 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 25,
+  },
+  priceRowDetail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  stockBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  stockText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  specsSection: {
+    backgroundColor: '#FAFAFA',
+    borderRadius: 30,
+    padding: 20,
+    marginBottom: 30,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  specHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  specHeaderTitle: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: COLORS.secondary,
+    letterSpacing: 2,
+  },
+  specsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 15,
+  },
+  specItem: {
+    width: '45%',
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 15,
+  },
+  specIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  specLabel: {
+    fontSize: 8,
+    fontWeight: '900',
+    color: '#A8A29E',
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  specValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.secondary,
+  },
+  agroSpecs: {
+    marginTop: 10,
+    gap: 12,
+  },
+  agroItem: {
+    flexDirection: 'row',
+    gap: 12,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+  },
+  agroValue: {
+    fontSize: 13,
+    color: '#57534E',
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  registryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#F0F9FF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+  },
+  registryText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#0369A1',
+    letterSpacing: 0.5,
+  },
+  laborCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#FFF7ED',
+    padding: 15,
+    borderRadius: 20,
+    marginTop: 15,
+    borderWidth: 1,
+    borderColor: '#FFEDD5',
+  },
+  laborLabel: {
+    fontSize: 8,
+    fontWeight: '900',
+    color: '#C2410C',
+    letterSpacing: 1,
+  },
+  laborValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#7C2D12',
+  },
+  sellerBio: {
+    fontSize: 13,
+    color: '#78716C',
+    lineHeight: 20,
+    marginTop: 15,
+    fontStyle: 'italic',
+  },
+  viewProfileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 15,
+    marginTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  viewProfileText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: COLORS.primary,
+    letterSpacing: 2,
   },
   benefit: {
     flexDirection: 'row',

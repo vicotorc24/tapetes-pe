@@ -26,8 +26,12 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
   const [sectorId, setSectorId] = useState('');
   const [isPromoted, setIsPromoted] = useState(false);
   
-  // Imagen local
-  const [imageUri, setImageUri] = useState(null);
+  // --- Gestión de Imágenes (Múltiples Fotos) ---
+  const [imageList, setImageList] = useState([]);
+  
+  const removePhoto = (index) => {
+    setImageList(prev => prev.filter((_, i) => i !== index));
+  };
   
   // Campos Dinámicos (Atributos)
   const [attributes, setAttributes] = useState({});
@@ -79,8 +83,9 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
       : await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.7 });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-      ArtisanEvents.PHOTO_UPLOAD(user.uid, 'product_new');
+      const newUri = result.assets[0].uri;
+      setImageList(prev => [...prev, newUri]);
+      ArtisanEvents.PHOTO_UPLOAD(user.uid, 'product_new_add');
     }
   };
 
@@ -95,16 +100,13 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
   };
 
   const handlePublish = async () => {
-    if (!title || !price || !sectorId || !imageUri) {
-      Alert.alert('Incompleto', 'El Título, Precio, Rubro y una Foto son campos obligatorios.');
-      return;
-    }
-
     try {
       setLoading(true);
       
-      // 1. Subir Imagen a Firebase Storage
-      const uploadedUrl = await uploadImage(imageUri, 'products');
+      // 1. Subir todas las imágenes a Firebase Storage
+      const uploadedUrls = await Promise.all(
+        imageList.map(uri => uploadImage(uri, 'products'))
+      );
 
       // 2. Construir Payload Robusto (Paridad Web)
       const payload = {
@@ -115,8 +117,8 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
         category,
         sector: sectorId,
         isPromoted,
-        image: uploadedUrl,
-        images: [uploadedUrl],
+        image: uploadedUrls[0] || '', // Imagen principal (la primera)
+        images: uploadedUrls,
         attributes,
         stitchType,
         materials,
@@ -156,27 +158,42 @@ export default function NewProductScreen({ user, onNavigate, onPublishSuccess })
             <Text style={styles.subtitle}>Publica un nuevo producto capturando su esencia al instante.</Text>
           </View>
 
-          {/* Selector de Fotografía */}
-          <View style={styles.imageSelector}>
-            {imageUri ? (
-              <View style={styles.previewContainer}>
-                <Image source={{ uri: imageUri }} style={styles.previewImage} />
-                <TouchableOpacity style={styles.removeImage} onPress={() => setImageUri(null)}>
-                  <X color="#fff" size={20} />
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <View style={styles.imageButtons}>
-                <TouchableOpacity style={styles.imagePickerBtn} onPress={() => pickImage(true)}>
-                  <Camera color={COLORS.primary} size={30} />
-                  <Text style={styles.imagePickerText}>Cámara</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.imagePickerBtn} onPress={() => pickImage(false)}>
-                  <ImageIcon color={COLORS.secondary} size={30} />
-                  <Text style={styles.imagePickerText}>Galería</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+          {/* Gestión de Galería de Fotos */}
+          <View style={styles.gallerySection}>
+            <View style={styles.cardHeader}>
+              <Camera size={16} color={COLORS.primary} />
+              <Text style={styles.cardTitle}>Galería de Fotos ({imageList.length})</Text>
+            </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
+               {imageList.map((uri, index) => (
+                 <View key={index} style={styles.galleryItem}>
+                    <Image source={{ uri }} style={styles.galleryImage} contentFit="cover" />
+                    <TouchableOpacity 
+                      style={styles.deletePhotoBtn} 
+                      onPress={() => removePhoto(index)}
+                    >
+                      <X color="#fff" size={14} />
+                    </TouchableOpacity>
+                    {index === 0 && (
+                      <View style={styles.mainPhotoBadge}>
+                        <Text style={styles.mainPhotoText}>PRINCIPAL</Text>
+                      </View>
+                    )}
+                 </View>
+               ))}
+               
+               <View style={styles.addPhotoActions}>
+                  <TouchableOpacity style={styles.addPhotoBtn} onPress={() => pickImage(true)}>
+                    <Camera color={COLORS.primary} size={22} />
+                    <Text style={styles.addPhotoText}>Cámara</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.addPhotoBtn} onPress={() => pickImage(false)}>
+                    <ImageIcon color={COLORS.secondary} size={22} />
+                    <Text style={styles.addPhotoText}>Galería</Text>
+                  </TouchableOpacity>
+               </View>
+            </ScrollView>
           </View>
 
           {/* 1. Datos Base */}
@@ -355,13 +372,18 @@ const styles = StyleSheet.create({
   header: { marginBottom: 30 },
   title: { fontSize: 32, fontWeight: '900', color: COLORS.secondary, letterSpacing: -1 },
   subtitle: { fontSize: 13, color: '#6B7280', lineHeight: 20 },
-  imageSelector: { marginBottom: 25 },
-  imageButtons: { flexDirection: 'row', gap: 15 },
-  imagePickerBtn: { flex: 1, backgroundColor: '#fff', height: 120, borderRadius: 25, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#E5E7EB', borderStyle: 'dashed' },
-  imagePickerText: { marginTop: 8, fontSize: 12, fontWeight: '800', color: '#6B7280', textTransform: 'uppercase' },
-  previewContainer: { position: 'relative', width: '100%', height: 280, borderRadius: 30, overflow: 'hidden' },
-  previewImage: { width: '100%', height: '100%' },
-  removeImage: { position: 'absolute', top: 15, right: 15, backgroundColor: 'rgba(0,0,0,0.5)', padding: 10, borderRadius: 15 },
+  // Estilos de Galería (Consistencia con Edit)
+  gallerySection: { marginBottom: 25 },
+  galleryScroll: { flexDirection: 'row', marginTop: 10 },
+  galleryItem: { position: 'relative', marginRight: 15 },
+  galleryImage: { width: 120, height: 120, borderRadius: 20, backgroundColor: '#F3F4F6' },
+  deletePhotoBtn: { position: 'absolute', top: -5, right: -5, backgroundColor: '#EF4444', padding: 6, borderRadius: 12, borderWidth: 2, borderColor: '#fff' },
+  mainPhotoBadge: { position: 'absolute', bottom: 8, left: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  mainPhotoText: { color: '#fff', fontSize: 8, fontWeight: '900' },
+  addPhotoActions: { flexDirection: 'row', gap: 10 },
+  addPhotoBtn: { width: 100, height: 120, borderRadius: 20, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#E5E7EB', borderStyle: 'dashed' },
+  addPhotoText: { marginTop: 8, fontSize: 10, fontWeight: '800', color: '#6B7280', textTransform: 'uppercase' },
+
   card: { backgroundColor: '#fff', borderRadius: 25, padding: 22, marginBottom: 20, borderWidth: 1, borderColor: '#E7E5E4', shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 10 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 20 },
   cardTitle: { fontSize: 14, fontWeight: '900', color: COLORS.secondary, textTransform: 'uppercase', letterSpacing: 1.5 },

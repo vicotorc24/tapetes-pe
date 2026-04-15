@@ -212,8 +212,21 @@ export default function CatalogScreen({ onNavigate }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   center: { padding: 50, alignItems: 'center' },
-  header: { padding: 20, paddingTop: 10 },
-  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 25, paddingHorizontal: 20, height: 60, borderWidth: 1, borderColor: '#F5F5F4' },
+  header: { padding: 20, paddingTop: 35 },
+  searchBar: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#fff', 
+    borderRadius: 30, 
+    paddingHorizontal: 20, 
+    height: 60, 
+    borderWidth: 1, 
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    elevation: 8 
+  },
   searchInput: { flex: 1, marginLeft: 10, fontSize: 16, color: COLORS.secondary, fontWeight: '500' },
   sectionContainer: { marginBottom: 15 },
   sectionTitle: { fontSize: 14, fontWeight: '900', color: COLORS.secondary, marginLeft: 25, marginBottom: 15, textTransform: 'uppercase', letterSpacing: 1 },
