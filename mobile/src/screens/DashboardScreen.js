@@ -7,6 +7,7 @@ import { Package, Award, MessageSquare, List, Settings, LogOut, ArrowRight, MapP
 import { COLORS } from '../theme/colors';
 import { getProducts } from '../services/products';
 import { ArtisanEvents } from '../services/analytics';
+import { clearSession } from '../services/session';
 
 const { width } = Dimensions.get('window');
 
@@ -125,7 +126,10 @@ export default function DashboardScreen({ user, onNavigate, onLogout }) {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <Text style={styles.headerTag}>CENTRO DE CONTROL</Text>
-            <TouchableOpacity style={styles.logoutBtn} onPress={onLogout}>
+            <TouchableOpacity style={styles.logoutBtn} onPress={async () => {
+              await clearSession();
+              onLogout();
+            }}>
               <LogOut size={18} color="#fff" />
             </TouchableOpacity>
           </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Dimensions, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -20,6 +20,7 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import EditProductScreen from './src/screens/EditProductScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import NewProductScreen from './src/screens/NewProductScreen';
+import { getSession } from './src/services/session';
 
 const { width } = Dimensions.get('window');
 
@@ -72,6 +73,30 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState('Home');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [user, setUser] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Restauración automática de sesión al arrancar
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const savedUser = await getSession();
+        if (savedUser) {
+          console.log("[INIT] Sesión restaurada para:", savedUser.email);
+          setUser(savedUser);
+          // Si estaba en el portal, volver al dashboard
+          if (currentScreen === 'Home') {
+            // No cambiamos el screen forzadamente si está en Home para no confundir al usuario,
+            // pero el botón Portal ahora llevará al Dashboard.
+          }
+        }
+      } catch (e) {
+        console.error("[INIT] Error al restaurar sesión:", e);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    checkSession();
+  }, []);
 
   // Sistema de Navegación Simple
   const navigate = (screen, data = null) => {
@@ -113,6 +138,14 @@ export default function App() {
         return <HomeScreen onNavigate={navigate} user={user} />;
     }
   };
+
+  if (isInitializing) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

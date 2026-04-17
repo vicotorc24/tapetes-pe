@@ -4,6 +4,7 @@ import { Mail, Lock, ArrowRight, UserCircle, Eye, EyeOff } from 'lucide-react-na
 import { COLORS } from '../theme/colors';
 import { login } from '../services/auth';
 import { ArtisanEvents } from '../services/analytics';
+import { saveSession } from '../services/session';
 
 const { width } = Dimensions.get('window');
 
@@ -22,7 +23,8 @@ export default function LoginScreen({ onNavigate, onLoginSuccess }) {
     try {
       setLoading(true);
       const user = await login(email, password);
-      ArtisanEvents.LOGIN(user.uid, user.email);
+      await saveSession(user);
+      ArtisanEvents.LOGIN(user.uid || user.id, user.email);
       onLoginSuccess(user);
     } catch (error) {
       alert(error.message);
