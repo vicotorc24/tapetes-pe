@@ -110,3 +110,21 @@ export const updateProfile = async (userId, profileData) => {
     throw error;
   }
 };
+
+/**
+ * Registra o actualiza el token de notificaciones push del usuario
+ */
+export const updatePushToken = async (userId, token) => {
+  if (!token) return false;
+  try {
+    const userRef = doc(db, COLLECTION_NAME, userId);
+    await updateDoc(userRef, {
+      pushToken: token,
+      tokenUpdatedAt: new Date().toISOString()
+    });
+    return true;
+  } catch (error) {
+    console.error("[AUTH] Error guardando push token:", error);
+    return false;
+  }
+};

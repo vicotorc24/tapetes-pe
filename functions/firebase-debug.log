@@ -1,0 +1,371 @@
+[debug] [2026-04-26T09:53:36.564Z] ----------------------------------------------------------------------
+[debug] [2026-04-26T09:53:36.567Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js functions:shell
+[debug] [2026-04-26T09:53:36.567Z] CLI Version:   15.15.0
+[debug] [2026-04-26T09:53:36.568Z] Platform:      win32
+[debug] [2026-04-26T09:53:36.568Z] Node Version:  v20.17.0
+[debug] [2026-04-26T09:53:36.568Z] Time:          Sun Apr 26 2026 04:53:36 GMT-0500 (hora estándar de Perú)
+[debug] [2026-04-26T09:53:36.568Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-26T09:53:39.020Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-26T09:53:39.021Z] > authorizing via signed-in user (alberto.velasquez1224@gmail.com)
+[debug] [2026-04-26T09:53:39.021Z] [iam] checking project tapetespe-prod for permissions ["firebase.projects.get"]
+[debug] [2026-04-26T09:53:39.022Z] Checked if tokens are valid: false, expires at: 1777147050476
+[debug] [2026-04-26T09:53:39.022Z] Checked if tokens are valid: false, expires at: 1777147050476
+[debug] [2026-04-26T09:53:39.022Z] > refreshing access token with scopes: []
+[debug] [2026-04-26T09:53:39.023Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-04-26T09:53:39.024Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-26T09:53:39.280Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-04-26T09:53:39.280Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-04-26T09:53:39.294Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions [none]
+[debug] [2026-04-26T09:53:39.294Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions  x-goog-user-project=tapetespe-prod
+[debug] [2026-04-26T09:53:39.295Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-04-26T09:53:40.546Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions 200
+[debug] [2026-04-26T09:53:40.547Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-04-26T09:53:40.552Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-26T09:53:40.585Z] defaultcredentials: writing to file C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T09:53:40.587Z] DEBUG: Setting GAC to C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T09:53:40.588Z] Checked if tokens are valid: true, expires at: 1777200818280
+[debug] [2026-04-26T09:53:40.588Z] Checked if tokens are valid: true, expires at: 1777200818280
+[debug] [2026-04-26T09:53:40.588Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig [none]
+[debug] [2026-04-26T09:53:41.053Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig 200
+[debug] [2026-04-26T09:53:41.053Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig {"projectId":"tapetespe-prod","storageBucket":"tapetespe-prod.firebasestorage.app"}
+[debug] [2026-04-26T09:53:41.071Z] [functions] Watching "C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions" for Cloud Functions...
+[debug] [2026-04-26T09:53:41.073Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-04-26T09:53:42.940Z] > [functions] package.json contents: {
+  "name": "tapetes-pe-functions",
+  "description": "Cloud Functions for Tapetes.pe",
+  "dependencies": {
+    "expo-server-sdk": "^3.10.0",
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  }
+}
+[debug] [2026-04-26T09:53:42.940Z] Building nodejs source
+[debug] [2026-04-26T09:53:42.941Z] Failed to find version of module node: reached end of search path C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules
+[info] +  functions: Using node@20 from host. 
+[debug] [2026-04-26T09:53:42.943Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-26T09:53:42.950Z] Found firebase-functions binary at 'C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8706
+
+[debug] [2026-04-26T09:53:43.726Z] Got response from /__/functions.yaml {"endpoints":{"notifyNewProduct":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"},"retry":false},"entryPoint":"notifyNewProduct"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-04-26T09:53:48.791Z] [functions] Loaded functions definitions from source: notifyNewProduct.
+[debug] [2026-04-26T09:53:48.792Z] [functions[us-central1-notifyNewProduct]] function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions: Loaded functions: notifyNewProduct 
+[warn] !  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 
+[debug] [2026-04-26T09:54:05.441Z] shell:notifyNewProduct: trigger={"entryPoint":"notifyNewProduct","platform":"gcfv2","region":"us-central1","name":"notifyNewProduct","id":"us-central1-notifyNewProduct","codebase":"default","availableMemoryMb":256,"labels":{"EVENTARC_CLOUD_EVENT_SOURCE":"run-emulated.googleapis.com/projects/tapetespe-prod/locations/us-central1/services/notifyNewProduct"},"timeoutSeconds":60,"secretEnvironmentVariables":[],"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"}}}
+[debug] [2026-04-26T09:54:05.442Z] shell:notifyNewProduct: opts={"resource":"products/{productId}"}, data={"value":{"fields":{"title":{"stringValue":"Poncho de Alpaca de Prueba"},"brandName":{"stringValue":"Asociación Contumazá"}},"createTime":"2026-04-26T09:54:05.441Z","updateTime":"2026-04-26T09:54:05.441Z"},"oldValue":{}}
+[debug] [2026-04-26T09:54:05.499Z] DEBUG: [worker-pool] addWorker(us-central1-notifyNewProduct)
+[debug] [2026-04-26T09:54:05.499Z] DEBUG: [worker-pool] Adding worker with key us-central1-notifyNewProduct, total=1
+[debug] [2026-04-26T09:54:06.691Z] DEBUG: [runtime-status] [44712] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-04-26T09:54:06.692Z] DEBUG: [runtime-status] [44712] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T09:54:06.693Z] DEBUG: [runtime-status] [44712] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}]
+[debug] [2026-04-26T09:54:06.694Z] DEBUG: [runtime-status] [44712] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T09:54:06.989Z] DEBUG: [runtime-status] [44712] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-04-26T09:54:06.991Z] DEBUG: [runtime-status] [44712] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T09:54:07.138Z] DEBUG: [runtime-status] [44712] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2026-04-26T09:54:07.161Z] DEBUG: [runtime-status] [44712] initializeApp(DEFAULT) {"storageBucket":"tapetespe-prod.firebasestorage.app","projectId":"tapetespe-prod"}
+[warn] !  functions: The Cloud Firestore emulator is not running, so calls to Firestore will affect production. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"The Cloud Firestore emulator is not running, so calls to Firestore will affect production."}}
+[debug] [2026-04-26T09:54:07.170Z] DEBUG: [runtime-status] [44712] Functions runtime initialized. {"cwd":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions","node_version":"20.17.0"}
+[debug] [2026-04-26T09:54:07.171Z] DEBUG: [runtime-status] [44712] Listening to port: \\?\pipe\fire_emu_1c15adb09f169621
+[debug] [2026-04-26T09:54:07.237Z] DEBUG: [worker-us-central1-notifyNewProduct-f46a4de4-487c-4627-9074-f645b4339761]: IDLE
+[info] >  SyntaxError: Unterminated string in JSON at position 490 {"user":"SyntaxError: Unterminated string in JSON at position 490","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m SyntaxError: Unterminated string in JSON at position 490"}}
+[info] >      at JSON.parse (<anonymous>) {"user":"    at JSON.parse (<anonymous>)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at JSON.parse (<anonymous>)"}}
+[info] >      at parse (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\lib\types\json.js:92:19) {"user":"    at parse (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\types\\json.js:92:19)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at parse (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\types\\json.js:92:19)"}}
+[info] >      at C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\lib\read.js:128:18 {"user":"    at C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\read.js:128:18","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\read.js:128:18"}}
+[info] >      at AsyncResource.runInAsyncScope (node:async_hooks:206:9) {"user":"    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at AsyncResource.runInAsyncScope (node:async_hooks:206:9)"}}
+[info] >      at invokeCallback (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\node_modules\raw-body\index.js:238:16) {"user":"    at invokeCallback (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:238:16)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at invokeCallback (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:238:16)"}}
+[info] >      at done (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\node_modules\raw-body\index.js:227:7) {"user":"    at done (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:227:7)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at done (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:227:7)"}}
+[info] >      at IncomingMessage.onEnd (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\node_modules\raw-body\index.js:287:7) {"user":"    at IncomingMessage.onEnd (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:287:7)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at IncomingMessage.onEnd (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:287:7)"}}
+[info] >      at IncomingMessage.emit (node:events:519:28) {"user":"    at IncomingMessage.emit (node:events:519:28)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at IncomingMessage.emit (node:events:519:28)"}}
+[info] >      at endReadableNT (node:internal/streams/readable:1696:12) {"user":"    at endReadableNT (node:internal/streams/readable:1696:12)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at endReadableNT (node:internal/streams/readable:1696:12)"}}
+[info] >      at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {"user":"    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at process.processTicksAndRejections (node:internal/process/task_queues:82:21)"}}
+[debug] [2026-04-26T09:54:15.191Z] shell:notifyNewProduct: trigger={"entryPoint":"notifyNewProduct","platform":"gcfv2","region":"us-central1","name":"notifyNewProduct","id":"us-central1-notifyNewProduct","codebase":"default","availableMemoryMb":256,"labels":{"EVENTARC_CLOUD_EVENT_SOURCE":"run-emulated.googleapis.com/projects/tapetespe-prod/locations/us-central1/services/notifyNewProduct"},"timeoutSeconds":60,"secretEnvironmentVariables":[],"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"}}}
+[debug] [2026-04-26T09:54:15.191Z] shell:notifyNewProduct: opts={"resource":"products/{productId}"}, data={"value":{"fields":{"title":{"stringValue":"Test"},"brandName":{"stringValue":"Test"}},"createTime":"2026-04-26T09:54:15.191Z","updateTime":"2026-04-26T09:54:15.191Z"},"oldValue":{}}
+[debug] [2026-04-26T09:54:15.195Z] DEBUG: [runtime-status] [44712] RunCloudEvent {"specversion":"1.0","datacontenttype":"application/json","id":"1070e700-2f1f-4ba0-8654-b17219283057","type":"google.cloud.firestore.document.v1.created","time":"2026-04-26T09:54:15.192Z","source":"projects/_/databases/(default)","data":{"value":{"fields":{"title":{"stringValue":"Test"},"brandName":{"stringValue":"Test"}},"createTime":"2026-04-26T09:54:15.191Z","updateTime":"2026-04-26T09:54:15.191Z"},"oldValue":{}},"document":"products/{productId}"}
+[info] >  [NOTIFY] Detectado nuevo producto: Test de Test {"user":"[NOTIFY] Detectado nuevo producto: Test de Test","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Detectado nuevo producto: Test de Test"}}
+[warn] !  Google API requested!
+   - URL: "https://oauth2.googleapis.com/token"
+   - Be careful, this may be a production service. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"Google API requested!\n   - URL: \"https://oauth2.googleapis.com/token\"\n   - Be careful, this may be a production service."}}
+[info] >  [NOTIFY] Intentando enviar 1 notificaciones... {"user":"[NOTIFY] Intentando enviar 1 notificaciones...","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Intentando enviar 1 notificaciones..."}}
+[warn] !  External network resource requested!
+   - URL: "https://exp.host/--/api/v2/push/send"
+ - Be careful, this may be a production service. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"External network resource requested!\n   - URL: \"https://exp.host/--/api/v2/push/send\"\n - Be careful, this may be a production service."}}
+[info] >  [NOTIFY] Proceso completado con éxito. {"user":"[NOTIFY] Proceso completado con éxito.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Proceso completado con éxito."}}
+[debug] [2026-04-26T11:27:07.630Z] ----------------------------------------------------------------------
+[debug] [2026-04-26T11:27:07.633Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js functions:shell
+[debug] [2026-04-26T11:27:07.633Z] CLI Version:   15.15.0
+[debug] [2026-04-26T11:27:07.634Z] Platform:      win32
+[debug] [2026-04-26T11:27:07.634Z] Node Version:  v20.17.0
+[debug] [2026-04-26T11:27:07.634Z] Time:          Sun Apr 26 2026 06:27:07 GMT-0500 (hora estándar de Perú)
+[debug] [2026-04-26T11:27:07.634Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-26T11:27:09.013Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-26T11:27:09.013Z] > authorizing via signed-in user (alberto.velasquez1224@gmail.com)
+[debug] [2026-04-26T11:27:09.014Z] [iam] checking project tapetespe-prod for permissions ["firebase.projects.get"]
+[debug] [2026-04-26T11:27:09.015Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:27:09.015Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:27:09.016Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions [none]
+[debug] [2026-04-26T11:27:09.016Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions  x-goog-user-project=tapetespe-prod
+[debug] [2026-04-26T11:27:09.016Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-04-26T11:27:10.353Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions 200
+[debug] [2026-04-26T11:27:10.353Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-04-26T11:27:10.357Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-26T11:27:10.380Z] defaultcredentials: writing to file C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T11:27:10.383Z] DEBUG: Setting GAC to C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T11:27:10.384Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:27:10.384Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:27:10.384Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig [none]
+[debug] [2026-04-26T11:27:10.840Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig 200
+[debug] [2026-04-26T11:27:10.841Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig {"projectId":"tapetespe-prod","storageBucket":"tapetespe-prod.firebasestorage.app"}
+[debug] [2026-04-26T11:27:10.852Z] [functions] Watching "C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions" for Cloud Functions...
+[debug] [2026-04-26T11:27:10.854Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-04-26T11:27:12.330Z] > [functions] package.json contents: {
+  "name": "tapetes-pe-functions",
+  "description": "Cloud Functions for Tapetes.pe",
+  "dependencies": {
+    "expo-server-sdk": "^3.10.0",
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  }
+}
+[debug] [2026-04-26T11:27:12.330Z] Building nodejs source
+[debug] [2026-04-26T11:27:12.330Z] Failed to find version of module node: reached end of search path C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules
+[info] +  functions: Using node@20 from host. 
+[debug] [2026-04-26T11:27:12.332Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-26T11:27:12.340Z] Found firebase-functions binary at 'C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8158
+
+[debug] [2026-04-26T11:27:12.959Z] Got response from /__/functions.yaml {"endpoints":{"notifyNewProduct":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"},"retry":false},"entryPoint":"notifyNewProduct"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-04-26T11:27:18.041Z] [functions] Loaded functions definitions from source: notifyNewProduct.
+[debug] [2026-04-26T11:27:18.042Z] [functions[us-central1-notifyNewProduct]] function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions: Loaded functions: notifyNewProduct 
+[warn] !  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 
+[debug] [2026-04-26T11:28:02.487Z] shell:notifyNewProduct: trigger={"entryPoint":"notifyNewProduct","platform":"gcfv2","region":"us-central1","name":"notifyNewProduct","id":"us-central1-notifyNewProduct","codebase":"default","availableMemoryMb":256,"labels":{"EVENTARC_CLOUD_EVENT_SOURCE":"run-emulated.googleapis.com/projects/tapetespe-prod/locations/us-central1/services/notifyNewProduct"},"timeoutSeconds":60,"secretEnvironmentVariables":[],"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"}}}
+[debug] [2026-04-26T11:28:02.487Z] shell:notifyNewProduct: opts={"params":{"productId":"test-id"},"resource":"products/test-id"}, data={"value":{"fields":{"title":{"stringValue":"Tapete Contumazino Imperial"},"brandName":{"stringValue":"Asociación de Artesanos"},"price":{"integerValue":250}},"createTime":"2026-04-26T11:28:02.487Z","updateTime":"2026-04-26T11:28:02.487Z"},"oldValue":{}}
+[debug] [2026-04-26T11:28:02.546Z] DEBUG: [worker-pool] addWorker(us-central1-notifyNewProduct)
+[debug] [2026-04-26T11:28:02.547Z] DEBUG: [worker-pool] Adding worker with key us-central1-notifyNewProduct, total=1
+[debug] [2026-04-26T11:28:03.674Z] DEBUG: [runtime-status] [35732] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-04-26T11:28:03.675Z] DEBUG: [runtime-status] [35732] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T11:28:03.676Z] DEBUG: [runtime-status] [35732] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}]
+[debug] [2026-04-26T11:28:03.676Z] DEBUG: [runtime-status] [35732] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T11:28:03.993Z] DEBUG: [runtime-status] [35732] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-04-26T11:28:03.995Z] DEBUG: [runtime-status] [35732] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T11:28:04.140Z] DEBUG: [runtime-status] [35732] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2026-04-26T11:28:04.163Z] DEBUG: [runtime-status] [35732] initializeApp(DEFAULT) {"storageBucket":"tapetespe-prod.firebasestorage.app","projectId":"tapetespe-prod"}
+[warn] !  functions: The Cloud Firestore emulator is not running, so calls to Firestore will affect production. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"The Cloud Firestore emulator is not running, so calls to Firestore will affect production."}}
+[debug] [2026-04-26T11:28:04.171Z] DEBUG: [runtime-status] [35732] Functions runtime initialized. {"cwd":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions","node_version":"20.17.0"}
+[debug] [2026-04-26T11:28:04.171Z] DEBUG: [runtime-status] [35732] Listening to port: \\?\pipe\fire_emu_12ca6ad94a0875ab
+[debug] [2026-04-26T11:28:04.283Z] DEBUG: [worker-us-central1-notifyNewProduct-900aa02c-8992-4527-8ec3-2dd506ad0fd6]: IDLE
+[info] >  SyntaxError: Expected ',' or '}' after property value in JSON at position 520 {"user":"SyntaxError: Expected ',' or '}' after property value in JSON at position 520","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m SyntaxError: Expected ',' or '}' after property value in JSON at position 520"}}
+[info] >      at JSON.parse (<anonymous>) {"user":"    at JSON.parse (<anonymous>)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at JSON.parse (<anonymous>)"}}
+[info] >      at parse (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\lib\types\json.js:92:19) {"user":"    at parse (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\types\\json.js:92:19)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at parse (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\types\\json.js:92:19)"}}
+[info] >      at C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\lib\read.js:128:18 {"user":"    at C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\read.js:128:18","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\lib\\read.js:128:18"}}
+[info] >      at AsyncResource.runInAsyncScope (node:async_hooks:206:9) {"user":"    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at AsyncResource.runInAsyncScope (node:async_hooks:206:9)"}}
+[info] >      at invokeCallback (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\node_modules\raw-body\index.js:238:16) {"user":"    at invokeCallback (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:238:16)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at invokeCallback (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:238:16)"}}
+[info] >      at done (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\node_modules\raw-body\index.js:227:7) {"user":"    at done (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:227:7)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at done (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:227:7)"}}
+[info] >      at IncomingMessage.onEnd (C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\body-parser\node_modules\raw-body\index.js:287:7) {"user":"    at IncomingMessage.onEnd (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:287:7)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at IncomingMessage.onEnd (C:\\Users\\ALBERTO VELASQUEZ\\AppData\\Local\\npm-cache\\_npx\\7750544ccf494d8b\\node_modules\\body-parser\\node_modules\\raw-body\\index.js:287:7)"}}
+[info] >      at IncomingMessage.emit (node:events:519:28) {"user":"    at IncomingMessage.emit (node:events:519:28)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at IncomingMessage.emit (node:events:519:28)"}}
+[info] >      at endReadableNT (node:internal/streams/readable:1696:12) {"user":"    at endReadableNT (node:internal/streams/readable:1696:12)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at endReadableNT (node:internal/streams/readable:1696:12)"}}
+[info] >      at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {"user":"    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m     at process.processTicksAndRejections (node:internal/process/task_queues:82:21)"}}
+[debug] [2026-04-26T11:28:11.637Z] shell:notifyNewProduct: trigger={"entryPoint":"notifyNewProduct","platform":"gcfv2","region":"us-central1","name":"notifyNewProduct","id":"us-central1-notifyNewProduct","codebase":"default","availableMemoryMb":256,"labels":{"EVENTARC_CLOUD_EVENT_SOURCE":"run-emulated.googleapis.com/projects/tapetespe-prod/locations/us-central1/services/notifyNewProduct"},"timeoutSeconds":60,"secretEnvironmentVariables":[],"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"}}}
+[debug] [2026-04-26T11:28:11.637Z] shell:notifyNewProduct: opts={"params":{"productId":"123"},"resource":"products/123"}, data={"value":{"fields":{"title":{"stringValue":"Test"},"price":{"integerValue":100}},"createTime":"2026-04-26T11:28:11.637Z","updateTime":"2026-04-26T11:28:11.637Z"},"oldValue":{}}
+[debug] [2026-04-26T11:28:11.640Z] DEBUG: [runtime-status] [35732] RunCloudEvent {"specversion":"1.0","datacontenttype":"application/json","id":"3b9f3934-783b-4fe7-8373-5a9c510ce304","type":"google.cloud.firestore.document.v1.created","time":"2026-04-26T11:28:11.637Z","source":"projects/_/databases/(default)","data":{"value":{"fields":{"title":{"stringValue":"Test"},"price":{"integerValue":100}},"createTime":"2026-04-26T11:28:11.637Z","updateTime":"2026-04-26T11:28:11.637Z"},"oldValue":{}},"document":"products/123"}
+[info] >  [NOTIFY] Detectado nuevo producto: Test de Productores locales {"user":"[NOTIFY] Detectado nuevo producto: Test de Productores locales","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Detectado nuevo producto: Test de Productores locales"}}
+[warn] !  Google API requested!
+   - URL: "https://oauth2.googleapis.com/token"
+   - Be careful, this may be a production service. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"Google API requested!\n   - URL: \"https://oauth2.googleapis.com/token\"\n   - Be careful, this may be a production service."}}
+[info] >  [NOTIFY] Intentando enviar 1 notificaciones... {"user":"[NOTIFY] Intentando enviar 1 notificaciones...","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Intentando enviar 1 notificaciones..."}}
+[warn] !  External network resource requested!
+   - URL: "https://exp.host/--/api/v2/push/send"
+ - Be careful, this may be a production service. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"External network resource requested!\n   - URL: \"https://exp.host/--/api/v2/push/send\"\n - Be careful, this may be a production service."}}
+[info] >  [NOTIFY] Proceso completado con éxito. {"user":"[NOTIFY] Proceso completado con éxito.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Proceso completado con éxito."}}
+[debug] [2026-04-26T11:38:25.484Z] ----------------------------------------------------------------------
+[debug] [2026-04-26T11:38:25.488Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js functions:shell
+[debug] [2026-04-26T11:38:25.488Z] CLI Version:   15.15.0
+[debug] [2026-04-26T11:38:25.488Z] Platform:      win32
+[debug] [2026-04-26T11:38:25.488Z] Node Version:  v20.17.0
+[debug] [2026-04-26T11:38:25.488Z] Time:          Sun Apr 26 2026 06:38:25 GMT-0500 (hora estándar de Perú)
+[debug] [2026-04-26T11:38:25.488Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-26T11:38:27.540Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-26T11:38:27.541Z] > authorizing via signed-in user (alberto.velasquez1224@gmail.com)
+[debug] [2026-04-26T11:38:27.541Z] [iam] checking project tapetespe-prod for permissions ["firebase.projects.get"]
+[debug] [2026-04-26T11:38:27.542Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:38:27.542Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:38:27.543Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions [none]
+[debug] [2026-04-26T11:38:27.544Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions  x-goog-user-project=tapetespe-prod
+[debug] [2026-04-26T11:38:27.544Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-04-26T11:38:28.911Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions 200
+[debug] [2026-04-26T11:38:28.911Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[warn] !  functions: Functions Emulator unable to start on port 5000, starting on 5001 instead. {"metadata":{"emulator":{"name":"functions"},"message":"Functions Emulator unable to start on port 5000, starting on 5001 instead."}}
+[debug] [2026-04-26T11:38:28.916Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-26T11:38:28.941Z] defaultcredentials: writing to file C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T11:38:28.943Z] DEBUG: Setting GAC to C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T11:38:28.944Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:38:28.944Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:38:28.944Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig [none]
+[debug] [2026-04-26T11:38:29.411Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig 200
+[debug] [2026-04-26T11:38:29.411Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig {"projectId":"tapetespe-prod","storageBucket":"tapetespe-prod.firebasestorage.app"}
+[debug] [2026-04-26T11:38:29.422Z] [functions] Watching "C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions" for Cloud Functions...
+[debug] [2026-04-26T11:38:29.424Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-04-26T11:38:30.757Z] > [functions] package.json contents: {
+  "name": "tapetes-pe-functions",
+  "description": "Cloud Functions for Tapetes.pe",
+  "dependencies": {
+    "expo-server-sdk": "^3.10.0",
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  }
+}
+[debug] [2026-04-26T11:38:30.757Z] Building nodejs source
+[debug] [2026-04-26T11:38:30.758Z] Failed to find version of module node: reached end of search path C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules
+[info] +  functions: Using node@20 from host. 
+[debug] [2026-04-26T11:38:30.759Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-26T11:38:30.767Z] Found firebase-functions binary at 'C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8750
+
+[debug] [2026-04-26T11:38:31.391Z] Got response from /__/functions.yaml {"endpoints":{"notifyNewProduct":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"},"retry":false},"entryPoint":"notifyNewProduct"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-04-26T11:38:36.462Z] [functions] Loaded functions definitions from source: notifyNewProduct.
+[debug] [2026-04-26T11:38:36.463Z] [functions[us-central1-notifyNewProduct]] function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions: Loaded functions: notifyNewProduct 
+[warn] !  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 
+[debug] [2026-04-26T11:38:53.527Z] shell:notifyNewProduct: trigger={"entryPoint":"notifyNewProduct","platform":"gcfv2","region":"us-central1","name":"notifyNewProduct","id":"us-central1-notifyNewProduct","codebase":"default","availableMemoryMb":256,"labels":{"EVENTARC_CLOUD_EVENT_SOURCE":"run-emulated.googleapis.com/projects/tapetespe-prod/locations/us-central1/services/notifyNewProduct"},"timeoutSeconds":60,"secretEnvironmentVariables":[],"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"}}}
+[debug] [2026-04-26T11:38:53.527Z] shell:notifyNewProduct: opts={"params":{"productId":"test-id-final"},"resource":"products/test-id-final"}, data={"value":{"fields":{"title":{"stringValue":"Tapete de Prueba Final"},"brandName":{"stringValue":"Control de Calidad"},"price":{"integerValue":99}},"createTime":"2026-04-26T11:38:53.527Z","updateTime":"2026-04-26T11:38:53.527Z"},"oldValue":{}}
+[debug] [2026-04-26T11:38:53.587Z] DEBUG: [worker-pool] addWorker(us-central1-notifyNewProduct)
+[debug] [2026-04-26T11:38:53.588Z] DEBUG: [worker-pool] Adding worker with key us-central1-notifyNewProduct, total=1
+[debug] [2026-04-26T11:38:54.614Z] DEBUG: [runtime-status] [60444] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-04-26T11:38:54.616Z] DEBUG: [runtime-status] [60444] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T11:38:54.616Z] DEBUG: [runtime-status] [60444] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"}]
+[debug] [2026-04-26T11:38:54.617Z] DEBUG: [runtime-status] [60444] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T11:38:54.838Z] DEBUG: [runtime-status] [60444] Resolved module firebase-admin {"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2026-04-26T11:38:54.840Z] DEBUG: [runtime-status] [60444] Resolved module firebase-functions {"declared":true,"installed":true,"version":"5.1.1","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-functions\\lib\\v1\\index.js"}
+[debug] [2026-04-26T11:38:54.972Z] DEBUG: [runtime-status] [60444] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"12.7.0","resolution":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2026-04-26T11:38:54.994Z] DEBUG: [runtime-status] [60444] initializeApp(DEFAULT) {"storageBucket":"tapetespe-prod.firebasestorage.app","projectId":"tapetespe-prod"}
+[warn] !  functions: The Cloud Firestore emulator is not running, so calls to Firestore will affect production. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"The Cloud Firestore emulator is not running, so calls to Firestore will affect production."}}
+[debug] [2026-04-26T11:38:55.002Z] DEBUG: [runtime-status] [60444] Functions runtime initialized. {"cwd":"C:\\Users\\ALBERTO VELASQUEZ\\Alberto\\Repos\\tapetes-pe\\functions","node_version":"20.17.0"}
+[debug] [2026-04-26T11:38:55.002Z] DEBUG: [runtime-status] [60444] Listening to port: \\?\pipe\fire_emu_627f3a9cd969a284
+[debug] [2026-04-26T11:38:55.112Z] DEBUG: [worker-us-central1-notifyNewProduct-1a94a3a4-8cef-4c25-a14c-2f9dc6461609]: IDLE
+[debug] [2026-04-26T11:38:55.128Z] DEBUG: [runtime-status] [60444] RunCloudEvent {"specversion":"1.0","datacontenttype":"application/json","id":"9578fbbb-bd37-4518-b6d7-53adbaebc545","type":"google.cloud.firestore.document.v1.created","time":"2026-04-26T11:38:53.528Z","source":"projects/_/databases/(default)","data":{"value":{"fields":{"title":{"stringValue":"Tapete de Prueba Final"},"brandName":{"stringValue":"Control de Calidad"},"price":{"integerValue":99}},"createTime":"2026-04-26T11:38:53.527Z","updateTime":"2026-04-26T11:38:53.527Z"},"oldValue":{}},"document":"products/test-id-final"}
+[info] >  [NOTIFY] Detectado nuevo producto: Tapete de Prueba Final de Control de Calidad {"user":"[NOTIFY] Detectado nuevo producto: Tapete de Prueba Final de Control de Calidad","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Detectado nuevo producto: Tapete de Prueba Final de Control de Calidad"}}
+[warn] !  Google API requested!
+   - URL: "https://oauth2.googleapis.com/token"
+   - Be careful, this may be a production service. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"Google API requested!\n   - URL: \"https://oauth2.googleapis.com/token\"\n   - Be careful, this may be a production service."}}
+[info] >  [NOTIFY] Intentando enviar 1 notificaciones... {"user":"[NOTIFY] Intentando enviar 1 notificaciones...","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Intentando enviar 1 notificaciones..."}}
+[warn] !  External network resource requested!
+   - URL: "https://exp.host/--/api/v2/push/send"
+ - Be careful, this may be a production service. {"metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"External network resource requested!\n   - URL: \"https://exp.host/--/api/v2/push/send\"\n - Be careful, this may be a production service."}}
+[info] >  [NOTIFY] Proceso completado con éxito. {"user":"[NOTIFY] Proceso completado con éxito.","metadata":{"emulator":{"name":"functions"},"function":{"name":"us-central1-notifyNewProduct"},"extension":{},"message":"\u001b[90m> \u001b[39m [NOTIFY] Proceso completado con éxito."}}
+[debug] [2026-04-26T11:51:07.019Z] ----------------------------------------------------------------------
+[debug] [2026-04-26T11:51:07.022Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ALBERTO VELASQUEZ\AppData\Local\npm-cache\_npx\7750544ccf494d8b\node_modules\firebase-tools\lib\bin\firebase.js functions:shell
+[debug] [2026-04-26T11:51:07.022Z] CLI Version:   15.15.0
+[debug] [2026-04-26T11:51:07.022Z] Platform:      win32
+[debug] [2026-04-26T11:51:07.022Z] Node Version:  v20.17.0
+[debug] [2026-04-26T11:51:07.022Z] Time:          Sun Apr 26 2026 06:51:07 GMT-0500 (hora estándar de Perú)
+[debug] [2026-04-26T11:51:07.022Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-26T11:51:08.999Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-26T11:51:09.000Z] > authorizing via signed-in user (alberto.velasquez1224@gmail.com)
+[debug] [2026-04-26T11:51:09.000Z] [iam] checking project tapetespe-prod for permissions ["firebase.projects.get"]
+[debug] [2026-04-26T11:51:09.001Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:51:09.001Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:51:09.002Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions [none]
+[debug] [2026-04-26T11:51:09.002Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions  x-goog-user-project=tapetespe-prod
+[debug] [2026-04-26T11:51:09.002Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2026-04-26T11:51:10.395Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions 200
+[debug] [2026-04-26T11:51:10.395Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/tapetespe-prod:testIamPermissions {"permissions":["firebase.projects.get"]}
+[warn] !  functions: Functions Emulator unable to start on port 5000, starting on 5002 instead. {"metadata":{"emulator":{"name":"functions"},"message":"Functions Emulator unable to start on port 5000, starting on 5002 instead."}}
+[debug] [2026-04-26T11:51:10.400Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-04-26T11:51:10.426Z] defaultcredentials: writing to file C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T11:51:10.428Z] DEBUG: Setting GAC to C:\Users\ALBERTO VELASQUEZ\AppData\Roaming\firebase\alberto_velasquez1224_gmail.com_application_default_credentials.json
+[debug] [2026-04-26T11:51:10.429Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:51:10.429Z] Checked if tokens are valid: true, expires at: 1777205758084
+[debug] [2026-04-26T11:51:10.429Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig [none]
+[debug] [2026-04-26T11:51:10.891Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig 200
+[debug] [2026-04-26T11:51:10.892Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/tapetespe-prod/adminSdkConfig {"projectId":"tapetespe-prod","storageBucket":"tapetespe-prod.firebasestorage.app"}
+[debug] [2026-04-26T11:51:10.904Z] [functions] Watching "C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions" for Cloud Functions...
+[debug] [2026-04-26T11:51:10.906Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2026-04-26T11:51:12.337Z] > [functions] package.json contents: {
+  "name": "tapetes-pe-functions",
+  "description": "Cloud Functions for Tapetes.pe",
+  "dependencies": {
+    "expo-server-sdk": "^3.10.0",
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  }
+}
+[debug] [2026-04-26T11:51:12.337Z] Building nodejs source
+[debug] [2026-04-26T11:51:12.338Z] Failed to find version of module node: reached end of search path C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules
+[info] +  functions: Using node@20 from host. 
+[debug] [2026-04-26T11:51:12.340Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-04-26T11:51:12.351Z] Found firebase-functions binary at 'C:\Users\ALBERTO VELASQUEZ\Alberto\Repos\tapetes-pe\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8983
+
+[debug] [2026-04-26T11:51:12.971Z] Got response from /__/functions.yaml {"endpoints":{"notifyNewProduct":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"products/{productId}"},"retry":false},"entryPoint":"notifyNewProduct"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[debug] [2026-04-26T11:51:18.046Z] [functions] Loaded functions definitions from source: notifyNewProduct.
+[debug] [2026-04-26T11:51:18.047Z] [functions[us-central1-notifyNewProduct]] function ignored because the firestore emulator does not exist or is not running.
+[info] i  functions: Loaded functions: notifyNewProduct 
+[warn] !  functions: The following emulators are not running, calls to these services will affect production: firestore, database, pubsub, storage, eventarc, tasks 

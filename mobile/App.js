@@ -21,6 +21,10 @@ import EditProductScreen from './src/screens/EditProductScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import NewProductScreen from './src/screens/NewProductScreen';
 import { getSession } from './src/services/session';
+import { updatePushToken } from './src/services/auth';
+import { registerForPushNotificationsAsync } from './src/services/notifications';
+import * as Notifications from 'expo-notifications';
+import { getProductById } from './src/services/products';
 
 const { width } = Dimensions.get('window');
 
@@ -83,6 +87,17 @@ export default function App() {
         if (savedUser) {
           console.log("[INIT] Sesión restaurada para:", savedUser.email);
           setUser(savedUser);
+          
+          // Solicitar y guardar token de notificaciones
+          try {
+            const token = await registerForPushNotificationsAsync();
+            if (token) {
+              await updatePushToken(savedUser.id, token);
+            }
+          } catch (tokenErr) {
+            console.error("[INIT] Error con notificaciones:", tokenErr);
+          }
+
           // Si estaba en el portal, volver al dashboard
           if (currentScreen === 'Home') {
             // No cambiamos el screen forzadamente si está en Home para no confundir al usuario,
@@ -96,6 +111,35 @@ export default function App() {
       }
     };
     checkSession();
+  }, []);
+
+  // Manejo de notificaciones cuando se tocan
+  useEffect(() => {
+    const handleResponse = async (response) => {
+      const data = response?.notification?.request?.content?.data;
+      if (data && data.productId && data.route === 'Detail') {
+        console.log("[NOTIFY] Redirigiendo a detalle de producto:", data.productId);
+        try {
+          const product = await getProductById(data.productId);
+          if (product) {
+            // Un pequeño delay asegura que la navegación esté lista si la app está arrancando
+            setTimeout(() => navigate('Detail', product), 500);
+          }
+        } catch (error) {
+          console.error("[NOTIFY] Error redirigiendo:", error);
+        }
+      }
+    };
+
+    // 1. Caso: App cerrada (Cold Start)
+    Notifications.getLastNotificationResponseAsync().then(response => {
+      if (response) handleResponse(response);
+    });
+
+    // 2. Caso: App abierta o en segundo plano
+    const subscription = Notifications.addNotificationResponseReceivedListener(handleResponse);
+
+    return () => subscription.remove();
   }, []);
 
   // Sistema de Navegación Simple
@@ -113,7 +157,16 @@ export default function App() {
       case 'Catalog':
         return <CatalogScreen onNavigate={navigate} />;
       case 'Login':
-        return <LoginScreen onNavigate={navigate} onLoginSuccess={(u) => { setUser(u); navigate('Dashboard'); }} />;
+        return <LoginScreen onNavigate={navigate} onLoginSuccess={async (u) => { 
+          setUser(u); 
+          navigate('Dashboard'); 
+          try {
+            const token = await registerForPushNotificationsAsync();
+            if (token) await updatePushToken(u.id, token);
+          } catch (e) {
+            console.error(e);
+          }
+        }} />;
       case 'Register':
         return <RegisterScreen onNavigate={navigate} onRegisterSuccess={(u) => { setUser(u); navigate('Dashboard'); }} />;
       case 'Dashboard':
