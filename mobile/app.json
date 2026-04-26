@@ -24,6 +24,7 @@
     },
     "android": {
       "package": "pe.madeincontumaza.app",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
