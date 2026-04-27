@@ -1,4 +1,4 @@
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const { Expo } = require("expo-server-sdk");
 
@@ -77,9 +77,105 @@ exports.notifyNewProduct = onDocumentCreated("products/{productId}", async (even
       }
     }
 
-    console.log("[NOTIFY] Proceso completado con éxito.");
+    // 4. Analizar los tickets para detectar tokens inválidos y limpiarlos
+    const tokensToDelete = [];
+    tickets.forEach((ticket, index) => {
+      if (ticket.status === 'error') {
+        const token = messages[index].to;
+        console.error(`[NOTIFY] Error en ticket para ${token}: ${ticket.message}`);
+        
+        if (ticket.details && ticket.details.error === 'DeviceNotRegistered') {
+          tokensToDelete.push(token);
+        }
+      }
+    });
+
+    // 5. Limpiar tokens inválidos en la base de datos
+    if (tokensToDelete.length > 0) {
+      console.log(`[NOTIFY] Limpiando ${tokensToDelete.length} tokens inválidos...`);
+      for (const token of tokensToDelete) {
+        const expiredUsers = await db.collection("users").where("pushToken", "==", token).get();
+        const batch = db.batch();
+        expiredUsers.forEach(doc => {
+          batch.update(doc.ref, { 
+            pushToken: null, 
+            tokenError: 'DeviceNotRegistered',
+            lastTokenErrorAt: new Date().toISOString()
+          });
+        });
+        await batch.commit();
+      }
+    }
+
+    console.log("[NOTIFY] Proceso de notificación finalizado.");
 
   } catch (error) {
     console.error("[NOTIFY] Error crítico procesando la notificación:", error);
+  }
+});
+/**
+ * Trigger que se ejecuta cada vez que un producto se actualiza (especialmente para cambios de precio)
+ */
+exports.notifyPriceChange = onDocumentUpdated("products/{productId}", async (event) => {
+  const beforeData = event.data.before.data();
+  const afterData = event.data.after.data();
+
+  if (!beforeData || !afterData) return;
+
+  // Solo actuamos si el precio ha cambiado (y si ha bajado, opcionalmente)
+  const oldPrice = parseFloat(beforeData.price);
+  const newPrice = parseFloat(afterData.price);
+
+  if (oldPrice === newPrice || isNaN(newPrice)) return;
+
+  const isPriceDrop = newPrice < oldPrice;
+  const title = afterData.title || "Un producto que te gusta";
+  
+  console.log(`[PRICE] Cambio de precio detectado en ${title}: ${oldPrice} -> ${newPrice}`);
+
+  try {
+    // 1. Buscar usuarios que tengan este producto en sus favoritos
+    // (Asumimos que guardamos los IDs de favoritos en un array llamado "favorites" en el doc del usuario)
+    const usersSnapshot = await db.collection("users")
+      .where("favorites", "array-contains", event.params.productId)
+      .where("pushToken", "!=", null)
+      .get();
+
+    if (usersSnapshot.empty) {
+      console.log("[PRICE] No hay usuarios con este producto en favoritos.");
+      return;
+    }
+
+    let messages = [];
+    usersSnapshot.forEach((doc) => {
+      const userData = doc.data();
+      const pushToken = userData.pushToken;
+
+      if (!Expo.isExpoPushToken(pushToken)) return;
+
+      messages.push({
+        to: pushToken,
+        sound: 'default',
+        title: isPriceDrop ? "¡Bajó de precio! 📉" : "Actualización de precio",
+        body: isPriceDrop 
+          ? `El producto "${title}" que tienes en favoritos ahora cuesta S/ ${newPrice}. ¡Aprovecha!`
+          : `El precio de "${title}" ha cambiado a S/ ${newPrice}.`,
+        data: { productId: event.params.productId, route: 'Detail' },
+      });
+    });
+
+    if (messages.length === 0) return;
+
+    // 2. Enviar notificaciones
+    console.log(`[PRICE] Enviando ${messages.length} alertas de precio...`);
+    let chunks = expo.chunkPushNotifications(messages);
+    for (let chunk of chunks) {
+      await expo.sendPushNotificationsAsync(chunk);
+    }
+
+    console.log("[PRICE] Alertas enviadas con éxito.");
+
+  } catch (error) {
+    console.error("[PRICE] Error procesando alerta de precio:", error);
   }
 });

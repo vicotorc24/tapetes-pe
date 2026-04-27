@@ -1,11 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from 'react-native';
-import { ShoppingBag, Heart, User, ArrowRight, Layout, Info, Award } from 'lucide-react-native';
+import { ShoppingBag, Heart, User, ArrowRight, Layout, Info, Award, LucideShoppingCart } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
+import { useCart } from '../context/CartContext';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen({ onNavigate, user }) {
+  const { cart, setIsCartOpen } = useCart();
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -20,13 +23,25 @@ export default function HomeScreen({ onNavigate, user }) {
                 </View>
                 <Text style={styles.brandSubtitle}>Contumazá</Text>
               </View>
-              <TouchableOpacity style={styles.profileBtn} onPress={() => onNavigate(user ? 'Dashboard' : 'Login')}>
-                {user ? (
-                  <View style={styles.avatarMini}><Text style={styles.avatarTextMini}>{user.name?.charAt(0)}</Text></View>
-                ) : (
-                  <User color="white" size={24} />
-                )}
-              </TouchableOpacity>
+              
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TouchableOpacity style={styles.profileBtn} onPress={() => setIsCartOpen(true)}>
+                  <LucideShoppingCart color="white" size={24} />
+                  {cart.length > 0 && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{cart.length}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.profileBtn} onPress={() => onNavigate(user ? 'Dashboard' : 'Login')}>
+                  {user ? (
+                    <View style={styles.avatarMini}><Text style={styles.avatarTextMini}>{user.name?.charAt(0)}</Text></View>
+                  ) : (
+                    <User color="white" size={24} />
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
 
             <View style={styles.heroSection}>
@@ -380,5 +395,23 @@ const styles = StyleSheet.create({
   artisanLink: {
     color: COLORS.primary,
     fontWeight: '900',
+  },
+  badge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#FF4444',
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: COLORS.secondary,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: 'bold',
   }
 });

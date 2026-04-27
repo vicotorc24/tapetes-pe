@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, db } from './firebase';
+import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 
 const FAVORITES_KEY = '@contumaza_favorites';
 
@@ -24,7 +26,17 @@ export const toggleFavorite = async (productId) => {
       newFavorites = [...favorites, productId];
     }
     
+    // Guardar localmente para rapidez
     await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+
+    // Sincronizar con Firestore si el usuario está logueado
+    if (auth.currentUser) {
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      await updateDoc(userRef, {
+        favorites: isFavorite ? arrayRemove(productId) : arrayUnion(productId)
+      }).catch(err => console.error('Error sincronizando favorito en Firestore:', err));
+    }
+    
     return !isFavorite;
   } catch (e) {
     console.error('Error alternando favorito:', e);
@@ -35,4 +47,20 @@ export const toggleFavorite = async (productId) => {
 export const isProductFavorite = async (productId) => {
   const favorites = await getFavorites();
   return favorites.includes(productId);
+};
+
+export const syncFavoritesToCloud = async () => {
+  if (!auth.currentUser) return;
+  try {
+    const favorites = await getFavorites();
+    if (favorites.length === 0) return;
+    
+    const userRef = doc(db, 'users', auth.currentUser.uid);
+    await updateDoc(userRef, {
+      favorites: favorites // Sobrescribe con la lista local
+    });
+    console.log('Favoritos sincronizados con la nube');
+  } catch (e) {
+    console.error('Error sincronizando favoritos masivamente:', e);
+  }
 };

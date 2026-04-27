@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, SafeAreaView, Dimensions, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
-import { Search, X, ChevronRight, Layout, ShoppingBag, BookOpen, User, Home as HomeIcon } from 'lucide-react-native';
+import { Search, X, ChevronRight, Layout, ShoppingBag, BookOpen, User, Home as HomeIcon, LucideShoppingCart } from 'lucide-react-native';
 import { COLORS } from '../theme/colors';
+import { useCart } from '../context/CartContext';
 import { getProducts } from '../services/products';
 import { getSectors } from '../services/sectors';
 import { getCategories } from '../services/categories';
@@ -10,7 +11,6 @@ import { normalizeText, isSectorMatch } from '../utils/text';
 
 const { width } = Dimensions.get('window');
 
-// Mapeo serio de Iconos Territoriales (Fallback)
 const getTerritorialIcon = (secName, color = '#A8A29E') => {
   const normalizedName = (secName || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   if (normalizedName.includes('artesania') || normalizedName.includes('tejido')) return <ShoppingBag size={24} color={color} />;
@@ -20,6 +20,7 @@ const getTerritorialIcon = (secName, color = '#A8A29E') => {
 };
 
 export default function CatalogScreen({ onNavigate }) {
+  const { cart, setIsCartOpen } = useCart();
   const [products, setProducts] = useState([]);
   const [sectors, setSectors] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -51,29 +52,20 @@ export default function CatalogScreen({ onNavigate }) {
     }
   };
 
-  // Filtrado de Categorías Vinculadas al Sector
   const filteredCategories = categories.filter(cat => {
     if (!activeSector) return true;
-    
-    // Encontrar el objeto sector activo para tener ID y Nombre
     const activeSectorObj = sectors.find(s => s.id === activeSector || s.name === activeSector);
     return isSectorMatch(cat.sector, activeSectorObj?.id, activeSectorObj?.name);
   });
 
-  // Filtrado de Productos (Lógica de la Web)
   const filteredProducts = products.filter(p => {
-    // 1. Filtro por Sector
     if (activeSector) {
       const activeSectorObj = sectors.find(s => s.id === activeSector || s.name === activeSector);
       if (!isSectorMatch(p.sector, activeSectorObj?.id, activeSectorObj?.name)) return false;
     }
-
-    // 2. Filtro por Categoría
     if (activeCategory !== 'Todos') {
       if (normalizeText(p.category) !== normalizeText(activeCategory)) return false;
     }
-
-    // 3. Filtro por Búsqueda
     if (searchQuery) {
       const queryNorm = normalizeText(searchQuery);
       return (
@@ -82,32 +74,44 @@ export default function CatalogScreen({ onNavigate }) {
         normalizeText(p.brandName).includes(queryNorm)
       );
     }
-
     return true;
   });
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.searchBar}>
-          <Search color={COLORS.secondary} size={20} />
-          <TextInput 
-            style={styles.searchInput}
-            placeholder="Buscar tesoros de Contumazá..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#A8A29E"
-          />
-          {searchQuery !== '' && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <X color={COLORS.secondary} size={20} />
-            </TouchableOpacity>
-          )}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={styles.searchBar}>
+            <Search color={COLORS.secondary} size={20} />
+            <TextInput 
+              style={styles.searchInput}
+              placeholder="Buscar tesoros..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor="#A8A29E"
+            />
+            {searchQuery !== '' && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <X color={COLORS.secondary} size={20} />
+              </TouchableOpacity>
+            )}
+          </View>
+          
+          <TouchableOpacity 
+            style={styles.cartHeaderBtn} 
+            onPress={() => setIsCartOpen(true)}
+          >
+            <LucideShoppingCart color={COLORS.secondary} size={24} />
+            {cart.length > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{cart.length}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Sectores Territoriales Dinámicos */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Sectores Productivos</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.sectorList}>
@@ -141,7 +145,6 @@ export default function CatalogScreen({ onNavigate }) {
           </ScrollView>
         </View>
 
-        {/* Categorías Vinculadas Dinámicas */}
         <View style={styles.categoryContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryList}>
             <TouchableOpacity 
@@ -163,7 +166,6 @@ export default function CatalogScreen({ onNavigate }) {
           </ScrollView>
         </View>
 
-        {/* Grid de Productos */}
         <View style={styles.productsGrid}>
           {loading ? (
             <View style={styles.center}>
@@ -202,7 +204,6 @@ export default function CatalogScreen({ onNavigate }) {
             </View>
           )}
         </View>
-
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
@@ -214,6 +215,7 @@ const styles = StyleSheet.create({
   center: { padding: 50, alignItems: 'center' },
   header: { padding: 20, paddingTop: 35 },
   searchBar: { 
+    flex: 1,
     flexDirection: 'row', 
     alignItems: 'center', 
     backgroundColor: '#fff', 
@@ -226,6 +228,38 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 15,
     elevation: 8 
+  },
+  cartHeaderBtn: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    elevation: 8 
+  },
+  badge: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: '#FF4444',
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#fff',
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: 'bold',
   },
   searchInput: { flex: 1, marginLeft: 10, fontSize: 16, color: COLORS.secondary, fontWeight: '500' },
   sectionContainer: { marginBottom: 15 },

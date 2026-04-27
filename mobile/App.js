@@ -6,6 +6,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Home, ShoppingBag, Award, User, BookOpen } from 'lucide-react-native';
 import { COLORS } from './src/theme/colors';
 
+// Contexto y Componentes Globales
+import { CartProvider } from './src/context/CartContext';
+import { CartModal } from './src/components/CartModal';
+
 // Pantallas
 import HomeScreen from './src/screens/HomeScreen';
 import CatalogScreen from './src/screens/CatalogScreen';
@@ -97,12 +101,6 @@ export default function App() {
           } catch (tokenErr) {
             console.error("[INIT] Error con notificaciones:", tokenErr);
           }
-
-          // Si estaba en el portal, volver al dashboard
-          if (currentScreen === 'Home') {
-            // No cambiamos el screen forzadamente si está en Home para no confundir al usuario,
-            // pero el botón Portal ahora llevará al Dashboard.
-          }
         }
       } catch (e) {
         console.error("[INIT] Error al restaurar sesión:", e);
@@ -122,7 +120,6 @@ export default function App() {
         try {
           const product = await getProductById(data.productId);
           if (product) {
-            // Un pequeño delay asegura que la navegación esté lista si la app está arrancando
             setTimeout(() => navigate('Detail', product), 500);
           }
         } catch (error) {
@@ -131,18 +128,14 @@ export default function App() {
       }
     };
 
-    // 1. Caso: App cerrada (Cold Start)
     Notifications.getLastNotificationResponseAsync().then(response => {
       if (response) handleResponse(response);
     });
 
-    // 2. Caso: App abierta o en segundo plano
     const subscription = Notifications.addNotificationResponseReceivedListener(handleResponse);
-
     return () => subscription.remove();
   }, []);
 
-  // Sistema de Navegación Simple
   const navigate = (screen, data = null) => {
     if ((screen === 'Detail' || screen === 'LegacyDetail' || screen === 'EditProduct') && data) {
       setSelectedProduct(data);
@@ -202,15 +195,18 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <View style={styles.container}>
-          <StatusBar style="dark" />
-          <View style={{ flex: 1 }}>
-            {renderScreen()}
+      <CartProvider>
+        <SafeAreaProvider>
+          <View style={styles.container}>
+            <StatusBar style="dark" />
+            <View style={{ flex: 1 }}>
+              {renderScreen()}
+            </View>
+            <NavigationOverlay currentScreen={currentScreen} navigate={navigate} user={user} />
+            <CartModal />
           </View>
-          <NavigationOverlay currentScreen={currentScreen} navigate={navigate} user={user} />
-        </View>
-      </SafeAreaProvider>
+        </SafeAreaProvider>
+      </CartProvider>
     </GestureHandlerRootView>
   );
 }
