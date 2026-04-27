@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 25,
     paddingTop: 15,
-    paddingBottom: 40,
+    paddingBottom: 45, // Un poco más de espacio para la barra de Android
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
@@ -339,15 +339,20 @@ const styles = StyleSheet.create({
   },
   buttonsColumn: {
     flex: 1,
-    gap: 10,
+    gap: 12,
   },
   mainActionBtn: {
-    height: 55,
-    borderRadius: 18,
+    height: 60, // Aumentado para mejor impacto
+    borderRadius: 20,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   waConsultBtn: {
     backgroundColor: '#25D366',
@@ -357,15 +362,17 @@ const styles = StyleSheet.create({
   },
   waConsultText: {
     color: 'white',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '900',
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   cartAddText: {
     color: 'white',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '900',
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   favCircle: {
     width: 60,

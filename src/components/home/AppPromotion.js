@@ -2,7 +2,7 @@ import React from 'react';
 import { LucideSmartphone, LucideQrCode, LucideCheckCircle, LucideArrowRight } from 'lucide-react';
 
 export function AppPromotion() {
-  const downloadUrl = "https://expo.dev/accounts/gvnarro/projects/madeincontumaza/builds/794e89d1-754f-4d1e-b02d-962a383238a2";
+  const downloadUrl = "https://expo.dev/accounts/gvnarro/projects/madeincontumaza/builds/00ff0f27-1fb8-4c05-8279-de249c426755";
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(downloadUrl)}`;
 
   return (
